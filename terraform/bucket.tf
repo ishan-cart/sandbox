@@ -13,7 +13,7 @@ resource "google_storage_bucket" "static-site" {
       type = "Delete"
     }
   }
-
+      
   lifecycle_rule {
     condition {
       age = 1
