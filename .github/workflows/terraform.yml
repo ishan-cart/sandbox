@@ -71,9 +71,9 @@ jobs:
 
     - name: Create tfvars file
       run: |-
-        echo 'region="us-central1"' >> auto.tfvars
-        echo 'data-project="dev-sandbox"' >> auto.tfvars
-        echo 'project="ishan-test-project"' >> auto.tfvars
+        echo 'region="us-central1"' >> dev.auto.tfvars
+        echo 'data-project="dev-sandbox"' >> dev.auto.tfvars
+        echo 'project="ishan-test-project"' >> dev.auto.tfvars
       working-directory: ./terraform
 
     # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
