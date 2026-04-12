@@ -135,4 +135,44 @@ jobs:
 
       - name: Terraform Plan
         run: terraform plan -input=false -no-color
-  
+
+  apply:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [vars,plan]
+    environment: production
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./terraform
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Download tfvar files
+        uses: actions/download-artifact@v4
+        with:
+          name: dev.auto.tfvars
+          path: ./terraform
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v6.1.0
+        with:
+          role-to-assume: arn:aws:iam::537239034666:role/github_oidc_role
+          aws-region: ${{ needs.vars.outputs.region }}
+
+      - name: Terraform Init
+        run: |
+          terraform init \
+          -backend-config=bucket=${{ needs.vars.outputs.tf_state_bucket }} \
+          -backend-config=key=${{ needs.vars.outputs.tf_state_key }} \
+          -backend-config=region=${{ needs.vars.outputs.region }} \
+          -backend-config=dynamodb_table=${{ needs.vars.outputs.tf_state_lock_table }}
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -input=false
+
