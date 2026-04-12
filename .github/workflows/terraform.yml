@@ -11,6 +11,10 @@ jobs:
   vars:
     name: Create github vars
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./terraform
     outputs:
       environment: ${{ steps.inputs.outputs.ENVIRONMENT }}
       region: ${{ steps.inputs.outputs.REGION  }}
@@ -24,8 +28,13 @@ jobs:
 
       - id: inputs
         name: Load env vars
-        working-directory: ./terraform
         run: tee -a "$GITHUB_OUTPUT" < dev.env
+      
+      - name: Create tfvars file
+        uses: actions/upload-artifact@v7
+        with:
+          name: dev.auto.tfvars
+          path: ./terraform/dev.tfvars
 
   lint:
         name: Lint
