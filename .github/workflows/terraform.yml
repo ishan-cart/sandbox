@@ -24,6 +24,7 @@ jobs:
 
       - id: inputs
         name: Load env vars
+        working-directory: ./terraform
         run: tee -a "$GITHUB_OUTPUT" < dev.env
 
 
