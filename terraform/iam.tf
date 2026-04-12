@@ -19,7 +19,7 @@ resource "aws_iam_role" "github_oidc_role" {
         }
         Condition = {
           StringLike = {
-            "token.actions.githubusercontent.com:sub" : "repo:ishan-cart/sandbox:ref:refs/heads/*"
+            "token.actions.githubusercontent.com:sub" : "repo:ishan-cart/sandbox:*"
           }
           StringEquals = {
             "token.actions.githubusercontent.com:aud" : "sts.amazonaws.com",
