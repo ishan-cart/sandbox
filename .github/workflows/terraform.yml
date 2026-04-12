@@ -20,7 +20,7 @@ jobs:
       region: ${{ steps.inputs.outputs.REGION  }}
       account_id: ${{ steps.inputs.outputs.ACCOUNT_ID }}
       tf_state_bucket: ${{ steps.inputs.outputs.TF_STATE_BUCKET }}
-      tf_state_key: ${{ steps.inputs.outputs.TF_STATE_PATH }}
+      tf_state_key: ${{ steps.inputs.outputs.TF_STATE_KEY }}
 
     steps:
       - name: Checkout
