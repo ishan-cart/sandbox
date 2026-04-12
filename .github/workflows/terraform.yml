@@ -76,6 +76,12 @@ jobs:
         uses: hashicorp/setup-terraform@v1
         with:
           terraform_version: "~1.14.0"
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v6.1.0
+        with:
+          role-to-assume: arn:aws:iam::537239034666:role/github_oidc_role
+          aws-region: ${{ needs.vars.outputs.region }}
 
       - name: Terraform Init
         run: |
