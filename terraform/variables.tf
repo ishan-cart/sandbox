@@ -1,20 +1,15 @@
-locals {
-    labels = {
-        "data-project" = var.data-project
-    }
-}
-
-variable "project" {
-    type= string
-    description = "ID Google project"
-}
-
 variable "region" {
-    type= string
-    description = "Region Google project"
+  type    = string
+  default = "ap-southeast-2"
 }
 
-variable  "data-project" {
-    type = string
-    description = "Name of data pipeline project to use as resource prefix"
+variable "environment" {
+  type    = string
+  default = "development"
+}
+
+variable "github_oidc_subject_pattern" {
+  type        = string
+  description = "StringLike match for token.actions.githubusercontent.com:sub (tighten to your org/repo)."
+  default     = "repo:*/*:*"
 }
