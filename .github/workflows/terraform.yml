@@ -5,7 +5,10 @@ on:
     branches: [main]
   push:
     branches: [main]
-  workflow_dispatch:      
+  workflow_dispatch:
+
+permissions:
+  id-token: write
 
 jobs:
   vars:
@@ -80,7 +83,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v6.1.0
         with:
-          role-to-assume: arn:aws:iam::537239034666:role/github_oidc_role
+          role-to-assume: arn:aws:iam::537239034666:oidc-provider/token.actions.githubusercontent.com
           aws-region: ${{ needs.vars.outputs.region }}
 
       - name: Terraform Init
