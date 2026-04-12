@@ -1,91 +1,29 @@
 name: 'Terraform'
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
-
-permissions:
-  contents: read
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:      
 
 jobs:
-  lint:
-    name: Lint
+  vars:
+    name: Create github vars
     runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.inputs.outputs.ENVIRONMENT }}
+      region: ${{ steps.inputs.outputs.REGION  }}
+      account_id: ${{ steps.inputs.outputs.ACCOUNT_ID }}
+      tf_state_bucket: ${{ steps.inputs.outputs.TF_STATE_BUCKET }}
+      tf_state_key: ${{ steps.inputs.outputs.TF_STATE_PATH }}
+
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
-      - name: Cache plugin dir
-        uses: actions/cache@v3
-        with:
-          path: ~/.tflint.d/plugins
-          key: linux-tflint-${{ hashFiles('.tflint.hcl') }}
-
-      - name: Setup TFLint
-        uses: terraform-linters/setup-tflint@v3
-        with:
-          tflint_version: v0.44.1
-
-      - name: Show version
-        run: tflint --version
-
-      - name: Init TFLint
-        run: tflint --init
-        env:
-          # https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/plugins.md#avoiding-rate-limiting
-          GITHUB_TOKEN: ${{ github.token }}
-
-      - name: Run TFLint
-        run: tflint -f compact
+      - id: inputs
+        name: Load env vars
+        run: tee -a "$GITHUB_OUTPUT" < dev.env
 
 
-  terraform:
-    name: 'Terraform'   
-    runs-on: ubuntu-latest
-    needs: ['lint']
-    environment: production
-
-    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
-    defaults:
-      run:
-        shell: bash
-        working-directory: ./terraform
-
-    steps:
-    # Checkout the repository to the GitHub Actions runner
-    - name: Checkout
-      uses: actions/checkout@v3
-
-    - name: Create tfvars file
-      run: |-
-        echo 'region="us-central1"' >> dev.auto.tfvars
-        echo 'data-project="dev-sandbox"' >> dev.auto.tfvars
-        echo 'project="ishan-test-project-389321"' >> dev.auto.tfvars
-      working-directory: ./terraform
-
-    # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v1
-      with:
-        cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
-
-    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
-    - name: Terraform Init
-      run: terraform init
-      env:
-        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-
-    # Generates an execution plan for Terraform
-    - name: Terraform Plan
-      run: terraform plan -input=false
-      env:
-        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
-
-      # On push to "main", build or change infrastructure according to Terraform configuration files
-      # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
-    - name: Terraform Apply
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      run: terraform apply -auto-approve -input=false
-      env:
-        GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
