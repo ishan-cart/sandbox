@@ -28,10 +28,6 @@ resource "aws_iam_role" "github_oidc_role" {
       },
     ]
   })
-
-  tags = {
-    tag-key = "tag-value"
-  }
 }
 
 resource "aws_iam_role_policy_attachment" "github_oidc_admin" {
