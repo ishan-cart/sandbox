@@ -118,6 +118,8 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: "~1.14.0"
       
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v6.1.0
@@ -138,7 +140,7 @@ jobs:
 
   apply:
     runs-on: ubuntu-latest
-    # if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: [vars,plan]
     environment: production
     defaults:
@@ -158,6 +160,8 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: "~1.14.0"
       
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v6.1.0
