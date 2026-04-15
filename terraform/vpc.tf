@@ -99,9 +99,9 @@ resource "aws_route_table" "public" {
 }
 
 resource "aws_route" "public" {
-  route_table_id            = aws_route_table.public.id
-  destination_cidr_block    = "0.0.0.0/0"
-  gateway_id = aws_internet_gateway.igw.id
+  route_table_id         = aws_route_table.public.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.igw.id
 }
 
 resource "aws_route_table" "private_1" {
@@ -115,9 +115,9 @@ resource "aws_route_table" "private_1" {
 }
 
 resource "aws_route" "private_1" {
-  route_table_id            = aws_route_table.private_1.id
-  destination_cidr_block    = "0.0.0.0/0"
-  nat_gateway_id = aws_nat_gateway.public_natgw_1.id
+  route_table_id         = aws_route_table.private_1.id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = aws_nat_gateway.public_natgw_1.id
 }
 
 resource "aws_route_table" "private_2" {
@@ -131,9 +131,9 @@ resource "aws_route_table" "private_2" {
 }
 
 resource "aws_route" "private_2" {
-  route_table_id            = aws_route_table.private_2.id
-  destination_cidr_block    = "0.0.0.0/0"
-  nat_gateway_id = aws_nat_gateway.public_natgw_2.id
+  route_table_id         = aws_route_table.private_2.id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = aws_nat_gateway.public_natgw_2.id
 }
 
 resource "aws_route_table_association" "public_subnet_1_route" {
@@ -214,16 +214,16 @@ resource "aws_s3_bucket_public_access_block" "access_logs" {
 resource "aws_s3_bucket_policy" "allow_lb_access" {
   bucket = aws_s3_bucket.access_logs.id
   policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
+    "Version" : "2012-10-17",
+    "Statement" : [
       {
-        "Sid": "AWSLoadBalancerWrite",
-        "Effect": "Allow",
-        "Principal": {
-          "Service": "logdelivery.elasticloadbalancing.amazonaws.com"
+        "Sid" : "AWSLoadBalancerWrite",
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : "logdelivery.elasticloadbalancing.amazonaws.com"
         },
-        "Action": "s3:PutObject",
-        "Resource": "arn:aws:s3:::${aws_s3_bucket.access_logs.bucket}/AWSLogs/${local.env_vars[var.environment].project_id}/*",
+        "Action" : "s3:PutObject",
+        "Resource" : "arn:aws:s3:::${aws_s3_bucket.access_logs.bucket}/AWSLogs/${local.env_vars[var.environment].project_id}/*",
       },
     ]
   })
