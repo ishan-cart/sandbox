@@ -34,3 +34,89 @@ resource "aws_iam_role_policy_attachment" "github_oidc_admin" {
   role       = aws_iam_role.github_oidc_role.name
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
+
+resource "aws_iam_user" "ishans" {
+  name = "ishans"
+}
+
+resource "aws_iam_group" "admins" {
+  name = "admins"
+  path = "/users/"
+}
+
+resource "aws_iam_group_policy_attachments_exclusive" "admin_policies" {
+  group_name = aws_iam_group.admins.name
+  policy_arns = [
+    "arn:aws:iam::aws:policy/AWSAccountActivityAccess",
+    "arn:aws:iam::aws:policy/AWSBillingReadOnlyAccess",
+    "arn:aws:iam::aws:policy/AdministratorAccess",
+    "arn:aws:iam::aws:policy/job-function/Billing",
+  ]
+}
+
+resource "aws_iam_role" "eks_role" {
+  name = "allow_user_eks_access"
+
+  # Terraform's "jsonencode" function converts a
+  # Terraform expression result to valid JSON syntax.
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${local.env_vars[var.environment].project_id}:root"
+        }
+      },
+    ]
+  })
+}
+
+resource "aws_iam_group_policy" "admins" {
+  name  = "allow_assume_eks_role"
+  group = aws_iam_group.admins.name
+
+  # Terraform's "jsonencode" function converts a
+  # Terraform expression result to valid JSON syntax.
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "sts:AssumeRole",
+        ]
+        Effect   = "Allow"
+        Resource = aws_iam_role.eks_role.arn
+      },
+    ]
+  })
+}
+
+resource "aws_iam_policy" "eks_actions" {
+  name = "allow_eks_actions"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "eks:*",
+          "iam:ListRoles"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : "ssm:GetParameter",
+        "Resource" : "arn:aws:ssm:*:${local.env_vars[var.environment].project_id}:parameter/*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_eks_actions" {
+  role       = aws_iam_role.eks_role.name
+  policy_arn = aws_iam_policy.eks_actions.arn
+}

@@ -1,9 +1,20 @@
 resource "aws_vpc" "vpc_network" {
-  cidr_block = "10.0.0.0/16"
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_support   = true
+  enable_dns_hostnames = true
 
   tags = {
     Name = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-vpc"
   }
+}
+
+resource "aws_vpc_dhcp_options" "dns_resolver" {
+  domain_name_servers = ["AmazonProvidedDNS", "8.8.8.8", "8.8.4.4"]
+}
+
+resource "aws_vpc_dhcp_options_association" "dns_resolver" {
+  vpc_id          = aws_vpc.vpc_network.id
+  dhcp_options_id = aws_vpc_dhcp_options.dns_resolver.id
 }
 
 resource "aws_subnet" "public_subnet_1" {
@@ -12,7 +23,9 @@ resource "aws_subnet" "public_subnet_1" {
   availability_zone = "ap-southeast-2a"
 
   tags = {
-    Name = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-pub-subnet-1"
+    Name                     = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-pub-subnet-1"
+    Tier                     = "public"
+    "kubernetes.io/role/elb" = 1
   }
 }
 
@@ -22,7 +35,9 @@ resource "aws_subnet" "public_subnet_2" {
   availability_zone = "ap-southeast-2b"
 
   tags = {
-    Name = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-pub-subnet-2"
+    Name                     = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-pub-subnet-2"
+    Tier                     = "public"
+    "kubernetes.io/role/elb" = 1
   }
 }
 
@@ -32,7 +47,9 @@ resource "aws_subnet" "private_subnet_1" {
   availability_zone = "ap-southeast-2a"
 
   tags = {
-    Name = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-priv-subnet-1"
+    Name                                                                        = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-priv-subnet-1"
+    Tier                                                                        = "private"
+    "kubernetes.io/cluster/${local.env_vars[var.environment].eks_cluster_name}" = "owned"
   }
 }
 
@@ -42,7 +59,9 @@ resource "aws_subnet" "private_subnet_2" {
   availability_zone = "ap-southeast-2b"
 
   tags = {
-    Name = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-priv-subnet-2"
+    Name                                                                        = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-priv-subnet-2"
+    Tier                                                                        = "private"
+    "kubernetes.io/cluster/${local.env_vars[var.environment].eks_cluster_name}" = "owned"
   }
 }
 
@@ -91,8 +110,6 @@ resource "aws_nat_gateway" "public_natgw_2" {
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.vpc_network.id
 
-  route = []
-
   tags = {
     Name = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-public"
   }
@@ -107,8 +124,6 @@ resource "aws_route" "public" {
 resource "aws_route_table" "private_1" {
   vpc_id = aws_vpc.vpc_network.id
 
-  route = []
-
   tags = {
     Name = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-private-1"
   }
@@ -122,8 +137,6 @@ resource "aws_route" "private_1" {
 
 resource "aws_route_table" "private_2" {
   vpc_id = aws_vpc.vpc_network.id
-
-  route = []
 
   tags = {
     Name = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-private-2"
