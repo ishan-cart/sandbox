@@ -34,4 +34,4 @@ jobs:
         terraform: ${{ fromJson(needs.pathcheck.outputs.terraform) }}
     uses: ./.github/workflows/terraform.yml
     with:
-      tf_state_key: ${{ matrix.terraform }}/terraform.tfstate
+      tf_state_key: ${{ matrix.terraform }}
