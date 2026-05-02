@@ -40,7 +40,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: ${{ inputs.application }}-dev.auto.tfvars
-          path: ./terraform/${{ inputs.application }}-dev.auto.tfvars
+          path: dev.tfvars
 
   lint:
     name: Lint
@@ -75,7 +75,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.application }}-dev.auto.tfvars
-          path: ./terraform
+          path: ./
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
@@ -115,7 +115,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.application }}-dev.auto.tfvars
-          path: ./terraform
+          path: ./
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
@@ -157,7 +157,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.application }}-dev.auto.tfvars
-          path: ./terraform
+          path: ./
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
