@@ -35,12 +35,15 @@ jobs:
       - id: inputs
         name: Load env vars
         run: tee -a "$GITHUB_OUTPUT" < dev.env
+
+      - name: test
+        run: pwd
       
       - name: Create tfvars file
         uses: actions/upload-artifact@v7
         with:
           name: ${{ inputs.application }}-dev.auto.tfvars
-          path: dev.tfvars
+          path: ./dev.tfvars
 
   lint:
     name: Lint
