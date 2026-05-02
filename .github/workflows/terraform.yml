@@ -78,7 +78,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.application }}-dev.auto.tfvars
-          path: ./
+          path: ./terraform/${{ inputs.application }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
@@ -118,7 +118,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.application }}-dev.auto.tfvars
-          path: ./
+          path: ./terraform/${{ inputs.application }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
@@ -160,7 +160,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.application }}-dev.auto.tfvars
-          path: ./
+          path: ./terraform/${{ inputs.application }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
