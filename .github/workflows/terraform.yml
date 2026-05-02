@@ -40,7 +40,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: dev.auto.tfvars
-          path: ./terraform/dev.tfvars
+          path: ./terraform/${{ inputs.application }}-dev.auto.tfvars
 
   lint:
     name: Lint
@@ -74,7 +74,7 @@ jobs:
       - name: Download tfvar files
         uses: actions/download-artifact@v4
         with:
-          name: dev.auto.tfvars
+          name: ${{ inputs.application }}-dev.auto.tfvars
           path: ./terraform
 
       - name: Setup Terraform
@@ -114,7 +114,7 @@ jobs:
       - name: Download tfvar files
         uses: actions/download-artifact@v4
         with:
-          name: dev.auto.tfvars
+          name: ${{ inputs.application }}-dev.auto.tfvars
           path: ./terraform
 
       - name: Setup Terraform
@@ -156,7 +156,7 @@ jobs:
       - name: Download tfvar files
         uses: actions/download-artifact@v4
         with:
-          name: ${{ inputs.application }}/dev.auto.tfvars
+          name: ${{ inputs.application }}-dev.auto.tfvars
           path: ./terraform
 
       - name: Setup Terraform
