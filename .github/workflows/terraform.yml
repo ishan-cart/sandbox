@@ -39,7 +39,7 @@ jobs:
       - name: Create tfvars file
         uses: actions/upload-artifact@v7
         with:
-          name: dev.auto.tfvars
+          name: ${{ inputs.application }}-dev.auto.tfvars
           path: ./terraform/${{ inputs.application }}-dev.auto.tfvars
 
   lint:
