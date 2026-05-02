@@ -3,8 +3,8 @@ name: 'Terraform'
 on:
   workflow_call:
     inputs:
-      tf_state_key:
-        description: "The key for the Terraform state"
+      application:
+        description: "The application name"
         required: true
         type: string
   workflow_dispatch:
@@ -92,7 +92,7 @@ jobs:
         run: |
           terraform init \
           -backend-config=bucket=${{ needs.vars.outputs.tf_state_bucket }} \
-          -backend-config=key=${{ inputs.tf_state_key }} \
+          -backend-config=key=${{ inputs.application }}/terraform.tfstate \
           -backend-config=region=${{ needs.vars.outputs.region }} \
           -backend-config=dynamodb_table=${{ needs.vars.outputs.tf_state_lock_table }}
 
@@ -132,7 +132,7 @@ jobs:
         run: |
           terraform init \
           -backend-config=bucket=${{ needs.vars.outputs.tf_state_bucket }} \
-          -backend-config=key=${{ inputs.tf_state_key }} \
+          -backend-config=key=${{ inputs.application }}/terraform.tfstate \
           -backend-config=region=${{ needs.vars.outputs.region }} \
           -backend-config=dynamodb_table=${{ needs.vars.outputs.tf_state_lock_table }}
 
@@ -156,7 +156,7 @@ jobs:
       - name: Download tfvar files
         uses: actions/download-artifact@v4
         with:
-          name: dev.auto.tfvars
+          name: ${{ inputs.application }}/dev.auto.tfvars
           path: ./terraform
 
       - name: Setup Terraform
@@ -174,7 +174,7 @@ jobs:
         run: |
           terraform init \
           -backend-config=bucket=${{ needs.vars.outputs.tf_state_bucket }} \
-          -backend-config=key=${{ inputs.tf_state_key }} \
+          -backend-config=key=${{ inputs.application }}/terraform.tfstate \
           -backend-config=region=${{ needs.vars.outputs.region }} \
           -backend-config=dynamodb_table=${{ needs.vars.outputs.tf_state_lock_table }}
 
