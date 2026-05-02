@@ -18,6 +18,8 @@ jobs:
     permissions:
       pull-requests: read
     steps:
+      - name: Checkout
+        uses: Actions/checkout@v6
       - name: Path Check
         uses: dorny/paths-filter@v4
         id: filter
