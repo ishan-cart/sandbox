@@ -1,10 +1,12 @@
 name: 'Terraform'
 
 on:
-  pull_request:
-    branches: [main]
-  push:
-    branches: [main]
+  workflow_call:
+    inputs:
+      tf_state_key:
+        description: "The key for the Terraform state"
+        required: true
+        type: string
   workflow_dispatch:
 
 permissions:
@@ -24,7 +26,6 @@ jobs:
       region: ${{ steps.inputs.outputs.REGION  }}
       account_id: ${{ steps.inputs.outputs.ACCOUNT_ID }}
       tf_state_bucket: ${{ steps.inputs.outputs.TF_STATE_BUCKET }}
-      tf_state_key: ${{ steps.inputs.outputs.TF_STATE_KEY }}
       tf_state_lock_table: ${{ steps.inputs.outputs.TF_STATE_LOCK_TABLE }}
 
     steps:
@@ -91,7 +92,7 @@ jobs:
         run: |
           terraform init \
           -backend-config=bucket=${{ needs.vars.outputs.tf_state_bucket }} \
-          -backend-config=key=${{ needs.vars.outputs.tf_state_key }} \
+          -backend-config=key=${{ inputs.tf_state_key }} \
           -backend-config=region=${{ needs.vars.outputs.region }} \
           -backend-config=dynamodb_table=${{ needs.vars.outputs.tf_state_lock_table }}
 
@@ -131,7 +132,7 @@ jobs:
         run: |
           terraform init \
           -backend-config=bucket=${{ needs.vars.outputs.tf_state_bucket }} \
-          -backend-config=key=${{ needs.vars.outputs.tf_state_key }} \
+          -backend-config=key=${{ inputs.tf_state_key }} \
           -backend-config=region=${{ needs.vars.outputs.region }} \
           -backend-config=dynamodb_table=${{ needs.vars.outputs.tf_state_lock_table }}
 
@@ -173,7 +174,7 @@ jobs:
         run: |
           terraform init \
           -backend-config=bucket=${{ needs.vars.outputs.tf_state_bucket }} \
-          -backend-config=key=${{ needs.vars.outputs.tf_state_key }} \
+          -backend-config=key=${{ inputs.tf_state_key }} \
           -backend-config=region=${{ needs.vars.outputs.region }} \
           -backend-config=dynamodb_table=${{ needs.vars.outputs.tf_state_lock_table }}
 
