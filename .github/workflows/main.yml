@@ -16,6 +16,7 @@ jobs:
     outputs:
       terraform: ${{ steps.filter.outputs.changes }}
     permissions:
+      contents: read
       pull-requests: read
     steps:
       - name: Checkout
