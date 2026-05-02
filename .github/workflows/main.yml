@@ -1,0 +1,37 @@
+name: 'Main'
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  pathcheck:
+    runs-on: ubuntu-latest
+    outputs:
+      terraform: ${{ steps.filter.outputs.changes }}
+    permissions:
+      pull-requests: read
+    steps:
+      - name: Path Check
+        uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            infra: terraform/infra/**
+            kubernetes: terraform/kubernetes/**
+
+  terraform:
+    needs: [pathcheck]
+    if: needs.pathcheck.outputs.terraform != '[]'
+    strategy:
+      matrix:
+        terraform: ${{ fromJson(needs.pathcheck.outputs.terraform) }}
+    uses: ./.github/workflows/terraform.yml
+    with:
+      application: ${{ matrix.terraform }}

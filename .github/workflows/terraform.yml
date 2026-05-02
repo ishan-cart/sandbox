@@ -1,10 +1,12 @@
 name: 'Terraform'
 
 on:
-  pull_request:
-    branches: [main]
-  push:
-    branches: [main]
+  workflow_call:
+    inputs:
+      application:
+        description: "The application name"
+        required: true
+        type: string
   workflow_dispatch:
 
 permissions:
@@ -18,13 +20,12 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: ./terraform
+        working-directory: ./terraform/${{ inputs.application }}
     outputs:
       environment: ${{ steps.inputs.outputs.ENVIRONMENT }}
       region: ${{ steps.inputs.outputs.REGION  }}
       account_id: ${{ steps.inputs.outputs.ACCOUNT_ID }}
       tf_state_bucket: ${{ steps.inputs.outputs.TF_STATE_BUCKET }}
-      tf_state_key: ${{ steps.inputs.outputs.TF_STATE_KEY }}
       tf_state_lock_table: ${{ steps.inputs.outputs.TF_STATE_LOCK_TABLE }}
 
     steps:
@@ -34,12 +35,15 @@ jobs:
       - id: inputs
         name: Load env vars
         run: tee -a "$GITHUB_OUTPUT" < dev.env
+
+      - name: test
+        run: ls
       
       - name: Create tfvars file
         uses: actions/upload-artifact@v7
         with:
-          name: dev.auto.tfvars
-          path: ./terraform/dev.tfvars
+          name: ${{ inputs.application }}-dev.auto.tfvars
+          path: ./terraform/${{ inputs.application }}/dev.tfvars
 
   lint:
     name: Lint
@@ -55,7 +59,7 @@ jobs:
           terraform_version: "~1.14.0"
 
       - name: Terraform Format Check
-        working-directory: ./terraform
+        working-directory: ./terraform/${{ inputs.application }}
         run: terraform fmt -check -recursive -diff
   
   validate:
@@ -64,7 +68,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: ./terraform
+        working-directory: ./terraform/${{ inputs.application }}
 
     steps:
       - name: Checkout
@@ -73,8 +77,8 @@ jobs:
       - name: Download tfvar files
         uses: actions/download-artifact@v4
         with:
-          name: dev.auto.tfvars
-          path: ./terraform
+          name: ${{ inputs.application }}-dev.auto.tfvars
+          path: ./terraform/${{ inputs.application }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
@@ -91,7 +95,7 @@ jobs:
         run: |
           terraform init \
           -backend-config=bucket=${{ needs.vars.outputs.tf_state_bucket }} \
-          -backend-config=key=${{ needs.vars.outputs.tf_state_key }} \
+          -backend-config=key=${{ inputs.application }}/terraform.tfstate \
           -backend-config=region=${{ needs.vars.outputs.region }} \
           -backend-config=dynamodb_table=${{ needs.vars.outputs.tf_state_lock_table }}
 
@@ -104,7 +108,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: ./terraform
+        working-directory: ./terraform/${{ inputs.application }}
 
     steps:
       - name: Checkout
@@ -113,8 +117,8 @@ jobs:
       - name: Download tfvar files
         uses: actions/download-artifact@v4
         with:
-          name: dev.auto.tfvars
-          path: ./terraform
+          name: ${{ inputs.application }}-dev.auto.tfvars
+          path: ./terraform/${{ inputs.application }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
@@ -131,7 +135,7 @@ jobs:
         run: |
           terraform init \
           -backend-config=bucket=${{ needs.vars.outputs.tf_state_bucket }} \
-          -backend-config=key=${{ needs.vars.outputs.tf_state_key }} \
+          -backend-config=key=${{ inputs.application }}/terraform.tfstate \
           -backend-config=region=${{ needs.vars.outputs.region }} \
           -backend-config=dynamodb_table=${{ needs.vars.outputs.tf_state_lock_table }}
 
@@ -146,7 +150,7 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: ./terraform
+        working-directory: ./terraform/${{ inputs.application }}
 
     steps:
       - name: Checkout
@@ -155,8 +159,8 @@ jobs:
       - name: Download tfvar files
         uses: actions/download-artifact@v4
         with:
-          name: dev.auto.tfvars
-          path: ./terraform
+          name: ${{ inputs.application }}-dev.auto.tfvars
+          path: ./terraform/${{ inputs.application }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
@@ -173,7 +177,7 @@ jobs:
         run: |
           terraform init \
           -backend-config=bucket=${{ needs.vars.outputs.tf_state_bucket }} \
-          -backend-config=key=${{ needs.vars.outputs.tf_state_key }} \
+          -backend-config=key=${{ inputs.application }}/terraform.tfstate \
           -backend-config=region=${{ needs.vars.outputs.region }} \
           -backend-config=dynamodb_table=${{ needs.vars.outputs.tf_state_lock_table }}
 
