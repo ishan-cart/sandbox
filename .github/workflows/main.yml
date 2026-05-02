@@ -16,8 +16,11 @@ jobs:
     outputs:
       terraform: ${{ steps.filter.outputs.changes }}
     permissions:
+      contents: read
       pull-requests: read
     steps:
+      - name: Checkout
+        uses: Actions/checkout@v6
       - name: Path Check
         uses: dorny/paths-filter@v4
         id: filter
