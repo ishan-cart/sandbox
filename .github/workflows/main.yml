@@ -15,6 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       terraform: ${{ steps.filter.outputs.changes }}
+    permissions:
+      pull-requests: read
     steps:
       - name: Checkout
         uses: Actions/checkout@v6
