@@ -122,7 +122,7 @@ resource "aws_eks_access_entry" "admins" {
   depends_on = [aws_eks_cluster.cluster]
 }
 
-resource "aws_eks_access_policy_association" "example" {
+resource "aws_eks_access_policy_association" "allow_admins_cluster_admin" {
   cluster_name  = local.env_vars[var.environment].eks_cluster_name
   policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
   principal_arn = aws_iam_role.eks_role.arn
@@ -133,3 +133,4 @@ resource "aws_eks_access_policy_association" "example" {
 
   depends_on = [aws_eks_cluster.cluster]
 }
+
