@@ -23,7 +23,7 @@ jobs:
         id: filter
         with:
           filters: |
-            infrastructure: terraform/infrastructure/**
+            infrastructure: terraform/infra/**
             kubernetes: terraform/kubernetes/**
 
   terraform:
@@ -34,4 +34,4 @@ jobs:
         terraform: ${{ fromJson(needs.pathcheck.outputs.terraform) }}
     uses: ./.github/workflows/terraform.yml
     with:
-      tf_state_key: ${{ matrix.terraform }}
+      application: ${{ matrix.terraform }}
