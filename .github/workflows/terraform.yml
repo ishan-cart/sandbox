@@ -43,7 +43,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: ${{ inputs.application }}-dev.auto.tfvars
-          path: dev.tfvars
+          path: ./terraform/${{ inputs.application }}/dev.tfvars
 
   lint:
     name: Lint
