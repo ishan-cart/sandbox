@@ -2,12 +2,13 @@ name: 'Terraform'
 
 on:
   workflow_call:
-    inputs:
+    inputs: &shared_inputs
       application:
         description: "The application name"
         required: true
         type: string
   workflow_dispatch:
+    inputs: *shared_inputs
 
 permissions:
   contents: read
