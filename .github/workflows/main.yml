@@ -23,7 +23,7 @@ jobs:
         id: filter
         with:
           filters: |
-            infrastructure: terraform/infra/**
+            infra: terraform/infra/**
             kubernetes: terraform/kubernetes/**
 
   terraform:
