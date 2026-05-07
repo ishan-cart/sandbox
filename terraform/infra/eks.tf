@@ -58,7 +58,7 @@ resource "aws_eks_node_group" "node_group" {
   ami_type        = "AL2023_x86_64_STANDARD"
   capacity_type   = "SPOT"
   disk_size       = 20
-  instance_types  = ["t3.micro"]
+  instance_types  = ["t3.small"]
 
   scaling_config {
     desired_size = 1
@@ -134,3 +134,13 @@ resource "aws_eks_access_policy_association" "allow_admins_cluster_admin" {
   depends_on = [aws_eks_cluster.cluster]
 }
 
+resource "aws_eks_addon" "vpc-cni" {
+  cluster_name = aws_eks_cluster.cluster.name
+  addon_name   = "vpc-cni"
+
+  configuration_values = jsonencode({
+    env = {
+      ENABLE_PREFIX_DELEGATION = "true"
+    }
+  })
+}
