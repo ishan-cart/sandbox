@@ -5,7 +5,7 @@ description: A Helm chart for Prometheus stack
 type: application
 dependencies:
   - name: kube-prometheus-stack
-    version: 0.17.0
+    version: 84.5.0
     repository: https://prometheus-community.github.io/helm-charts
 # annotations:
   # example: A list of annotations keyed by name (optional).
