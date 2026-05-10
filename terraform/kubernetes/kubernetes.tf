@@ -18,7 +18,7 @@ resource "helm_release" "argocd" {
   version    = "9.5.4"
   namespace  = "argocd"
 
-  depends_on = [ kubernetes_namespace_v1.argocd ]
+  depends_on = [kubernetes_namespace_v1.argocd]
 
   values = [
     file("${path.module}/helm/argocd-values.yaml"),
