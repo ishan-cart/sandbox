@@ -21,7 +21,7 @@ spec:
   # Source of the application manifests
   source:
     repoURL: https://github.com/ishan-cart/sandbox.git # Can point to either a Helm chart repo or a git repo.
-    targetRevision: main  # For Helm, this refers to the chart version.
+    targetRevision: deploy-haproxy  # For Helm, this refers to the chart version.
 
     # helm specific config
     # chart: chart-name  # Set this when pulling directly from a Helm repo. DO NOT set for git-hosted Helm charts.
@@ -83,11 +83,6 @@ spec:
     name: in-cluster
     # The namespace will only be set for namespace-scoped resources that have not set a value for .metadata.namespace
     namespace: ingress
-
-  # Extra information to show in the Argo CD Application details tab
-  info:
-    - name: 'Example:'
-      value: 'https://example.com'
 
   # Sync policy
   syncPolicy:
