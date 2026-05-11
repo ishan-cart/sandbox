@@ -256,3 +256,15 @@ resource "aws_lb" "lb" {
     enabled = true
   }
 }
+
+resource "aws_ec2_subnet_cidr_reservation" "k8s_private_1_reservation" {
+  cidr_block       = "10.0.31.96/28"
+  reservation_type = "prefix"
+  subnet_id        = aws_subnet.private_subnet_1.id
+}
+
+resource "aws_ec2_subnet_cidr_reservation" "k8s_private_2_reservation" {
+  cidr_block       = "10.0.32.96/28"
+  reservation_type = "prefix"
+  subnet_id        = aws_subnet.private_subnet_2.id
+} 
