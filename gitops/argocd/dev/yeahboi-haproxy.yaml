@@ -22,6 +22,7 @@ spec:
   source:
     repoURL: https://github.com/ishan-cart/sandbox.git # Can point to either a Helm chart repo or a git repo.
     targetRevision: deploy-haproxy-ingress  # For Helm, this refers to the chart version.
+    path: gitops/services/ingress-controller
 
     # helm specific config
     # chart: chart-name  # Set this when pulling directly from a Helm repo. DO NOT set for git-hosted Helm charts.
