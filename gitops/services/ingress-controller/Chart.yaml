@@ -1,0 +1,11 @@
+apiVersion: v2
+name: haproxy-ingress
+version: 1.0.0
+description: HAProxy ingress controller for K8s
+type: application
+dependencies: # A list of the chart requirements (optional)
+  - name: kubernetes-ingress
+    version: 1.49.0
+    repository: https://haproxytech.github.io/helm-charts
+# annotations:
+#   example: A list of annotations keyed by name (optional).
