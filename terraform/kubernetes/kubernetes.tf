@@ -50,11 +50,11 @@ resource "helm_release" "argocd" {
 
 resource "kubernetes_service_account_v1" "aws_load_balancer_controller" {
   metadata {
-    name = "aws-load-balancer-controller"
+    name      = "aws-load-balancer-controller"
     namespace = "kube-system"
     annotations = {
-      "eks.amazonaws.com/role-arn" = data.aws_iam_role.aws_load_balancer_controller.arn
-      "meta.helm.sh/release-name" = "aws-load-balancer-controller"
+      "eks.amazonaws.com/role-arn"     = data.aws_iam_role.aws_load_balancer_controller.arn
+      "meta.helm.sh/release-name"      = "aws-load-balancer-controller"
       "meta.helm.sh/release-namespace" = "kube-system"
     }
     labels = {
@@ -75,11 +75,11 @@ resource "helm_release" "aws_load_balancer_controller" {
   ]
   set = [
     {
-      name = "clusterName"
+      name  = "clusterName"
       value = data.aws_eks_cluster.cluster.name
     },
     {
-      name = "serviceAccount.name"
+      name  = "serviceAccount.name"
       value = kubernetes_service_account_v1.aws_load_balancer_controller.metadata.0.name
     },
     {
@@ -98,8 +98,8 @@ resource "kubernetes_manifest" "haproxy_nlb_target_group_binding" {
   manifest = {
     apiVersion = "elbv2.k8s.aws/v1beta1"
     kind       = "TargetGroupBinding"
-    metadata   = {
-      name = "my-tgb"
+    metadata = {
+      name      = "my-tgb"
       namespace = "ingress-haproxy"
     }
     spec = {
@@ -108,7 +108,7 @@ resource "kubernetes_manifest" "haproxy_nlb_target_group_binding" {
         port = 443
       }
       targetGroupARN = data.aws_lb_target_group.eks_haproxy_backend_https.arn
-      targetType = "ip"
+      targetType     = "ip"
     }
   }
 }

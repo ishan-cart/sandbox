@@ -237,8 +237,8 @@ resource "aws_lb_target_group" "eks_haproxy_backend_https" {
   ip_address_type = "ipv4"
   health_check {
     enabled = true
-    path = "/healthz"
-    port = 1042
+    path    = "/healthz"
+    port    = 1042
   }
 }
 
