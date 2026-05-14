@@ -1417,8 +1417,7 @@ grafana:
     ##
     # hosts:
     #   - grafana.domain.com
-    hosts: 
-      - grafana.ishans.au
+    hosts: [grafana.ishans.au]
 
     ## Path for grafana ingress
     path: /
@@ -3749,8 +3748,7 @@ prometheus:
     ##
     # hosts:
     #   - prometheus.domain.com
-    hosts: 
-      - prometheus.ishans.au
+    hosts: [prometheus.ishans.au]
 
     ## Paths to use for ingress rules - one path should match the prometheusSpec.routePrefix
     ##
