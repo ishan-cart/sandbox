@@ -201,48 +201,7 @@ resource "aws_network_acl_association" "acl_public_subnet_2" {
   subnet_id      = aws_subnet.public_subnet_2.id
 }
 
-
-resource "aws_s3_bucket" "access_logs" {
-  bucket = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-access-logs"
-}
-
-resource "aws_s3_bucket_server_side_encryption_configuration" "access_logs" {
-  bucket = aws_s3_bucket.access_logs.id
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-}
-
-resource "aws_s3_bucket_public_access_block" "access_logs" {
-  bucket = aws_s3_bucket.access_logs.id
-
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
-resource "aws_s3_bucket_policy" "allow_lb_access" {
-  bucket = aws_s3_bucket.access_logs.id
-  policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Sid" : "AWSLoadBalancerWrite",
-        "Effect" : "Allow",
-        "Principal" : {
-          "Service" : "logdelivery.elasticloadbalancing.amazonaws.com"
-        },
-        "Action" : "s3:PutObject",
-        "Resource" : "arn:aws:s3:::${aws_s3_bucket.access_logs.bucket}/AWSLogs/${local.env_vars[var.environment].project_id}/*",
-      },
-    ]
-  })
-}
-
-resource "aws_lb" "lb" {
+resource "aws_lb" "front_end" {
   name               = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-lb"
   internal           = false
   load_balancer_type = "application"
@@ -252,8 +211,8 @@ resource "aws_lb" "lb" {
   enable_deletion_protection = true
 
   access_logs {
-    bucket  = aws_s3_bucket.access_logs.bucket
     enabled = true
+    bucket  = aws_s3_bucket.access_logs.bucket
   }
 }
 
@@ -267,4 +226,47 @@ resource "aws_ec2_subnet_cidr_reservation" "k8s_private_2_reservation" {
   cidr_block       = "10.0.32.96/28"
   reservation_type = "prefix"
   subnet_id        = aws_subnet.private_subnet_2.id
-} 
+}
+
+resource "aws_lb_target_group" "eks_haproxy_backend_https" {
+  name            = "eks-haproxy-backend-https"
+  port            = 443
+  protocol        = "HTTPS"
+  target_type     = "ip"
+  vpc_id          = aws_vpc.vpc_network.id
+  ip_address_type = "ipv4"
+  health_check {
+    enabled = true
+    path    = "/healthz"
+    port    = 1042
+  }
+}
+
+resource "aws_lb_listener" "front_end" {
+  load_balancer_arn = aws_lb.front_end.arn
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = aws_acm_certificate.cert.arn
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.eks_haproxy_backend_https.arn
+  }
+
+  # Tell Terraform it CANNOT start this until the waiter is done
+  depends_on = [aws_acm_certificate_validation.cert_waiter]
+}
+
+resource "aws_acm_certificate" "cert" {
+  domain_name       = local.env_vars[var.environment].domain_name
+  validation_method = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_acm_certificate_validation" "cert_waiter" {
+  certificate_arn = aws_acm_certificate.cert.arn
+}

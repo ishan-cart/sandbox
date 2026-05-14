@@ -58,7 +58,7 @@ resource "aws_eks_node_group" "node_group" {
   ami_type        = "AL2023_x86_64_STANDARD"
   capacity_type   = "SPOT"
   disk_size       = 20
-  instance_types  = ["t3.small"]
+  instance_types  = ["t3.medium"]
 
   scaling_config {
     desired_size = 1
@@ -143,4 +143,38 @@ resource "aws_eks_addon" "vpc-cni" {
       ENABLE_PREFIX_DELEGATION = "true"
     }
   })
+}
+
+resource "aws_iam_openid_connect_provider" "eks_cluster" {
+  url            = aws_eks_cluster.cluster.identity[0].oidc[0].issuer
+  client_id_list = ["sts.amazonaws.com"]
+}
+
+resource "aws_iam_role" "aws_load_balancer_controller" {
+  name = "AWSLoadBalancerControllerIAMRole"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Federated = aws_iam_openid_connect_provider.eks_cluster.arn
+        }
+        # Condition = {
+        #   "StringEquals": {
+        #     "${aws_eks_cluster.cluster.identity[0].oidc[0].issuer}:sub": "system:serviceaccount:kube-system:aws-load-balancer-controller",
+        #     "${aws_eks_cluster.cluster.identity[0].oidc[0].issuer}:aud": "sts.amazonaws.com"
+        #   }
+        # }
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_aws_lbc_role" {
+  role       = aws_iam_role.aws_load_balancer_controller.name
+  policy_arn = aws_iam_policy.aws_load_balancer_controller.arn
 }
