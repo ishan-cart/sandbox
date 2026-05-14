@@ -125,3 +125,7 @@ resource "aws_iam_role_policy_attachment" "attach_eks_actions" {
   policy_arn = aws_iam_policy.eks_actions.arn
 }
 
+resource "aws_iam_policy" "aws_load_balancer_controller" {
+  name   = "AWSLoadBalancerControllerIAMPolicy"
+  policy = file("${path.module}/policies/aws-lb-controller.json")
+}
