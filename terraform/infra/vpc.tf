@@ -230,7 +230,7 @@ resource "aws_ec2_subnet_cidr_reservation" "k8s_private_2_reservation" {
 
 resource "aws_lb_target_group" "eks_haproxy_backend_https" {
   name            = "eks-haproxy-backend-https"
-  port            = 443
+  port            = 8443
   protocol        = "HTTPS"
   target_type     = "ip"
   vpc_id          = aws_vpc.vpc_network.id
@@ -244,10 +244,10 @@ resource "aws_lb_target_group" "eks_haproxy_backend_https" {
 
 resource "aws_lb_listener" "front_end" {
   load_balancer_arn = aws_lb.front_end.arn
-  port              = "443"
+  port              = 443
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_acm_certificate.cert.arn
+  certificate_arn   = aws_acm_certificate.domain_cert.arn
 
   default_action {
     type             = "forward"
@@ -258,7 +258,7 @@ resource "aws_lb_listener" "front_end" {
   depends_on = [aws_acm_certificate_validation.cert_waiter]
 }
 
-resource "aws_acm_certificate" "cert" {
+resource "aws_acm_certificate" "domain_cert" {
   domain_name       = local.env_vars[var.environment].domain_name
   validation_method = "DNS"
 
@@ -268,5 +268,23 @@ resource "aws_acm_certificate" "cert" {
 }
 
 resource "aws_acm_certificate_validation" "cert_waiter" {
-  certificate_arn = aws_acm_certificate.cert.arn
+  certificate_arn = aws_acm_certificate.domain_cert.arn
+}
+
+resource "aws_acm_certificate" "wildcard_subdomain_cert" {
+  domain_name       = "*.${local.env_vars[var.environment].domain_name}"
+  validation_method = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_acm_certificate_validation" "wildcard_cert_waiter" {
+  certificate_arn = aws_acm_certificate.wildcard_subdomain_cert.arn
+}
+
+resource "aws_lb_listener_certificate" "wildcard_cert_attachment" {
+  listener_arn    = aws_lb_listener.front_end.arn
+  certificate_arn = aws_acm_certificate.wildcard_subdomain_cert.arn
 }
