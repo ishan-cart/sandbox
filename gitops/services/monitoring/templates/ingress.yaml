@@ -7,7 +7,7 @@ spec:
   ingressClassName: haproxy
   rules:
   - host: prometheus.ishans.au
-    https:
+    http:
       paths:
       - pathType: Prefix
         path: /
@@ -17,7 +17,7 @@ spec:
             port:
               number: 9090
   - host: grafana.ishans.au
-    https:
+    http:
       paths:
       - pathType: Prefix
         path: /
