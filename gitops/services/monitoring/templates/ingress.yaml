@@ -15,7 +15,7 @@ spec:
           service:
             name: prometheus-kube-prometheus-prometheus
             port:
-              name: http-web
+              number: 9090
   - host: grafana.ishans.au
     https:
       paths:
@@ -25,4 +25,4 @@ spec:
           service:
             name: prometheus-grafana
             port:
-              name: http-web
+              number: 80
