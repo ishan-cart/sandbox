@@ -201,21 +201,6 @@ resource "aws_network_acl_association" "acl_public_subnet_2" {
   subnet_id      = aws_subnet.public_subnet_2.id
 }
 
-resource "aws_lb" "front_end" {
-  name               = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-lb"
-  internal           = false
-  load_balancer_type = "application"
-  # security_groups    = [aws_security_group.lb_sg.id]
-  subnets = [aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
-
-  enable_deletion_protection = true
-
-  access_logs {
-    enabled = true
-    bucket  = aws_s3_bucket.access_logs.bucket
-  }
-}
-
 resource "aws_ec2_subnet_cidr_reservation" "k8s_private_1_reservation" {
   cidr_block       = "10.0.31.96/28"
   reservation_type = "prefix"
@@ -228,45 +213,40 @@ resource "aws_ec2_subnet_cidr_reservation" "k8s_private_2_reservation" {
   subnet_id        = aws_subnet.private_subnet_2.id
 }
 
-resource "aws_lb_target_group" "eks_haproxy_backend_https" {
-  name            = "eks-haproxy-backend-https"
-  port            = 443
-  protocol        = "HTTPS"
-  target_type     = "ip"
-  vpc_id          = aws_vpc.vpc_network.id
-  ip_address_type = "ipv4"
-  health_check {
-    enabled = true
-    path    = "/healthz"
-    port    = 1042
-  }
+resource "aws_security_group" "fe_lb" {
+  name        = "fe-loadbalancer"
+  description = "Frontend LB to EKS"
+  vpc_id      = aws_vpc.vpc_network.id
 }
 
-resource "aws_lb_listener" "front_end" {
-  load_balancer_arn = aws_lb.front_end.arn
-  port              = "443"
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_acm_certificate.cert.arn
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.eks_haproxy_backend_https.arn
-  }
-
-  # Tell Terraform it CANNOT start this until the waiter is done
-  depends_on = [aws_acm_certificate_validation.cert_waiter]
+resource "aws_vpc_security_group_ingress_rule" "lb_all_self" {
+  security_group_id            = aws_security_group.fe_lb.id
+  description                  = "Allow all inbound from self"
+  ip_protocol                  = "-1"
+  referenced_security_group_id = aws_security_group.fe_lb.id
 }
 
-resource "aws_acm_certificate" "cert" {
-  domain_name       = local.env_vars[var.environment].domain_name
-  validation_method = "DNS"
-
-  lifecycle {
-    create_before_destroy = true
-  }
+resource "aws_vpc_security_group_ingress_rule" "lb_http" {
+  security_group_id = aws_security_group.fe_lb.id
+  description       = "Allow http inbound"
+  cidr_ipv4         = "159.196.168.43/32"
+  from_port         = 80
+  ip_protocol       = "tcp"
+  to_port           = 80
 }
 
-resource "aws_acm_certificate_validation" "cert_waiter" {
-  certificate_arn = aws_acm_certificate.cert.arn
+resource "aws_vpc_security_group_ingress_rule" "lb_https" {
+  security_group_id = aws_security_group.fe_lb.id
+  description       = "Allow https inbound"
+  cidr_ipv4         = "159.196.168.43/32"
+  from_port         = 443
+  ip_protocol       = "tcp"
+  to_port           = 443
+}
+
+resource "aws_vpc_security_group_egress_rule" "lb_all_self" {
+  security_group_id            = aws_security_group.fe_lb.id
+  description                  = "Allow all outbound to self"
+  ip_protocol                  = "-1"
+  referenced_security_group_id = aws_security_group.fe_lb.id
 }
