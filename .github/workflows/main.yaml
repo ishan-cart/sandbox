@@ -26,6 +26,7 @@ jobs:
         id: filter
         with:
           filters: |
+            cloudflare: terraform/cloudflare/**
             infra: terraform/infra/**
             kubernetes: terraform/kubernetes/**
 
