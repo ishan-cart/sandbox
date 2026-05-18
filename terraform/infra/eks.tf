@@ -16,6 +16,7 @@ resource "aws_eks_cluster" "cluster" {
     # Make control-plane reachability from private subnets unambiguous.
     endpoint_private_access = true
     endpoint_public_access  = true
+    security_group_ids      = [aws_security_group.eks_worker_nodes.id]
   }
 
   # Ensure that IAM Role permissions are created before and deleted
@@ -50,6 +51,22 @@ resource "aws_iam_role_policy_attachment" "cluster_AmazonEKSClusterPolicy" {
   role       = aws_iam_role.cluster.name
 }
 
+resource "aws_launch_template" "eks_worker_nodes" {
+  vpc_security_group_ids = []
+  network_interfaces {
+    security_groups = [
+      aws_eks_cluster.cluster.vpc_config[0].cluster_security_group_id,
+      aws_security_group.eks_worker_nodes.id,
+    ]
+  }
+  block_device_mappings {
+    device_name = "/dev/sdf"
+    ebs {
+      volume_size = 20
+    }
+  }
+}
+
 resource "aws_eks_node_group" "node_group" {
   cluster_name    = aws_eks_cluster.cluster.name
   node_group_name = "${aws_eks_cluster.cluster.name}-node-group"
@@ -57,8 +74,12 @@ resource "aws_eks_node_group" "node_group" {
   subnet_ids      = [aws_subnet.private_subnet_1.id, aws_subnet.private_subnet_2.id]
   ami_type        = "AL2023_x86_64_STANDARD"
   capacity_type   = "SPOT"
-  disk_size       = 20
   instance_types  = ["t3.medium"]
+
+  launch_template {
+    id      = aws_launch_template.eks_worker_nodes.id
+    version = "1"
+  }
 
   scaling_config {
     desired_size = 1
@@ -178,3 +199,63 @@ resource "aws_iam_role_policy_attachment" "attach_aws_lbc_role" {
   role       = aws_iam_role.aws_load_balancer_controller.name
   policy_arn = aws_iam_policy.aws_load_balancer_controller.arn
 }
+
+resource "aws_security_group" "eks_worker_nodes" {
+  name        = "eks-worker-nodes"
+  description = "EKS worker nodes"
+  vpc_id      = aws_vpc.vpc_network.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "backend_all_self" {
+  security_group_id            = aws_security_group.eks_worker_nodes.id
+  description                  = "Allow all inbound from self"
+  ip_protocol                  = "-1"
+  referenced_security_group_id = aws_security_group.eks_worker_nodes.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "backend_https" {
+  security_group_id            = aws_security_group.eks_worker_nodes.id
+  description                  = "Allow https from frontend lb"
+  from_port                    = 8443
+  ip_protocol                  = "tcp"
+  to_port                      = 8443
+  referenced_security_group_id = aws_security_group.fe_lb.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "backend_healthcheck" {
+  security_group_id            = aws_security_group.eks_worker_nodes.id
+  description                  = "Allow healthcheck from frontend lb"
+  from_port                    = 1042
+  ip_protocol                  = "tcp"
+  to_port                      = 1042
+  referenced_security_group_id = aws_security_group.fe_lb.id
+}
+
+resource "aws_vpc_security_group_egress_rule" "backend_all_self" {
+  security_group_id            = aws_security_group.eks_worker_nodes.id
+  description                  = "Allow all outbound to self"
+  ip_protocol                  = "-1"
+  referenced_security_group_id = aws_security_group.eks_worker_nodes.id
+}
+
+############# Rules for frontend SG #############
+
+resource "aws_vpc_security_group_egress_rule" "lb_8443" {
+  security_group_id            = aws_security_group.fe_lb.id
+  description                  = "Allow 8443 traffic to HAProxy backend"
+  from_port                    = 8443
+  ip_protocol                  = "tcp"
+  to_port                      = 8443
+  referenced_security_group_id = aws_security_group.eks_worker_nodes.id
+}
+
+resource "aws_vpc_security_group_egress_rule" "lb_backend_healthcheck" {
+  security_group_id            = aws_security_group.fe_lb.id
+  description                  = "Allow HAProxy healthcheck "
+  from_port                    = 1042
+  ip_protocol                  = "tcp"
+  to_port                      = 1042
+  referenced_security_group_id = aws_security_group.eks_worker_nodes.id
+}
+
+#################################################
