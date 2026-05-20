@@ -10,7 +10,8 @@ on:
       push:
         description: push image to registry
         required: false
-        type: boolean 
+        type: boolean
+        default: false
 
   workflow_dispatch:
     inputs: *shared_inputs
