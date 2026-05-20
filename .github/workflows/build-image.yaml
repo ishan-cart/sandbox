@@ -1,0 +1,46 @@
+name: 'Build Image'
+
+on:
+  workflow_call:
+    inputs: &shared_inputs
+      application:
+        description: "The application name"
+        required: true
+        type: string 
+      push:
+        description: push image to registry
+        required: false
+        type: boolean
+        default: false
+
+  workflow_dispatch:
+    inputs: *shared_inputs
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v6.1.0
+        with:
+          role-to-assume: arn:aws:iam::537239034666:role/github_oidc_role
+          aws-region: "ap-southeast-2"
+        
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      
+      - name: Build
+        working-directory: apps/${{ inputs.application }}
+        run: docker build -t ${{ steps.login-ecr.outputs.registry }}/${{ inputs.application }}:${{ github.sha }} -f ./build/Dockerfile .
+
+      - name: Push
+        if: ${{ inputs.push }}
+        run: docker push ${{ steps.login-ecr.outputs.registry }}/${{ inputs.application }}:${{ github.sha }}
