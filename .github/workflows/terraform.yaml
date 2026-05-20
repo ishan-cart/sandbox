@@ -186,7 +186,7 @@ jobs:
         with:
           parse-json-secrets: true
           secret-ids: |
-            CLOUDFLARE_API_TOKEN,${{ needs.vars.outputs.CLOUDFLARE_API_TOKEN }}
+            ,${{ needs.vars.outputs.CLOUDFLARE_API_TOKEN }}
 
       - name: Terraform Init
         run: |
