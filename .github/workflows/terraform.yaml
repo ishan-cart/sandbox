@@ -37,15 +37,12 @@ jobs:
       - id: inputs
         name: Load env vars
         run: tee -a "$GITHUB_OUTPUT" < dev.env
-
-      - name: test
-        run: ls
       
-      - name: Create tfvars file
-        uses: actions/upload-artifact@v7
-        with:
-          name: ${{ inputs.application }}-dev.auto.tfvars
-          path: ./terraform/${{ inputs.application }}/dev.tfvars
+      # - name: Create tfvars file
+      #   uses: actions/upload-artifact@v7
+      #   with:
+      #     name: ${{ inputs.application }}-dev.auto.tfvars
+      #     path: ./terraform/${{ inputs.application }}/dev.tfvars
 
   lint:
     name: Lint
@@ -76,11 +73,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Download tfvar files
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ inputs.application }}-dev.auto.tfvars
-          path: ./terraform/${{ inputs.application }}
+      # - name: Download tfvar files
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: ${{ inputs.application }}-dev.auto.tfvars
+      #     path: ./terraform/${{ inputs.application }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
@@ -116,11 +113,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Download tfvar files
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ inputs.application }}-dev.auto.tfvars
-          path: ./terraform/${{ inputs.application }}
+      # - name: Download tfvar files
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: ${{ inputs.application }}-dev.auto.tfvars
+      #     path: ./terraform/${{ inputs.application }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
@@ -166,11 +163,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Download tfvar files
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ inputs.application }}-dev.auto.tfvars
-          path: ./terraform/${{ inputs.application }}
+      # - name: Download tfvar files
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: ${{ inputs.application }}-dev.auto.tfvars
+      #     path: ./terraform/${{ inputs.application }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
