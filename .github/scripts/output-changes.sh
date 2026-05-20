@@ -6,7 +6,7 @@ terraform=()
 
 for arg in "$@"; do
   if [[ "$arg" == terraform* ]]; then
-    terraform+=("${arg##*-}")
+    terraform+=("${arg#*-}")
   fi
 done
 
