@@ -1,0 +1,33 @@
+name: 'Build Image'
+
+on:
+  workflow_call:
+    inputs: &shared_inputs
+      application:
+        description: "The application name"
+        required: true
+        type: string 
+      push:
+        description: push image to registry
+        required: false
+        type: boolean 
+
+  workflow_dispatch:
+    inputs: *shared_inputs
+
+permissions:
+  contents: read
+  # id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Build
+        run: docker build apps/${{ inputs.app }}/build/
+      - name: Push
+        if: ${{ inputs.push }}
+        run: docker push
