@@ -27,7 +27,7 @@ jobs:
       pull-requests: read
     steps:
       - name: Build
-        run: docker build apps/${{ inputs.app }}/build/
+        run: docker build apps/${{ inputs.application }}/build/
       - name: Push
         if: ${{ inputs.push }}
         run: docker push
