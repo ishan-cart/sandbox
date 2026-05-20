@@ -92,13 +92,6 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::537239034666:role/github_oidc_role
           aws-region: ${{ needs.vars.outputs.region }}
-      
-      - name: AWS Secrets Manager GitHub Action
-        if: ${{ needs.vars.outputs.CLOUDFLARE_API_TOKEN }}
-        uses: aws-actions/aws-secretsmanager-get-secrets@v3.0.1
-        with:
-          secret-ids: |
-            CLOUDFLARE_API_TOKEN,${{ needs.vars.outputs.CLOUDFLARE_API_TOKEN }}
 
       - name: Terraform Init
         run: |
@@ -140,6 +133,13 @@ jobs:
           role-to-assume: arn:aws:iam::537239034666:role/github_oidc_role
           aws-region: ${{ needs.vars.outputs.region }}
 
+      - name: AWS Secrets Manager GitHub Action
+        if: ${{ needs.vars.outputs.CLOUDFLARE_API_TOKEN }}
+        uses: aws-actions/aws-secretsmanager-get-secrets@v3.0.1
+        with:
+          secret-ids: |
+            CLOUDFLARE_API_TOKEN,${{ needs.vars.outputs.CLOUDFLARE_API_TOKEN }}
+
       - name: Terraform Init
         run: |
           terraform init \
@@ -153,7 +153,7 @@ jobs:
 
   apply:
     runs-on: ubuntu-latest
-    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref_name == 'main'
     needs: [vars,plan]
     environment: production
     defaults:
@@ -181,6 +181,13 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::537239034666:role/github_oidc_role
           aws-region: ${{ needs.vars.outputs.region }}
+
+      - name: AWS Secrets Manager GitHub Action
+        if: ${{ needs.vars.outputs.CLOUDFLARE_API_TOKEN }}
+        uses: aws-actions/aws-secretsmanager-get-secrets@v3.0.1
+        with:
+          secret-ids: |
+            CLOUDFLARE_API_TOKEN,${{ needs.vars.outputs.CLOUDFLARE_API_TOKEN }}
 
       - name: Terraform Init
         run: |
