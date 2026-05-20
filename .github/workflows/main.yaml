@@ -24,7 +24,7 @@ jobs:
         uses: Actions/checkout@v6
       - name: Get Paths
         id: paths
-        run: ./.github/scripts/get-paths.sh >> "$GITHUB_OUTPUT"
+        run: ./.github/scripts/get-paths.sh | tee -a "$GITHUB_OUTPUT"
       - name: Path Check
         uses: dorny/paths-filter@v4
         id: filter
@@ -32,7 +32,7 @@ jobs:
           filters: ${{ steps.paths.outputs.paths }}
       - name: Output Changes
         id: changes
-        run: ./.github/scripts/output-changes.sh ${{ join(fromJson(steps.filter.outputs.changes), ' ') }} >> "$GITHUB_OUTPUT"
+        run: ./.github/scripts/output-changes.sh ${{ join(fromJson(steps.filter.outputs.changes), ' ') }} | tee -a "$GITHUB_OUTPUT"
 
   terraform:
     needs: [changes]
