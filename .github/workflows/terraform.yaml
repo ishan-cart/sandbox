@@ -137,6 +137,7 @@ jobs:
         if: ${{ needs.vars.outputs.CLOUDFLARE_API_TOKEN }}
         uses: aws-actions/aws-secretsmanager-get-secrets@v3.0.1
         with:
+          parse-json-secrets: true
           secret-ids: |
             CLOUDFLARE_API_TOKEN,${{ needs.vars.outputs.CLOUDFLARE_API_TOKEN }}
 
@@ -186,6 +187,7 @@ jobs:
         if: ${{ needs.vars.outputs.CLOUDFLARE_API_TOKEN }}
         uses: aws-actions/aws-secretsmanager-get-secrets@v3.0.1
         with:
+          parse-json-secrets: true
           secret-ids: |
             CLOUDFLARE_API_TOKEN,${{ needs.vars.outputs.CLOUDFLARE_API_TOKEN }}
 
