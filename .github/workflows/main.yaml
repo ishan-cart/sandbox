@@ -32,7 +32,7 @@ jobs:
           filters: ${{ steps.paths.outputs.paths }}
       - name: Output Changes
         id: changes
-        run: ./.github/scripts/output-changes.sh ${{ join(fromJson(steps.filter.outputs.changes),' ') }} >> "$GITHUB_OUTPUT"
+        run: ./.github/scripts/output-changes.sh ${{ join(fromJson(steps.filter.outputs.changes), ' ') }} >> "$GITHUB_OUTPUT"
 
   terraform:
     needs: [changes]
