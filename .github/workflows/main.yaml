@@ -47,9 +47,7 @@ jobs:
   build:
     needs: [changes, terraform]
     uses: ./.github/workflows/build-image.yaml
-    strategy:
-      matrix:
-        application: ${{ needs.changes.outputs.web-app }}
+    if: ${{ needs.changes.outputs.web-app }}
     with:
-      application: test
+      application: web-app
       push: ${{ github.ref_name == 'main' && github.event == 'push' }}
