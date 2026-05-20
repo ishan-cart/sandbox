@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       web-app: ${{ steps.filter.outputs.web-app }}
-      terraform: ${{ steps.changes.outputs.terraform }}
+      terraform: ${{ steps.changes.outputs.changes }}
     permissions:
       contents: read
       pull-requests: read
