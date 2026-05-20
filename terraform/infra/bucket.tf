@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "terraform_state" {
-  bucket = local.env_vars[var.environment].tf_state_bucket
+  bucket = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-state"
 }
 
 resource "aws_s3_bucket_versioning" "terraform_state" {
