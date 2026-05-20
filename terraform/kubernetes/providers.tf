@@ -18,7 +18,7 @@ data "terraform_remote_state" "infra" {
   config = {
     bucket = "yeahboi-dev-state"
     key    = "infra/terraform.tfstate"
-    region = "ap-southeast-2"
+    region = var.region
   }
 }
 

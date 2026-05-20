@@ -1,0 +1,19 @@
+services:
+  web:
+    build: &source
+      context: apps/web-app
+      dockerfile: build/Dockerfile
+    volumes:
+      - type: bind
+        source: apps/web-app/src
+        target: /app/src
+        read_only: true
+    ports:
+      - "8080:3000"
+
+  # test:
+  #   build: 
+  #     context: apps/test-app
+  #     dockerfile: build/Dockerfile
+  #   ports:
+  #     - "8080:3000"

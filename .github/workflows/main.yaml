@@ -11,30 +11,43 @@ permissions:
   id-token: write
 
 jobs:
-  pathcheck:
+  changes:
     runs-on: ubuntu-latest
     outputs:
-      terraform: ${{ steps.filter.outputs.changes }}
+      web-app: ${{ steps.filter.outputs.web-app }}
+      terraform: ${{ steps.changes.outputs.changes }}
     permissions:
       contents: read
       pull-requests: read
     steps:
       - name: Checkout
         uses: Actions/checkout@v6
+      - name: Get Paths
+        id: paths
+        run: ./.github/scripts/get-paths.sh | tee -a "$GITHUB_OUTPUT"
       - name: Path Check
         uses: dorny/paths-filter@v4
         id: filter
         with:
-          filters: |
-            infra: terraform/infra/**
-            kubernetes: terraform/kubernetes/**
+          filters: ${{ steps.paths.outputs.paths }}
+      - name: Output Changes
+        id: changes
+        run: ./.github/scripts/output-changes.sh ${{ join(fromJson(steps.filter.outputs.changes), ' ') }} | tee -a "$GITHUB_OUTPUT"
 
   terraform:
-    needs: [pathcheck]
-    if: needs.pathcheck.outputs.terraform != '[]'
+    needs: [changes]
+    if: needs.changes.outputs.terraform != '[]'
     strategy:
       matrix:
-        terraform: ${{ fromJson(needs.pathcheck.outputs.terraform) }}
+        terraform: ${{ fromJson(needs.changes.outputs.terraform) }}
     uses: ./.github/workflows/terraform.yaml
     with:
       application: ${{ matrix.terraform }}
+  
+  build:
+    needs: [changes, terraform]
+    uses: ./.github/workflows/build-image.yaml
+    if: ${{ needs.changes.outputs.web-app }}
+    with:
+      application: web-app
+      push: ${{ github.ref_name == 'main' && github.event == 'push' }}

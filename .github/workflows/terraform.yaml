@@ -37,9 +37,6 @@ jobs:
       - id: inputs
         name: Load env vars
         run: tee -a "$GITHUB_OUTPUT" < dev.env
-
-      - name: test
-        run: ls
       
       - name: Create tfvars file
         uses: actions/upload-artifact@v7
