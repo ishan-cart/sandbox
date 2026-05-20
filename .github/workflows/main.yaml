@@ -44,12 +44,12 @@ jobs:
     with:
       application: ${{ matrix.terraform }}
   
-  # build:
-  #   needs: [changes, terraform]
-  #   uses: ./.github/workflows/build-image.yaml
-  #   strategy:
-  #     matrix:
-  #       application: ${{ fromJson(needs.changes.outputs.terraform) }}
-  #   with:
-  #     application: test
-  #     push: ${{ github.ref_name == 'main' && github.event == 'push' }}
+  build:
+    needs: [changes, terraform]
+    uses: ./.github/workflows/build-image.yaml
+    strategy:
+      matrix:
+        application: ${{ needs.changes.outputs.web-app }}
+    with:
+      application: test
+      push: ${{ github.ref_name == 'main' && github.event == 'push' }}
