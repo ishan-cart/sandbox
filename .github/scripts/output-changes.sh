@@ -4,9 +4,11 @@ set -euo pipefail
 
 terraform=()
 
-echo $1 | jq -c '.{}' | while read -r f; do
-  if [ "${f##-*}" == "terraform" ]; then
+for arg in "$@"; do
+
+  if [ "${arg##-*}" == "terraform" ]; then
     terraform+=("${f##*-}")
+  fi
 done
 
 json_output=$(jq -c --args "${terraform[@]}")
