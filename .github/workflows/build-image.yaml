@@ -39,8 +39,8 @@ jobs:
       
       - name: Build
         working-directory: apps/${{ inputs.application }}
-        run: docker build -t ${{ steps.login-ecr.outputs.registry }}/yeahboi-${{ inputs.application }}:${{ github.sha }} -f ./build/Dockerfile .
+        run: docker build -t ${{ steps.login-ecr.outputs.registry }}/yeahboi/${{ inputs.application }}:${{ github.sha }} -f ./build/Dockerfile .
 
       - name: Push
         if: ${{ inputs.push }}
-        run: docker push ${{ steps.login-ecr.outputs.registry }}/yeahboi-${{ inputs.application }}:${{ github.sha }}
+        run: docker push ${{ steps.login-ecr.outputs.registry }}/yeahboi/${{ inputs.application }}:${{ github.sha }}
