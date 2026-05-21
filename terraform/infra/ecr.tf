@@ -1,5 +1,5 @@
-resource "aws_ecr_repository_creation_template" "example" {
-  prefix               = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}"
+resource "aws_ecr_repository_creation_template" "repo_template" {
+  prefix               = "${local.env_vars[var.environment].project}/"
   image_tag_mutability = "MUTABLE_WITH_EXCLUSION"
 
   applied_for = [
