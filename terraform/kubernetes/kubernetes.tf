@@ -209,12 +209,12 @@ resource "kubernetes_manifest" "eso_helm_ecr_secret" {
         name = "helm-ecr-secret"
         template = {
           data = {
-              url = "{{ .proxy_endpoint | replace \"https://\" \"\" }}"
-              name = "yeahboi/helm-libraries"
-              type = "helm"
-              password = "{{ .password }}"
-              username = "{{ .username }}"
-              enableOCI = "true"
+            url       = "{{ .proxy_endpoint | replace \"https://\" \"\" }}"
+            name      = "yeahboi/helm-libraries"
+            type      = "helm"
+            password  = "{{ .password }}"
+            username  = "{{ .username }}"
+            enableOCI = "true"
           }
           metadata = {
             annotations = {
