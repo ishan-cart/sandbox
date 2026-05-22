@@ -40,10 +40,10 @@ jobs:
     if: needs.changes.outputs.terraform != '[]'
     strategy:
       matrix:
-        terraform: ${{ fromJson(needs.changes.outputs.terraform) }}
+        application: ${{ fromJson(needs.changes.outputs.terraform) }}
     uses: ./.github/workflows/terraform.yaml
     with:
-      application: ${{ matrix.terraform }}
+      application: ${{ matrix.application }}
   
   build:
     needs: [changes, terraform]
@@ -62,7 +62,7 @@ jobs:
         uses: Actions/checkout@v6
         with:
           sparse-checkout: |
-            charts
+            helm-libraries
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v6.1.0
         with:
@@ -71,6 +71,9 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
-      - name: Setup ORAS
-        uses: oras-project/setup-oras@v1
-
+      - name: Package & Push
+        run: |
+          helm package helm-libraries/common-library/ -d helm-libraries/
+          # Not require for OCI registries
+          # helm repo index helm-libraries --url ${{ steps.login-ecr.outputs.registry }}/yeahboi/helm-libaries/
+          helm push helm-libraries/common-library oci://${{ steps.login-ecr.outputs.registry }}/yeahboi/helm-libaries/
