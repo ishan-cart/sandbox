@@ -2,4 +2,4 @@ apiVersion: v2
 name: common-library
 description: Yeahboi helm template library
 type: library
-version: 1.0.0
+version: 1.0.1
