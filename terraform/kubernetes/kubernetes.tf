@@ -145,20 +145,20 @@ resource "kubernetes_manifest" "eso_ecr_token_generator" {
   }
 }
 
-resource "kubernetes_manifest" "eso_ecr_secret" {
+resource "kubernetes_manifest" "eso_docker_ecr_secret" {
   manifest = {
     apiVersion = "external-secrets.io/v1"
     kind       = "ExternalSecret"
     metadata = {
-      name      = "ecr-secret"
+      name      = "eso-docker-ecr-secret"
       namespace = "argocd"
     }
     spec = {
       refreshInterval = "1h0m0s"
-      "target" = {
-        "name" = "ecr-secret"
-        "template" = {
-          "data" = {
+      target = {
+        name = "docker-ecr-secret"
+        template = {
+          data = {
             ".dockerconfigjson" = <<-EOT
             {
               "auths": {
@@ -172,12 +172,12 @@ resource "kubernetes_manifest" "eso_ecr_secret" {
             
             EOT
           }
-          "metadata" = {
-            "annotations" = {
-              "expiresAt" = "{{ .expires_at }}"
+          metadata = {
+            annotations = {
+              expiresAt = "{{ .expires_at }}"
             }
           }
-          "type" = "kubernetes.io/dockerconfigjson"
+          type = "kubernetes.io/dockerconfigjson"
         }
       }
       dataFrom = [
@@ -195,3 +195,49 @@ resource "kubernetes_manifest" "eso_ecr_secret" {
   }
 }
 
+resource "kubernetes_manifest" "eso_helm_ecr_secret" {
+  manifest = {
+    apiVersion = "external-secrets.io/v1"
+    kind       = "ExternalSecret"
+    metadata = {
+      name      = "eso-helm-ecr-secret"
+      namespace = "argocd"
+    }
+    spec = {
+      refreshInterval = "1h0m0s"
+      target = {
+        name = "helm-ecr-secret"
+        template = {
+          data = {
+              url = "{{ .proxy_endpoint | replace \"https://\" \"\" }}"
+              name = "yeahboi/helm-libraries"
+              type = "helm"
+              password = "{{ .password }}"
+              username = "{{ .username }}"
+              enableOCI = "true"
+          }
+          metadata = {
+            annotations = {
+              expiresAt = "{{ .expires_at }}"
+            }
+            labels = {
+              "argocd.argoproj.io/secret-type" = "repository"
+            }
+          }
+          type = "Opaque"
+        }
+      }
+      dataFrom = [
+        {
+          sourceRef = {
+            generatorRef = {
+              apiVersion = "generators.external-secrets.io/v1alpha1"
+              kind       = "ECRAuthorizationToken"
+              name       = kubernetes_manifest.eso_ecr_token_generator.manifest.metadata.name
+            }
+          }
+        }
+      ]
+    }
+  }
+}
