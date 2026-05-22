@@ -1,5 +1,6 @@
 {{- define "common-library._ingress.tpl" -}}
 {{- if .Values.ingress.enabled -}}
+{{- $servicePort := .Values.service.port -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -26,7 +27,7 @@ spec:
               service:
                 name: {{ include "common-library.fullname" $ }}-svc
                 port:
-                  number: {{ .Values.service.port }}
+                  number: {{ $servicePort }}
           {{- end }}
     {{- end }}
 {{- end }}
