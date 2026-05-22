@@ -76,4 +76,4 @@ jobs:
           helm package helm-libraries/common-library/ -d helm-libraries/
           # Not require for OCI registries
           # helm repo index helm-libraries --url ${{ steps.login-ecr.outputs.registry }}/yeahboi/helm-libaries/
-          helm push helm-libraries/common-library oci://${{ steps.login-ecr.outputs.registry }}/yeahboi/helm-libaries/
+          helm push helm-libraries/common-library-*.tgz oci://${{ steps.login-ecr.outputs.registry }}/yeahboi/helm-libaries/
