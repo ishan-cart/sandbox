@@ -1,0 +1,7 @@
+{{- include "common-library._deployment.tpl" . }}
+---
+{{- include "common-library._hpa.tpl" . }}
+---
+{{- include "common-library._service.tpl" . }}
+---
+{{- include "common-library._ingress.tpl" . }}
