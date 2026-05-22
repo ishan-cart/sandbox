@@ -81,21 +81,21 @@ resources:
 startupProbe:
   httpGet:
     path: /
-    port: http
+    port: 3000
   failureThreshold: 15   # Try 15 times before giving up
   periodSeconds: 3       # Check every 3 seconds (15 * 3 = 45s total max boot time)
   timeoutSeconds: 3
 livenessProbe:
   httpGet:
     path: /
-    port: http
+    port: 3000
   initialDelaySeconds: 10
   periodSeconds: 10
   timeoutSeconds: 3
 readinessProbe:
   httpGet:
     path: /
-    port: http
+    port: 3000
   initialDelaySeconds: 10
   periodSeconds: 10
   timeoutSeconds: 3
