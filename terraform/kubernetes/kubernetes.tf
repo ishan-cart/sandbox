@@ -176,6 +176,9 @@ resource "kubernetes_manifest" "eso_docker_ecr_secret" {
             annotations = {
               expiresAt = "{{ .expires_at }}"
             }
+            labels = {
+              "argocd.argoproj.io/secret-type" = "repository"
+            }
           }
           type = "kubernetes.io/dockerconfigjson"
         }
