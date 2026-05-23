@@ -10,8 +10,8 @@ image:
   tag: latest
 
 # This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-imagePullSecrets: 
-  - name: docker-ecr-secret
+# imagePullSecrets: 
+#   - name: docker-ecr-secret
 # This is to override the chart name.
 nameOverride: ""
 fullnameOverride: ""
@@ -51,7 +51,7 @@ securityContext: {}
 # This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
 service:
   port: 8080
-  targetPort: 3000
+  targetPort: 80
 
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:
@@ -81,21 +81,21 @@ resources:
 startupProbe:
   httpGet:
     path: /
-    port: 3000
+    port: http
   failureThreshold: 15   # Try 15 times before giving up
   periodSeconds: 3       # Check every 3 seconds (15 * 3 = 45s total max boot time)
   timeoutSeconds: 3
 livenessProbe:
   httpGet:
     path: /
-    port: 3000
+    port: http
   initialDelaySeconds: 10
   periodSeconds: 10
   timeoutSeconds: 3
 readinessProbe:
   httpGet:
     path: /
-    port: 3000
+    port: http
   initialDelaySeconds: 10
   periodSeconds: 10
   timeoutSeconds: 3
