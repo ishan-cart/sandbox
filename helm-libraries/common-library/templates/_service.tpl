@@ -6,10 +6,10 @@ metadata:
   labels:
     {{- include "common-library.labels" . | nindent 4 }}
 spec:
-  type: ClusterIP
+  type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
-      targetPort: {{ default 8080 .Values.service.targetPort }}
+      targetPort: {{ default 8080 .Values.containerPort }}
       protocol: {{ default "TCP" .Values.service.protocol }}
       name: {{ default "http" .Values.service.portName }}
   selector:
