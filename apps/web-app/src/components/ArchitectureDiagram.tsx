@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 import { useCallback, useRef } from "react";
 import QuickPinchZoom from "react-quick-pinch-zoom";
 
-const DIAGRAM_URL = "/src/assets/images/Untitled-2026-05-16-2229.png";
+import DIAGRAM_URL from "../assets/images/Untitled-2026-05-16-2229.png";
 
 export const ArchitectureDiagram = () => {
   const imgRef = useRef<HTMLImageElement>(null);
@@ -16,8 +16,8 @@ export const ArchitectureDiagram = () => {
   }, []);
 
   return (
-    <div className="pt-20 pb-16 px-6 relative overflow-hidden bg-white" id="architecture">
-      <div className="max-w-7xl mx-auto">
+    <section className="pt-20 pb-16 px-6 relative overflow-hidden bg-white" id="architecture">
+      <div className="max-w-6xl mx-auto">
         <div className="mb-16 text-left">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -67,7 +67,7 @@ export const ArchitectureDiagram = () => {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

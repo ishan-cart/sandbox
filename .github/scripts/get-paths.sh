@@ -15,4 +15,6 @@ for f in ./terraform/*; do
   fi
 done
 
+echo 'chart-library: charts/common-library/**'
+
 echo 'EOF'

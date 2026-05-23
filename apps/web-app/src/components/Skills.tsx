@@ -2,42 +2,43 @@ import { motion } from "motion/react";
 import { useState } from "react";
 import { Cpu } from "lucide-react";
 
+import amazonwebservicesLogo from "../assets/images/logos/amazonwebservices.svg";
+import argocdLogo from "../assets/images/logos/argocd.svg";
+import saltLogo from "../assets/images/logos/salt.png";
+
 interface Skill {
   name: string;
   slug: string;
 }
 
+const LOCAL_LOGOS: Record<string, string> = {
+  amazonwebservices: amazonwebservicesLogo,
+  argocd: argocdLogo,
+  salt: saltLogo,
+};
+
 const SkillIcon = ({ skill }: { skill: Skill }) => {
-  const [errorType, setErrorType] = useState<"none" | "simpleicons" | "svg" | "local">("none");
+  const [errorType, setErrorType] = useState<"none" | "simpleicons" | "local">("none");
 
   const simpleIconsUrl = `https://cdn.simpleicons.org/${skill.slug}`;
-  const localSvgUrl = `/src/assets/images/logos/${skill.slug}.svg`;
-  const localPngUrl = `/src/assets/images/logos/${skill.slug}.png`;
+  const localLogoUrl = LOCAL_LOGOS[skill.slug];
 
   if (errorType === "local") {
     return <Cpu className="w-4 h-4 text-slate-400" />;
   }
 
-  if (errorType === "svg") {
-    return (
-      <img
-        src={localPngUrl}
-        alt={skill.name}
-        className="w-4 h-4 group-hover:scale-110 transition-all"
-        onError={() => setErrorType("local")}
-      />
-    );
-  }
-
   if (errorType === "simpleicons") {
-    return (
-      <img
-        src={localSvgUrl}
-        alt={skill.name}
-        className="w-4 h-4 group-hover:scale-110 transition-all"
-        onError={() => setErrorType("svg")}
-      />
-    );
+    if (localLogoUrl) {
+      return (
+        <img
+          src={localLogoUrl}
+          alt={skill.name}
+          className="w-4 h-4 group-hover:scale-110 transition-all"
+          onError={() => setErrorType("local")}
+        />
+      );
+    }
+    return <Cpu className="w-4 h-4 text-slate-400" />;
   }
 
   return (
