@@ -1,16 +1,14 @@
-FROM node:26-alpine
+FROM docker.io/node:26-alpine AS build
 
 WORKDIR /app
-
 COPY package.json package-lock.json index.html vite.config.ts tsconfig.json .
-
-RUN npm install
-
+RUN npm clean-install
 COPY src/ src/
+RUN npm run build
+RUN ls
 
-# RUN npm run build
+FROM docker.io/nginx:1.30.2-alpine
 
-EXPOSE 3000
+COPY --from=build /app/dist /usr/share/nginx/html
 
-CMD ["npm", "run", "dev"]
-
+EXPOSE 80

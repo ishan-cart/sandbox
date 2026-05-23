@@ -259,3 +259,33 @@ resource "aws_vpc_security_group_egress_rule" "lb_backend_healthcheck" {
 }
 
 #################################################
+
+resource "aws_iam_role" "eks_ecr_access" {
+  name = "allow-eks-ecr-access"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Effect = "Allow"
+        Principal = {
+          Federated = aws_iam_openid_connect_provider.eks_cluster.arn
+        }
+      },
+    ]
+  })
+}
+
+resource "aws_iam_policy" "gitops_ecr_pull" {
+  name        = "ECRPullOnly"
+  path        = "/gitops/"
+  description = "ECR pull only access for GitOps"
+
+  policy = file("./policies/gitops-ecr-access.json")
+}
+
+resource "aws_iam_role_policy_attachment" "gitops_ecr_pull_attachment" {
+  role       = aws_iam_role.eks_ecr_access.name
+  policy_arn = aws_iam_policy.gitops_ecr_pull.arn
+}

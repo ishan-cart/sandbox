@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       web-app: ${{ steps.filter.outputs.web-app }}
+      chart-library: ${{ steps.filter.outputs.chart-library }}
       terraform: ${{ steps.changes.outputs.changes }}
     permissions:
       contents: read
@@ -39,10 +40,10 @@ jobs:
     if: needs.changes.outputs.terraform != '[]'
     strategy:
       matrix:
-        terraform: ${{ fromJson(needs.changes.outputs.terraform) }}
+        application: ${{ fromJson(needs.changes.outputs.terraform) }}
     uses: ./.github/workflows/terraform.yaml
     with:
-      application: ${{ matrix.terraform }}
+      application: ${{ matrix.application }}
   
   build:
     needs: [changes, terraform]
@@ -51,3 +52,28 @@ jobs:
     with:
       application: web-app
       push: ${{ github.ref_name == 'main' && github.event == 'push' }}
+
+  helm-libraries:
+    needs: [changes]
+    if: ${{ needs.changes.outputs.chart-library }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: Actions/checkout@v6
+        with:
+          sparse-checkout: |
+            helm-libraries
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v6.1.0
+        with:
+          role-to-assume: arn:aws:iam::537239034666:role/github_oidc_role
+          aws-region: "ap-southeast-2"
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+      - name: Package & Push
+        run: |
+          helm package helm-libraries/common-library/ -d helm-libraries/
+          # Not require for OCI registries
+          # helm repo index helm-libraries --url ${{ steps.login-ecr.outputs.registry }}/yeahboi/helm-libraries/
+          helm push helm-libraries/common-library-*.tgz oci://${{ steps.login-ecr.outputs.registry }}/yeahboi/helm-libraries/
