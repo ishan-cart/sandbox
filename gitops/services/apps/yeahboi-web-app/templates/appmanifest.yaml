@@ -33,6 +33,7 @@ spec:
           containers:
           - name: yeahboi-web-app-snapshot
             image: 537239034666.dkr.ecr.ap-southeast-2.amazonaws.com/yeahboi/apps/web-app-snapshot:latest
+            imagePullPolicy: IfNotPresent
             volumeMounts:
             - name: snapshots
               mountPath: /scripts/data
