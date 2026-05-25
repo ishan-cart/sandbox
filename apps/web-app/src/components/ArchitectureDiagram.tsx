@@ -35,7 +35,7 @@ export const ArchitectureDiagram = () => {
     let active = true;
     const fetchRuntimeSnapshot = async () => {
       try {
-        const response = await fetch("/data.json");
+        const response = await fetch("/data/data.json");
         if (response.ok) {
           const data = await response.json();
           if (active) {
@@ -50,7 +50,7 @@ export const ArchitectureDiagram = () => {
           }
         }
       } catch (err) {
-        console.warn("Could not fetch runtime /data.json:", err);
+        console.warn("Could not fetch runtime /data/data.json:", err);
         if (active) {
           setIsUnavailable(true);
           setLoading(false);
@@ -272,7 +272,7 @@ export const ArchitectureDiagram = () => {
                         Dashboard Unavailable
                       </h3>
                       <p className="text-slate-500 text-xs font-mono max-w-sm leading-relaxed mx-auto">
-                        The application was unable to retrieve a valid Prometheus query-range JSON from <code className="bg-slate-900 px-1 py-0.5 rounded border border-slate-800 text-slate-300 font-sans">/data.json</code>.
+                        The application was unable to retrieve a valid Prometheus query-range JSON from <code className="bg-slate-900 px-1 py-0.5 rounded border border-slate-800 text-slate-300 font-sans">/data/data.json</code>.
                         Please verify that the configuration file exists in your output directory and is well-formed.
                       </p>
                     </div>
