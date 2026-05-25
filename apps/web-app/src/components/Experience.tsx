@@ -35,7 +35,7 @@ export const Experience = () => {
       company: "Orion Fire Engineering",
       roles: [
         {
-          title: "Engineer",
+          title: "Mechatronic Engineer",
           period: "2018 - 2020",
           description: "Developing and maintaining the software driving next generation washdown monitors, executing deployments on PLCs and Linux SBCs.",
           tags: ["Python", "C++", "Industrial communication protocols"]
