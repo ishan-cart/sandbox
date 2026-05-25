@@ -124,7 +124,6 @@ volumes:
 volumeMounts:
   - name: snapshots
     mountPath: /usr/share/nginx/html/data
-    readOnly: true
 
 nodeSelector: {}
 
