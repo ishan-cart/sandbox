@@ -37,6 +37,11 @@ spec:
             volumeMounts:
             - name: snapshots
               mountPath: /scripts/data
+            env:
+            - name: GRAFANA_HOST
+              value: prometheus-grafana.monitoring.svc.cluster.local
+            - name: GRAFANA_PORT
+              value: 80
           volumes:
           - name: snapshots
             persistentVolumeClaim:
