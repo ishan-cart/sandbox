@@ -5,3 +5,38 @@
 {{- include "common-library._service.tpl" . }}
 ---
 {{- include "common-library._ingress.tpl" . }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: yeahboi-web-app-snapshot
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 50Mi
+  storageClassName: gp2
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: yeahboi-web-app-snapshot
+spec:
+  schedule: "*/1 * * * *" # Runs every 1 minutes
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: yeahboi-web-app-snapshot
+            image: web-app-snapshot:latest
+            volumeMounts:
+            - name: snapshots
+              mountPath: /scripts/data
+          volumes:
+          - name: snapshots
+            persistentVolumeClaim:
+              claimName: yeahboi-web-app-snapshot
+          restartPolicy: OnFailure
