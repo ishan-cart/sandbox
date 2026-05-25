@@ -13,9 +13,11 @@ image:
 # imagePullSecrets: 
 #   - name: docker-ecr-secret
 
-env:
-  - name: GRAFANA_HOST
-    value: 80
+env: []
+  # - name: GRAFANA_HOST
+  #   value: yeahboi-web-app-svc.svc.cluster.local
+  # - name: GRAFANA_PORT
+  #   value: 80
 
 # This is to override the chart name.
 nameOverride: ""
