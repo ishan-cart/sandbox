@@ -1,19 +1,44 @@
 services:
-  web:
-    build: &source
+  web-app:
+    build:
       context: apps/web-app
       dockerfile: build/Dockerfile
-    volumes:
-      - type: bind
-        source: apps/web-app/src
-        target: /app/src
-        read_only: true
+      target: ${BUILD_TARGET:-production}
+    restart: always
+    environment:
+      PODMAN_DNS: 10.89.0.1
+      DOCKER_DNS: 127.0.0.11
+      GRAFANA_HOST: grafana
+      GRAFANA_PORT: 3000
     ports:
-      - "8080:3000"
+      - 8080:8080
+    volumes:
+      - ./apps/web-app/src:/app/src # dev only
+      - ./apps/web-app/nginx.conf.template:/etc/nginx/templates/nginx.conf.template
+      - snapshot:/usr/share/nginx/html/data
+  grafana:
+    image: docker.io/grafana/grafana:main
+    ports:
+      - 3000:3000
+    volumes:
+      - ./.docker-compose/grafana/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
+      - ./.docker-compose/grafana/dashboards:/var/lib/grafana/dashboards/
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      start_interval: 2s
+  
+  snapshot-cron:
+    build:
+      context: ./.docker-compose/snapshot-cron/
+      dockerfile: Dockerfile
+    volumes:
+      - ./.docker-compose/snapshot-cron/snapshot.sh:/scripts/snapshot.sh
+      - snapshot:/scripts/data
+    environment:
+      GRAFANA_HOST: grafana
+    depends_on:
+      grafana:
+        condition: service_healthy
 
-  # test:
-  #   build: 
-  #     context: apps/test-app
-  #     dockerfile: build/Dockerfile
-  #   ports:
-  #     - "8080:3000"
+volumes:
+  snapshot:
