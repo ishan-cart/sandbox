@@ -32,6 +32,8 @@ spec:
     spec:
       template:
         spec:
+          securityContext:
+            fsGroup: 1000
           containers:
           - name: curl
             image: curlimages/curl:latest
