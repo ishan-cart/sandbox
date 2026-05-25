@@ -24,7 +24,8 @@ kind: CronJob
 metadata:
   name: yeahboi-web-app-snapshot
 spec:
-  schedule: "*/1 * * * *" # Runs every 1 minutes
+  schedule: "*/5 * * * *" # Runs every 1 minutes
+  concurrencyPolicy: Forbid 
   jobTemplate:
     spec:
       template:
