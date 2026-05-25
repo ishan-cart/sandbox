@@ -26,24 +26,30 @@ metadata:
 spec:
   schedule: "*/5 * * * *" # Runs every 1 minutes
   concurrencyPolicy: Forbid 
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
   jobTemplate:
     spec:
       template:
         spec:
           containers:
-          - name: yeahboi-web-app-snapshot
-            image: 537239034666.dkr.ecr.ap-southeast-2.amazonaws.com/yeahboi/apps/web-app-snapshot:latest
-            imagePullPolicy: IfNotPresent
-            volumeMounts:
-            - name: snapshots
-              mountPath: /scripts/data
+          - name: curl
+            image: curlimages/curl:latest
             env:
-            - name: GRAFANA_HOST
-              value: prometheus-grafana.monitoring.svc.cluster.local
-            - name: GRAFANA_PORT
-              value: "80"
-            - name: API_KEY
-              value: ***REMOVED***
+            - name: PROMETHEUS_HOST
+              value: "prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local" # Use your cluster's Prometheus service name
+            - name: PROMETHEUS_PORT
+              value: "9090"
+            - name: QUERY
+              value: "sum(max by (cluster, namespace, pod, container)(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m)) by (namespace)"
+            command: ["sh", "-c"]
+            args:
+            - |
+              curl -fs -X POST http://${PROMETHEUS_HOST}:${PROMETHEUS_PORT}/api/v1/query_range \
+                --data-urlencode "query=${QUERY}" \
+                --data-urlencode "start=$(($(date +%s) - 600))" \
+                --data-urlencode "end=$(date +%s)" \
+                --data-urlencode 'step=1m'
           volumes:
           - name: snapshots
             persistentVolumeClaim:
