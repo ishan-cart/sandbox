@@ -5,10 +5,6 @@ metadata:
   name: {{ include "common-library.fullname" . }}
   labels:
     {{- include "common-library.labels" . | nindent 4 }}
-  {{- with .Values.annotations.deployment -}}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
