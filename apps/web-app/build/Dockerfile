@@ -1,14 +1,16 @@
-FROM docker.io/node:26-alpine AS build
+FROM docker.io/node:26-alpine AS development
 
 WORKDIR /app
 COPY package.json package-lock.json index.html vite.config.ts tsconfig.json .
 RUN npm clean-install
 COPY src/ src/
+COPY public/ public/
 RUN npm run build
-RUN ls
+CMD ["npm", "run", "dev"]
 
-FROM docker.io/nginx:1.30.2-alpine
+FROM docker.io/nginx:1.30.2-alpine as production
 
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY --from=development /app/dist /usr/share/nginx/html/
+COPY nginx.conf.template /etc/nginx/templates/
 
-EXPOSE 80
+EXPOSE 8080
