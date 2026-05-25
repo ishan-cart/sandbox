@@ -41,7 +41,7 @@ spec:
             - name: GRAFANA_HOST
               value: prometheus-grafana.monitoring.svc.cluster.local
             - name: GRAFANA_PORT
-              value: 80
+              value: "80"
             - name: API_KEY
               value: glsa_LbYz9ZuOTkwD0OCsZCetahOpyD5OoC3V_8d7cc023
           volumes:
