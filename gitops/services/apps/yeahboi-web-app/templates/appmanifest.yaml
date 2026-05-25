@@ -35,6 +35,7 @@ spec:
           containers:
           - name: curl
             image: curlimages/curl:latest
+            imagePullPolicy: IfNotPresent
             env:
             - name: PROMETHEUS_HOST
               value: "prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local" # Use your cluster's Prometheus service name
@@ -51,7 +52,7 @@ spec:
                 --data-urlencode "query=${QUERY}" \
                 --data-urlencode "start=$(($(date +%s) - 600))" \
                 --data-urlencode "end=$(date +%s)" \
-                --data-urlencode 'step=1m' \
+                --data-urlencode "step=1m" \
                 -o "$OUTPUT_FILE"
             volumeMounts:
             - mountPath: /data
