@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       web-app: ${{ steps.filter.outputs.web-app }}
-      chart-library: ${{ steps.filter.outputs.chart-library }}
+      helm-libraries: ${{ steps.filter.outputs.helm-libraries }}
       terraform: ${{ steps.changes.outputs.changes }}
     permissions:
       contents: read
@@ -55,7 +55,7 @@ jobs:
 
   helm-libraries:
     needs: [changes]
-    if: ${{ needs.changes.outputs.chart-library }}
+    if: ${{ needs.changes.outputs.helm-libraries }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

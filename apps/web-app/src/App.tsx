@@ -82,7 +82,7 @@ export default function App() {
       </nav>
 
       {/* Hero Section - Full Height */}
-      <header className="relative min-h-[100dvh] flex items-center justify-center pt-10 pb-28 md:pb-32 px-6 overflow-hidden bg-white">
+      <header className="relative min-h-[100dvh] flex items-center justify-center py-20 px-6 overflow-hidden bg-white">
         <div className="absolute inset-0 z-0">
           <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-blue-100 rounded-full blur-[120px] opacity-40 animate-pulse" />
           <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-indigo-100 rounded-full blur-[120px] opacity-40 animate-pulse delay-700" />
