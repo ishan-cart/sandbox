@@ -14,6 +14,7 @@ export default function App() {
   const { scrollY } = useScroll();
   const { scrollYProgress } = useScroll();
   const [showHomeButton, setShowHomeButton] = useState(false);
+  const [showChevron, setShowChevron] = useState(true);
 
   // Parallax/Layering effects for the name
   const nameX = useTransform(scrollY, [0, 500], [0, -40]);
@@ -24,6 +25,12 @@ export default function App() {
   const nameScale = useTransform(scrollY, [0, 500], [1, 1.1]);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
+    if (latest > 10) {
+      setShowChevron(false);
+    } else {
+      setShowChevron(true);
+    }
+
     if (latest > 100) {
       setShowHomeButton(true);
     } else {
@@ -75,7 +82,7 @@ export default function App() {
       </nav>
 
       {/* Hero Section - Full Height */}
-      <header className="relative min-h-[100dvh] flex items-center justify-center pt-10 px-6 overflow-hidden bg-white">
+      <header className="relative min-h-[100dvh] flex items-center justify-center pt-10 pb-28 md:pb-32 px-6 overflow-hidden bg-white">
         <div className="absolute inset-0 z-0">
           <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-blue-100 rounded-full blur-[120px] opacity-40 animate-pulse" />
           <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-indigo-100 rounded-full blur-[120px] opacity-40 animate-pulse delay-700" />
@@ -115,7 +122,7 @@ export default function App() {
             transition={{ delay: 0.2 }}
           >
             <p className="text-xl md:text-2xl text-slate-400 font-light max-w-2xl mx-auto mb-10 leading-relaxed">
-              <span className="text-slate-900 font-medium">Passionate</span> about building <span className="text-slate-900 font-medium">reliable tech</span> and improving the <span className="text-slate-900 font-medium">DevEx</span>.
+              <span className="text-slate-900 font-medium">Passionate</span> about building <span className="text-slate-900 font-medium">reliable systems</span> and streamlining <span className="text-slate-900 font-medium">DevEx</span>.
             </p>
             
             <div className="flex flex-wrap justify-center gap-3 mb-10">
@@ -149,10 +156,10 @@ export default function App() {
         </div>
 
         <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8, duration: 1 }}
-          className="absolute bottom-8 sm:bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 text-slate-400 z-20 pointer-events-none"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: showChevron ? 1 : 0, y: showChevron ? 0 : 10 }}
+          transition={{ duration: 0.3 }}
+          className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 text-slate-400 z-20 pointer-events-none"
         >
           <ChevronDown className="w-4 h-4 animate-bounce" />
         </motion.div>
