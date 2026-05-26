@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { ExternalLink, Calendar, Briefcase, ArrowRight } from "lucide-react";
+import { Calendar } from "lucide-react";
 
 export const Experience = () => {
   const experiences = [
@@ -10,13 +10,13 @@ export const Experience = () => {
           title: "Site Reliability Engineer",
           period: "2024 - 2026",
           description: "Tackled operations head on for a large-scale fleet of Linux machines; automated away toil, investigated root causes, and adapted smoothly to changing technical and business requirements.",
-          tags: ["GCP", "K8s", "Terraform", "GitHub Actions", "Argo CD", "Go", "Helm"]
+          tags: ["GCP", "Terraform", "Salt", "GitHub Actions", "K8s", "Argo CD", "Helm", "Docker", "Splunk", "Go"]
         },
         {
           title: "Linux SysAdmin",
           period: "2023 - 2024",
           description: "Advanced monitoring and alerting capabilities for the remote fleet while serving as the primary technical escalation point for field technicians.",
-          tags: ["Linux", "SaltStack", "Docker", "Splunk", "Python", "Bash"]
+          tags: ["Salt", "Docker", "Prometheus", "Grafana", "Python", "Bash"]
         }
       ]
     },
@@ -155,11 +155,6 @@ export const Experience = () => {
                 </div>
               </div>
 
-              <div className="flex-none opacity-0 group-hover:opacity-100 transition-all hidden md:block">
-                <div className="w-12 h-12 rounded-2xl border border-slate-100 bg-white flex items-center justify-center text-slate-300 group-hover:text-brand-primary group-hover:border-brand-primary group-hover:shadow-lg transition-all">
-                  <ExternalLink className="w-5 h-5" />
-                </div>
-              </div>
             </motion.div>
           ))}
         </motion.div>
