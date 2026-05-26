@@ -388,7 +388,7 @@ export const ArchitectureDiagram = () => {
                         Technical Difficulties
                       </h3>
                       <p className="text-slate-400 text-xs font-sans max-w-sm leading-relaxed mx-auto">
-                        We &apos; re having technical difficulties, data will be back up shortly.
+                        Data will be back up shortly.
                       </p>
                     </div>
                   ) : (
