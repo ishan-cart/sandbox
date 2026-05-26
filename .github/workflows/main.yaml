@@ -48,10 +48,10 @@ jobs:
   build:
     needs: [changes, terraform]
     uses: ./.github/workflows/build-image.yaml
-    if: ${{ needs.changes.outputs.web-app }}
+    if: always() && (needs.terraform.result == 'success' || needs.terraform.result == 'skipped') && needs.changes.outputs.web-app == 'true'
     with:
       application: web-app
-      push: ${{ github.ref_name == 'main' && github.event == 'push' }}
+      push: ${{ github.ref_name == 'main' && github.event_name == 'push' }}
 
   helm-libraries:
     needs: [changes]
