@@ -55,7 +55,7 @@ jobs:
 
   helm-libraries:
     needs: [changes]
-    if: ${{ needs.changes.outputs.helm-libraries }}
+    if: ${{ needs.changes.outputs.helm-libraries == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
