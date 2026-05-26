@@ -1,13 +1,16 @@
 import { motion, AnimatePresence } from "motion/react";
 import React, { useCallback, useRef, useState, useEffect } from "react";
-import QuickPinchZoom from "react-quick-pinch-zoom";
+import QuickPinchZoom, { make3dTransformValue } from "react-quick-pinch-zoom";
 import { 
   Activity, 
   LayoutDashboard, 
   Info,
-  Cpu,
+  Layers,
   Code,
-  AlertTriangle
+  AlertTriangle,
+  ZoomIn,
+  ZoomOut,
+  RotateCcw
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -22,14 +25,50 @@ import {
 import DIAGRAM_URL from "../assets/images/Untitled-2026-05-16-2229.png";
 
 export const ArchitectureDiagram = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const pinchZoomRef = useRef<any>(null);
+  const currentScaleRef = useRef<number>(1);
   const imgRef = useRef<HTMLImageElement>(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const [activeTab, setActiveTab] = useState<"diagram" | "telemetry">("diagram");
   const [showRawJson, setShowRawJson] = useState(false);
+
+  useEffect(() => {
+    if (imgRef.current && imgRef.current.complete) {
+      setImageLoaded(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (pinchZoomRef.current) {
+      const pz = pinchZoomRef.current;
+      const originalUpdateInteraction = pz._updateInteraction;
+      
+      pz._updateInteraction = function (event: any) {
+        // Distinguish real native touch events from library-simulated mouse events on desktop
+        const isRealTouchEvent = event && (
+          (event.type && typeof event.type === "string" && event.type.startsWith("touch"))
+        );
+
+        if (isRealTouchEvent) {
+          const fingers = this._fingers;
+          if (fingers === 2) {
+            return this._setInteraction("zoom", event);
+          }
+          // Prevent drag/pan with single finger on touch screens and allow it to bubble up to page scroll
+          this._setInteraction(null, event);
+          return;
+        }
+
+        return originalUpdateInteraction.call(this, event);
+      };
+    }
+  }, [imageLoaded, activeTab]);
 
   const [snapshotData, setSnapshotData] = useState<any>(null);
   const [isUnavailable, setIsUnavailable] = useState(false);
   const [loading, setLoading] = useState(true);
-  const dashboardTitle = "CPU Usage by Cluster Namespace";
+  const dashboardTitle = "Memory Usage by Cluster Namespace";
 
   useEffect(() => {
     let active = true;
@@ -65,12 +104,48 @@ export const ArchitectureDiagram = () => {
   }, []);
 
   const onUpdate = useCallback(({ x, y, scale }: { x: number; y: number; scale: number }) => {
-    const { current: img } = imgRef;
-    if (img) {
-      const value = `translate3d(${x}px, ${y}px, 0) scale(${scale})`;
-      img.style.setProperty("transform", value);
+    currentScaleRef.current = scale;
+    const { current: container } = containerRef;
+    if (container) {
+      const value = make3dTransformValue({ x, y, scale });
+      container.style.setProperty("transform", value);
     }
   }, []);
+
+  const handleZoomIn = () => {
+    if (pinchZoomRef.current) {
+      const nextScale = Math.min(4, currentScaleRef.current + 0.5);
+      pinchZoomRef.current.scaleTo({
+        scale: nextScale,
+        x: 0,
+        y: 0,
+        animated: true
+      });
+    }
+  };
+
+  const handleZoomOut = () => {
+    if (pinchZoomRef.current) {
+      const nextScale = Math.max(1, currentScaleRef.current - 0.5);
+      pinchZoomRef.current.scaleTo({
+        scale: nextScale,
+        x: 0,
+        y: 0,
+        animated: true
+      });
+    }
+  };
+
+  const handleReset = () => {
+    if (pinchZoomRef.current) {
+      pinchZoomRef.current.scaleTo({
+        scale: 1,
+        x: 0,
+        y: 0,
+        animated: true
+      });
+    }
+  };
 
   // Parse Prometheus range query matrix results to coordinate records
   const parsePanelMetrics = (panel: any): any[] => {
@@ -109,6 +184,9 @@ export const ArchitectureDiagram = () => {
           const val = parseFloat(valStr);
           if (isNaN(val)) return;
 
+          // Convert raw byte values to MiB
+          const valInMiB = val / (1024 * 1024);
+
           if (!mergedByTime[timestampMillis]) {
             const date = new Date(timestampMillis);
             const hrs = date.getHours().toString().padStart(2, "0");
@@ -118,7 +196,7 @@ export const ArchitectureDiagram = () => {
               timestamp: `${hrs}:${mins}`,
             };
           }
-          mergedByTime[timestampMillis][seriesName] = Math.round(val * 100000) / 100000;
+          mergedByTime[timestampMillis][seriesName] = Math.round(valInMiB * 100) / 100;
         });
       });
 
@@ -149,7 +227,7 @@ export const ArchitectureDiagram = () => {
     id: "prometheus-matrix-query",
     title: dashboardTitle,
     type: "timeseries",
-    unit: "CPU Cores",
+    unit: "5min Update Interval",
     rawData: snapshotData?.data,
   }] : [];
 
@@ -173,7 +251,7 @@ export const ArchitectureDiagram = () => {
             transition={{ type: "spring", stiffness: 100, damping: 20 }}
             className="text-5xl md:text-6xl font-black mb-4 text-slate-900 tracking-tighter"
           >
-            How did I <span className="text-slate-300">deploy this?</span>
+            How Did I <span className="text-slate-300">Deploy This?</span>
           </motion.h2>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
@@ -182,7 +260,7 @@ export const ArchitectureDiagram = () => {
             transition={{ delay: 0.1 }}
             className="text-slate-400 max-w-xl text-lg leading-relaxed font-light"
           >
-            Explore my deployment blueprints and live cluster telemetry directly feeding from the server's Prometheus SRE metrics pool.
+            What began as a deep-dive into self-managed Kubernetes ultimately gave me the idea to deploy this portfolio!
           </motion.p>
         </div>
 
@@ -198,7 +276,7 @@ export const ArchitectureDiagram = () => {
               }`}
             >
               <LayoutDashboard className="w-4 h-4" />
-              Blueprints
+              SYSTEM
             </button>
             <button
               onClick={() => setActiveTab("telemetry")}
@@ -225,24 +303,62 @@ export const ArchitectureDiagram = () => {
               transition={{ duration: 0.25 }}
               className="relative flex flex-col items-center w-full max-w-4xl lg:max-w-2xl mx-auto"
             >
-              <div className="relative w-full rounded-2xl border-2 border-slate-900 bg-white overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.1)] p-4 md:p-8 touch-none">
-                <QuickPinchZoom onUpdate={onUpdate} enforceBounds={true} tapZoomFactor={2}>
-                  <img 
-                    ref={imgRef}
-                    src={DIAGRAM_URL} 
-                    alt="Cloud Architecture Strategy" 
-                    className="w-full h-auto block mx-auto transition-transform duration-75 will-change-transform"
-                    referrerPolicy="no-referrer"
-                  />
+              <div className="relative w-full rounded-2xl border-2 border-slate-900 bg-white overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.1)] touch-pan-y">
+                <QuickPinchZoom 
+                  key={imageLoaded ? "loaded" : "loading"} 
+                  ref={pinchZoomRef} 
+                  onUpdate={onUpdate} 
+                  enforceBounds={true} 
+                  tapZoomFactor={2}
+                  horizontalPadding={16}
+                  verticalPadding={16}
+                  containerProps={{
+                    style: {
+                      touchAction: "pan-y"
+                    }
+                  }}
+                >
+                  <div ref={containerRef} className="w-full h-auto origin-[0_0]">
+                    <img 
+                      ref={imgRef}
+                      src={DIAGRAM_URL} 
+                      onLoad={() => setImageLoaded(true)}
+                      alt="Cloud Architecture Strategy" 
+                      className="w-full h-auto block mx-auto transition-transform duration-75 will-change-transform"
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
                 </QuickPinchZoom>
                 
-                <div className="absolute bottom-4 right-4 md:hidden pointer-events-none">
-                  <span className="bg-slate-900/80 text-white text-[10px] px-2 py-1 rounded-full font-mono uppercase tracking-tighter backdrop-blur-sm">Pinch to Zoom</span>
+                {/* Floating Interactive Zoom Controls */}
+                <div className="absolute bottom-4 right-4 flex items-center gap-1.5 bg-slate-900/90 text-white rounded-xl p-1.5 shadow-lg backdrop-blur-sm z-10 border border-slate-800">
+                  <button 
+                    onClick={handleZoomIn}
+                    title="Zoom In"
+                    className="p-1 px-1.5 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer flex items-center justify-center"
+                  >
+                    <ZoomIn className="w-4 h-4" />
+                  </button>
+                  <button 
+                    onClick={handleZoomOut}
+                    title="Zoom Out"
+                    className="p-1 px-1.5 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer flex items-center justify-center"
+                  >
+                    <ZoomOut className="w-4 h-4" />
+                  </button>
+                  <div className="w-[1px] h-4 bg-slate-800 mx-1" />
+                  <button 
+                    onClick={handleReset}
+                    title="Reset Zoom"
+                    className="p-1 px-1.5 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer flex items-center justify-center text-slate-300"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
               <div className="mt-4 flex items-center gap-2 text-slate-400 text-xs font-sans">
                 <Info className="w-3.5 h-3.5 text-slate-300" />
-                <span>Pinch to zoom dynamically on touch screens</span>
+                <span>Pinch with 2 fingers to zoom/pan on touch screens</span>
               </div>
             </motion.div>
           ) : (
@@ -269,11 +385,10 @@ export const ArchitectureDiagram = () => {
                         <AlertTriangle className="w-8 h-8" />
                       </div>
                       <h3 className="text-base font-bold text-slate-100 font-mono uppercase tracking-wider mb-2">
-                        Dashboard Unavailable
+                        Technical Difficulties
                       </h3>
-                      <p className="text-slate-500 text-xs font-mono max-w-sm leading-relaxed mx-auto">
-                        The application was unable to retrieve a valid Prometheus query-range JSON from <code className="bg-slate-900 px-1 py-0.5 rounded border border-slate-800 text-slate-300 font-sans">/data/data.json</code>.
-                        Please verify that the configuration file exists in your output directory and is well-formed.
+                      <p className="text-slate-400 text-xs font-sans max-w-sm leading-relaxed mx-auto">
+                        We &apos; re having technical difficulties, data will be back up shortly.
                       </p>
                     </div>
                   ) : (
@@ -291,7 +406,7 @@ export const ArchitectureDiagram = () => {
                             <div key={panel.id || idx} className="p-5 rounded-2xl border border-slate-900 bg-slate-900/30 flex flex-col gap-3 md:col-span-2">
                               <div className="flex items-center justify-between">
                                 <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                                  <Cpu className="w-4 h-4 text-cyan-400" />
+                                  <Layers className="w-4 h-4 text-cyan-400" />
                                   {title}
                                 </h3>
                                 {unit && (
@@ -334,6 +449,7 @@ export const ArchitectureDiagram = () => {
                                         }} 
                                         labelStyle={{ color: '#94a3b8', fontSize: '10px', fontFamily: 'monospace' }}
                                         itemStyle={{ fontSize: '11px', fontWeight: 'bold' }}
+                                        formatter={(value: any, name: any) => [`${value} MiB`, name]}
                                       />
                                       <Legend wrapperStyle={{ fontSize: '9px', paddingTop: '8px' }} />
                                       {keys.map((key, index) => {
