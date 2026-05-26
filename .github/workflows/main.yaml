@@ -51,7 +51,7 @@ jobs:
     if: ${{ needs.changes.outputs.web-app }}
     with:
       application: web-app
-      push: ${{ github.ref_name == 'main' && github.event == 'push' }}
+      push: ${{ github.ref_name == 'main' && github.event_name == 'push' }}
 
   helm-libraries:
     needs: [changes]
