@@ -7,17 +7,22 @@ image:
   # This sets the pull policy for images.
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: latest
+  tag: 4290a6a0412ac77e261b0b758e63c989d956c247
 
 # This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 # imagePullSecrets: 
 #   - name: docker-ecr-secret
+
+env: []
+  # - name: GRAFANA_HOST
+  #   value: yeahboi-web-app-svc.svc.cluster.local
+  # - name: GRAFANA_PORT
+  #   value: 80
+
 # This is to override the chart name.
 nameOverride: ""
 fullnameOverride: ""
 
-annotations:
-  deployment: {}
 # This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
 serviceAccount:
   # Specifies whether a service account should be created.
@@ -41,14 +46,13 @@ podSecurityContext: {}
   # fsGroup: 2000
 
 securityContext: {}
+  # allowPrivilegeEscalation: false
+  # readOnlyRootFilesystem: true
   # capabilities:
   #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
+  #     - ALL
 
-containerPort: 80
+containerPort: 8080  
 
 # This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
 service:
@@ -73,11 +77,11 @@ ingress:
 
 resources:
   limits:
-    cpu:  500m
-    memory: 512Mi
+    cpu:  50m
+    memory: 64Mi
   requests:
-    cpu: 500m
-    memory: 512Mi
+    cpu: 10m
+    memory: 32Mi
 
 # This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
 startupProbe:
@@ -111,17 +115,16 @@ autoscaling:
   # targetMemoryUtilizationPercentage: 80
 
 # Additional volumes on the output Deployment definition.
-volumes: []
-  # - name: foo
-  #   secret:
-  #     secretName: mysecret
-  #     optional: false
+volumes:
+  - name: snapshots
+    persistentVolumeClaim:
+      claimName: yeahboi-web-app-snapshot
 
 # Additional volumeMounts on the output Deployment definition.
-volumeMounts: []
-  # - name: foo
-  #   mountPath: "/etc/foo"
-  #   readOnly: true
+volumeMounts:
+  - name: snapshots
+    mountPath: /usr/share/nginx/html/data
+    readOnly: true
 
 nodeSelector: {}
 

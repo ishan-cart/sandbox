@@ -289,3 +289,25 @@ resource "aws_iam_role_policy_attachment" "gitops_ecr_pull_attachment" {
   role       = aws_iam_role.eks_ecr_access.name
   policy_arn = aws_iam_policy.gitops_ecr_pull.arn
 }
+
+resource "aws_iam_role" "ebs_csi_controller" {
+  name = "allow-eks-ebs-access"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Effect = "Allow"
+        Principal = {
+          Federated = aws_iam_openid_connect_provider.eks_cluster.arn
+        }
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ebs_csi_controller_attachment" {
+  role       = aws_iam_role.ebs_csi_controller.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEBSCSIDriverPolicyV2"
+}

@@ -5,40 +5,40 @@ services:
       dockerfile: build/Dockerfile
       target: ${BUILD_TARGET:-production}
     restart: always
-    environment:
-      PODMAN_DNS: 10.89.0.1
-      DOCKER_DNS: 127.0.0.11
-      GRAFANA_HOST: grafana
-      GRAFANA_PORT: 3000
     ports:
       - 8080:8080
     volumes:
       - ./apps/web-app/src:/app/src # dev only
       - ./apps/web-app/nginx.conf.template:/etc/nginx/templates/nginx.conf.template
-      - snapshot:/usr/share/nginx/html/data
-  grafana:
-    image: docker.io/grafana/grafana:main
-    ports:
-      - 3000:3000
-    volumes:
-      - ./.docker-compose/grafana/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
-      - ./.docker-compose/grafana/dashboards:/var/lib/grafana/dashboards/
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000"]
-      start_interval: 2s
+      - ./apps/web-app/public/data:/usr/share/nginx/html/data/
+      # - data:/usr/share/nginx/html/data
+
+  # grafana:
+  #   image: docker.io/grafana/grafana:main
+  #   ports:
+  #     - 3000:3000
+  #   volumes:
+  #     - ./.docker-compose/grafana/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
+  #     - ./.docker-compose/grafana/dashboards:/var/lib/grafana/dashboards/
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:3000"]
+  #     start_interval: 2s
   
-  snapshot-cron:
-    build:
-      context: ./.docker-compose/snapshot-cron/
-      dockerfile: Dockerfile
-    volumes:
-      - ./.docker-compose/snapshot-cron/snapshot.sh:/scripts/snapshot.sh
-      - snapshot:/scripts/data
-    environment:
-      GRAFANA_HOST: grafana
-    depends_on:
-      grafana:
-        condition: service_healthy
+  # prometheus-cron:
+  #   build:
+  #     context: ./.docker-compose/snapshot-cron
+  #     dockerfile: Dockerfile
+  #   environment:
+  #     PROMETHEUS_HOST: localhost
+  #     PROMETHEUS_PORT: 9090
+  #     OUTPUT_FILE: /data/data.json
+  #     QUERY: "sum(max by (cluster, namespace, pod, container)(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m)) by (namespace)"
+  #   volumes:
+  #     - ./.docker-compose/snapshot-cron/script.sh:/scripts/script.sh
+  #     - data:/data
+      
+    # grafana:
+    #   condition: service_healthy
 
 volumes:
-  snapshot:
+  data:
