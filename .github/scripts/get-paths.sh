@@ -15,6 +15,6 @@ for f in ./terraform/*; do
   fi
 done
 
-echo 'chart-library: charts/common-library/**'
+echo 'helm-libraries: helm-libraries/common-library/**'
 
 echo 'EOF'
