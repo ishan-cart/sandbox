@@ -44,7 +44,7 @@ spec:
             - name: PROMETHEUS_PORT
               value: "9090"
             - name: QUERY
-              value: "sum(max by (cluster, namespace, pod, container)(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m)) by (namespace)"
+              value: "sum(max by (cluster, namespace, pod, container) (container_memory_rss{job="kubelet", metrics_path="/metrics/cadvisor", container!=""})) by (namespace)"
             - name: OUTPUT_FILE
               value: "/data/data.json"
             command: ["sh", "-c"]
