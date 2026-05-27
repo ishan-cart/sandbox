@@ -1,0 +1,27 @@
+data "aws_subnets" "private_subnets" {
+  tags = {
+    Tier = "private"
+  }
+}
+
+data "aws_security_group" "efs" {
+  name = "efs-security-group"
+}
+
+resource "aws_efs_file_system" "eks_efs" {
+  creation_token = "${local.env_vars[var.environment].project}-web-app-nfs-storage"
+  encrypted      = true # Enables encryption at rest
+  # kms_key_id     = "arn:aws:kms:region:account:key/your-key"
+
+  tags = {
+    Name = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-efs"
+  }
+}
+
+resource "aws_efs_mount_target" "private_subnets" {
+  for_each        = toset(data.aws_subnets.private_subnets.ids)
+  file_system_id  = aws_efs_file_system.eks_efs.id
+  subnet_id       = each.value
+  security_groups = [data.aws_security_group.efs.id]
+}
+

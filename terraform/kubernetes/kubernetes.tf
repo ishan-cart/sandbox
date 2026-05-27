@@ -24,6 +24,10 @@ data "aws_iam_role" "ebs_csi_controller" {
   name = "allow-eks-ebs-access"
 }
 
+data "aws_iam_role" "efs_csi_controller" {
+  name = "allow-eks-efs-access"
+}
+
 resource "kubernetes_namespace_v1" "ingress" {
   metadata {
     name = "ingress-haproxy"
@@ -263,3 +267,43 @@ resource "helm_release" "aws_ebs_csi_driver" {
     }
   ]
 }
+
+resource "helm_release" "aws_efs_csi_driver" {
+  name       = "aws-efs-csi-driver"
+  repository = "https://kubernetes-sigs.github.io/aws-efs-csi-driver"
+  chart      = "aws-efs-csi-driver"
+  version    = "4.2.0"
+  namespace  = "kube-system"
+
+  set = [
+    {
+      name  = "controller.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+      value = data.aws_iam_role.efs_csi_controller.arn
+    }
+  ]
+}
+
+
+resource "kubernetes_manifest" "efs_storage_class" {
+  manifest = {
+    "apiVersion" = "storage.k8s.io/v1"
+    "kind"       = "StorageClass"
+    "metadata" = {
+      "name" = "efs-sc"
+    }
+    "parameters" = {
+      "basePath"              = "/dynamic_provisioning"
+      "directoryPerms"        = "700"
+      "ensureUniqueDirectory" = "true"
+      "fileSystemId"          = "fs-0ae8c10f6c888d6cc"
+      "gidRangeEnd"           = "70000"
+      "gidRangeStart"         = "50000"
+      "provisioningMode"      = "efs-ap"
+      "reuseAccessPoint"      = "false"
+      "subPathPattern"        = "$${.PVC.namespace}/$${.PVC.name}"
+    }
+    "provisioner"       = "efs.csi.aws.com"
+    "volumeBindingMode" = "WaitForFirstConsumer"
+  }
+}
+
