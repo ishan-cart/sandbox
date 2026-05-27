@@ -255,7 +255,7 @@ export const ArchitectureDiagram = () => {
     id: "prometheus-matrix-query",
     title: dashboardTitle,
     type: "timeseries",
-    unit: "5min Update Interval",
+    unit: "LAST 10MIN",
     rawData: snapshotData?.data,
   }] : [];
 
