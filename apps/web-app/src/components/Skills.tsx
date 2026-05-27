@@ -4,7 +4,7 @@ import { Cpu } from "lucide-react";
 
 import amazonwebservicesLogo from "../assets/images/logos/amazonwebservices.svg";
 import argocdLogo from "../assets/images/logos/argocd.svg";
-import saltLogo from "../assets/images/logos/salt.png";
+import saltLogo from "../assets/images/logos/salt.svg";
 
 interface Skill {
   name: string;

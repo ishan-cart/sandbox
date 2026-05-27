@@ -12,12 +12,12 @@ metadata:
   name: yeahboi-web-app-snapshot
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   volumeMode: Filesystem
   resources:
     requests:
       storage: 50Mi
-  storageClassName: gp2
+  storageClassName: efs-sc
 ---
 apiVersion: batch/v1
 kind: CronJob

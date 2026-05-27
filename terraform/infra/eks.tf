@@ -238,6 +238,15 @@ resource "aws_vpc_security_group_egress_rule" "backend_all_self" {
   referenced_security_group_id = aws_security_group.eks_worker_nodes.id
 }
 
+resource "aws_vpc_security_group_egress_rule" "backend_2049_efs" {
+  security_group_id = aws_security_group.eks_worker_nodes.id
+  description       = "Allow 2049 to EFS"
+  cidr_ipv4         = aws_vpc.vpc_network.cidr_block
+  from_port         = 2049
+  ip_protocol       = "tcp"
+  to_port           = 2049
+}
+
 ############# Rules for frontend SG #############
 
 resource "aws_vpc_security_group_egress_rule" "lb_8443" {
@@ -311,3 +320,32 @@ resource "aws_iam_role_policy_attachment" "ebs_csi_controller_attachment" {
   role       = aws_iam_role.ebs_csi_controller.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEBSCSIDriverPolicyV2"
 }
+
+resource "aws_iam_role" "efs_csi_controller" {
+  name = "allow-eks-efs-access"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Effect = "Allow"
+        Principal = {
+          Federated = aws_iam_openid_connect_provider.eks_cluster.arn
+        }
+        Condition = {
+          StringLike = {
+            "${aws_iam_openid_connect_provider.eks_cluster.url}:sub" = "system:serviceaccount:kube-system:efs-csi-*",
+            "${aws_iam_openid_connect_provider.eks_cluster.url}:aud" = "sts.amazonaws.com",
+          }
+        }
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "efs_csi_controller_attachment" {
+  role       = aws_iam_role.efs_csi_controller.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEFSCSIDriverPolicy"
+}
+
