@@ -22,7 +22,7 @@ import {
   Tooltip,
   Legend
 } from "recharts";
-import DIAGRAM_URL from "../assets/images/Untitled-2026-05-16-2229.png";
+import DIAGRAM_URL from "../assets/images/Untitled-2026-05-16-2229.svg";
 
 export const ArchitectureDiagram = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -260,7 +260,7 @@ export const ArchitectureDiagram = () => {
             transition={{ delay: 0.1 }}
             className="text-slate-400 max-w-xl text-lg leading-relaxed font-light"
           >
-            What began as a deep-dive into self-managed Kubernetes ultimately gave me the idea to deploy this portfolio!
+            Below is a diagram of the system design. What began as a deep-dive into Kubernetes ultimately gave me the idea to deploy this site on it!
           </motion.p>
         </div>
 
