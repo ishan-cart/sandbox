@@ -1,16 +1,12 @@
 import { motion, AnimatePresence } from "motion/react";
-import React, { useCallback, useRef, useState, useEffect } from "react";
-import QuickPinchZoom, { make3dTransformValue } from "react-quick-pinch-zoom";
+import React, { useRef, useState, useEffect } from "react";
 import { 
   Activity, 
   LayoutDashboard, 
   Info,
   Layers,
   Code,
-  AlertTriangle,
-  ZoomIn,
-  ZoomOut,
-  RotateCcw
+  AlertTriangle
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -22,16 +18,22 @@ import {
   Tooltip,
   Legend
 } from "recharts";
-import DIAGRAM_URL from "../assets/images/Untitled-2026-05-16-2229.png";
+import DIAGRAM_URL from "../assets/images/Untitled-2026-05-16-2229.svg";
 
 export const ArchitectureDiagram = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const pinchZoomRef = useRef<any>(null);
-  const currentScaleRef = useRef<number>(1);
   const imgRef = useRef<HTMLImageElement>(null);
+  const [zoomContainer, setZoomContainer] = useState<HTMLDivElement | null>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [activeTab, setActiveTab] = useState<"diagram" | "telemetry">("diagram");
+  const [activeTab, setActiveTab] = useState<"diagram" | "metrics">("diagram");
   const [showRawJson, setShowRawJson] = useState(false);
+
+  const [zoomState, setZoomState] = useState({ scale: 1, x: 0, y: 0 });
+  const [isZooming, setIsZooming] = useState(false);
+  const [transitioningBack, setTransitioningBack] = useState(false);
+  const isZoomingRef = useRef(false);
+  const touchStartRef = useRef<{ dist: number; cx: number; cy: number }>({ dist: 0, cx: 0, cy: 0 });
+
+  const isCurrentlyZoomed = isZooming || zoomState.scale > 1 || transitioningBack;
 
   useEffect(() => {
     if (imgRef.current && imgRef.current.complete) {
@@ -40,30 +42,100 @@ export const ArchitectureDiagram = () => {
   }, []);
 
   useEffect(() => {
-    if (pinchZoomRef.current) {
-      const pz = pinchZoomRef.current;
-      const originalUpdateInteraction = pz._updateInteraction;
-      
-      pz._updateInteraction = function (event: any) {
-        // Distinguish real native touch events from library-simulated mouse events on desktop
-        const isRealTouchEvent = event && (
-          (event.type && typeof event.type === "string" && event.type.startsWith("touch"))
-        );
-
-        if (isRealTouchEvent) {
-          const fingers = this._fingers;
-          if (fingers === 2) {
-            return this._setInteraction("zoom", event);
-          }
-          // Prevent drag/pan with single finger on touch screens and allow it to bubble up to page scroll
-          this._setInteraction(null, event);
-          return;
-        }
-
-        return originalUpdateInteraction.call(this, event);
-      };
+    if (activeTab !== "diagram") {
+      setImageLoaded(false);
+      setZoomState({ scale: 1, x: 0, y: 0 });
+      setIsZooming(false);
+      setTransitioningBack(false);
+      isZoomingRef.current = false;
     }
-  }, [imageLoaded, activeTab]);
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (!zoomContainer) {
+      setZoomState({ scale: 1, x: 0, y: 0 });
+      setIsZooming(false);
+      setTransitioningBack(false);
+      isZoomingRef.current = false;
+      return;
+    }
+
+    // Explicitly reset everything on mount/remount of the zoom container to guarantee a fresh state
+    setZoomState({ scale: 1, x: 0, y: 0 });
+    setIsZooming(false);
+    setTransitioningBack(false);
+    isZoomingRef.current = false;
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        if (e.cancelable) {
+          e.preventDefault();
+        }
+        const t1 = e.touches[0];
+        const t2 = e.touches[1];
+        const dx = t1.clientX - t2.clientX;
+        const dy = t1.clientY - t2.clientY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        // Guard against single-point coordinates or extremely close fingers to avoid infinite scale
+        if (dist > 15) {
+          const cx = (t1.clientX + t2.clientX) / 2;
+          const cy = (t1.clientY + t2.clientY) / 2;
+
+          touchStartRef.current = { dist, cx, cy };
+          isZoomingRef.current = true;
+          setIsZooming(true);
+        }
+      }
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (isZoomingRef.current && e.touches.length === 2) {
+        if (e.cancelable) {
+          e.preventDefault();
+        }
+        const t1 = e.touches[0];
+        const t2 = e.touches[1];
+        const dx = t1.clientX - t2.clientX;
+        const dy = t1.clientY - t2.clientY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        
+        const cx = (t1.clientX + t2.clientX) / 2;
+        const cy = (t1.clientY + t2.clientY) / 2;
+
+        // Clamp the zoom scale factor conservatively between 1 and 4.5
+        const scale = Math.min(4.5, Math.max(1, dist / touchStartRef.current.dist));
+        const x = cx - touchStartRef.current.cx;
+        const y = cy - touchStartRef.current.cy;
+
+        setZoomState({ scale, x, y });
+      }
+    };
+
+    const onTouchEnd = () => {
+      if (isZoomingRef.current) {
+        isZoomingRef.current = false;
+        setIsZooming(false);
+        setZoomState({ scale: 1, x: 0, y: 0 });
+        setTransitioningBack(true);
+        setTimeout(() => {
+          setTransitioningBack(false);
+        }, 300);
+      }
+    };
+
+    zoomContainer.addEventListener("touchstart", onTouchStart, { passive: false });
+    zoomContainer.addEventListener("touchmove", onTouchMove, { passive: false });
+    zoomContainer.addEventListener("touchend", onTouchEnd, { passive: true });
+    zoomContainer.addEventListener("touchcancel", onTouchEnd, { passive: true });
+
+    return () => {
+      zoomContainer.removeEventListener("touchstart", onTouchStart);
+      zoomContainer.removeEventListener("touchmove", onTouchMove);
+      zoomContainer.removeEventListener("touchend", onTouchEnd);
+      zoomContainer.removeEventListener("touchcancel", onTouchEnd);
+    };
+  }, [zoomContainer]);
 
   const [snapshotData, setSnapshotData] = useState<any>(null);
   const [isUnavailable, setIsUnavailable] = useState(false);
@@ -102,50 +174,6 @@ export const ArchitectureDiagram = () => {
       active = false;
     };
   }, []);
-
-  const onUpdate = useCallback(({ x, y, scale }: { x: number; y: number; scale: number }) => {
-    currentScaleRef.current = scale;
-    const { current: container } = containerRef;
-    if (container) {
-      const value = make3dTransformValue({ x, y, scale });
-      container.style.setProperty("transform", value);
-    }
-  }, []);
-
-  const handleZoomIn = () => {
-    if (pinchZoomRef.current) {
-      const nextScale = Math.min(4, currentScaleRef.current + 0.5);
-      pinchZoomRef.current.scaleTo({
-        scale: nextScale,
-        x: 0,
-        y: 0,
-        animated: true
-      });
-    }
-  };
-
-  const handleZoomOut = () => {
-    if (pinchZoomRef.current) {
-      const nextScale = Math.max(1, currentScaleRef.current - 0.5);
-      pinchZoomRef.current.scaleTo({
-        scale: nextScale,
-        x: 0,
-        y: 0,
-        animated: true
-      });
-    }
-  };
-
-  const handleReset = () => {
-    if (pinchZoomRef.current) {
-      pinchZoomRef.current.scaleTo({
-        scale: 1,
-        x: 0,
-        y: 0,
-        animated: true
-      });
-    }
-  };
 
   // Parse Prometheus range query matrix results to coordinate records
   const parsePanelMetrics = (panel: any): any[] => {
@@ -227,7 +255,7 @@ export const ArchitectureDiagram = () => {
     id: "prometheus-matrix-query",
     title: dashboardTitle,
     type: "timeseries",
-    unit: "5min Update Interval",
+    unit: "LAST 10MIN",
     rawData: snapshotData?.data,
   }] : [];
 
@@ -260,7 +288,7 @@ export const ArchitectureDiagram = () => {
             transition={{ delay: 0.1 }}
             className="text-slate-400 max-w-xl text-lg leading-relaxed font-light"
           >
-            What began as a deep-dive into self-managed Kubernetes ultimately gave me the idea to deploy this portfolio!
+            Below is a diagram of the system design. What began as a deep-dive into Kubernetes ultimately gave me the idea to deploy this site on it!
           </motion.p>
         </div>
 
@@ -276,18 +304,18 @@ export const ArchitectureDiagram = () => {
               }`}
             >
               <LayoutDashboard className="w-4 h-4" />
-              SYSTEM
+              System Design
             </button>
             <button
-              onClick={() => setActiveTab("telemetry")}
+              onClick={() => setActiveTab("metrics")}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-bold tracking-wider uppercase transition-all duration-200 ${
-                activeTab === "telemetry"
+                activeTab === "metrics"
                   ? "bg-white text-slate-900 shadow-md"
                   : "text-slate-400 hover:text-slate-700"
               }`}
             >
               <Activity className="w-4 h-4 text-brand-primary" />
-              Live Telemetry
+              Metrics
             </button>
           </div>
         </div>
@@ -303,73 +331,48 @@ export const ArchitectureDiagram = () => {
               transition={{ duration: 0.25 }}
               className="relative flex flex-col items-center w-full max-w-4xl lg:max-w-2xl mx-auto"
             >
-              <div className="relative w-full rounded-2xl border-2 border-slate-900 bg-white overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.1)] touch-pan-y">
-                <QuickPinchZoom 
-                  key={imageLoaded ? "loaded" : "loading"} 
-                  ref={pinchZoomRef} 
-                  onUpdate={onUpdate} 
-                  enforceBounds={true} 
-                  tapZoomFactor={2}
-                  horizontalPadding={16}
-                  verticalPadding={16}
-                  containerProps={{
-                    style: {
-                      touchAction: "pan-y"
-                    }
+              <div 
+                ref={setZoomContainer} 
+                className={`relative w-full rounded-2xl border-2 border-slate-900 bg-white select-none aspect-[816/844] touch-pan-y transition-shadow duration-300 ${
+                  isCurrentlyZoomed 
+                    ? "overflow-visible z-[100] shadow-[0_30px_70px_rgba(0,0,0,0.25)]" 
+                    : "overflow-hidden z-0 shadow-[0_20px_50px_rgba(0,0,0,0.1)]"
+                }`}
+              >
+                {!imageLoaded && (
+                  <div className="absolute inset-0 bg-slate-50 flex flex-col items-center justify-center gap-3 z-20">
+                    <div className="w-8 h-8 rounded-full border-2 border-slate-200 border-t-cyan-500 animate-spin" />
+                    <span className="text-[10px] font-mono tracking-wider text-slate-400 uppercase font-bold animate-pulse">Rendering system design...</span>
+                  </div>
+                )}
+                <div 
+                  className="w-full h-auto origin-center"
+                  style={{
+                    transform: `translate3d(${zoomState.x}px, ${zoomState.y}px, 0) scale3d(${zoomState.scale}, ${zoomState.scale}, 1)`,
+                    transition: isZooming ? "none" : "transform 0.3s cubic-bezier(0.25, 1, 0.5, 1)",
+                    willChange: "transform"
                   }}
                 >
-                  <div ref={containerRef} className="w-full h-auto origin-[0_0]">
-                    <img 
-                      ref={imgRef}
-                      src={DIAGRAM_URL} 
-                      onLoad={() => setImageLoaded(true)}
-                      alt="Cloud Architecture Strategy" 
-                      className="w-full h-auto block mx-auto transition-transform duration-75 will-change-transform"
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
-                </QuickPinchZoom>
-                
-                {/* Floating Interactive Zoom Controls */}
-                <div className="absolute bottom-4 right-4 flex items-center gap-1.5 bg-slate-900/90 text-white rounded-xl p-1.5 shadow-lg backdrop-blur-sm z-10 border border-slate-800">
-                  <button 
-                    onClick={handleZoomIn}
-                    title="Zoom In"
-                    className="p-1 px-1.5 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer flex items-center justify-center"
-                  >
-                    <ZoomIn className="w-4 h-4" />
-                  </button>
-                  <button 
-                    onClick={handleZoomOut}
-                    title="Zoom Out"
-                    className="p-1 px-1.5 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer flex items-center justify-center"
-                  >
-                    <ZoomOut className="w-4 h-4" />
-                  </button>
-                  <div className="w-[1px] h-4 bg-slate-800 mx-1" />
-                  <button 
-                    onClick={handleReset}
-                    title="Reset Zoom"
-                    className="p-1 px-1.5 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer flex items-center justify-center text-slate-300"
-                  >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                  </button>
+                  <img 
+                    ref={imgRef}
+                    src={DIAGRAM_URL} 
+                    onLoad={() => setImageLoaded(true)}
+                    alt="Cloud Architecture Strategy" 
+                    className="w-full h-auto block mx-auto select-none pointer-events-none"
+                    referrerPolicy="no-referrer"
+                  />
                 </div>
-              </div>
-              <div className="mt-4 flex items-center gap-2 text-slate-400 text-xs font-sans">
-                <Info className="w-3.5 h-3.5 text-slate-300" />
-                <span>Pinch with 2 fingers to zoom/pan on touch screens</span>
               </div>
             </motion.div>
           ) : (
-            <motion.div
-              key="telemetry-tab"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.25 }}
-              className="w-full max-w-4xl mx-auto flex flex-col gap-6"
-            >
+                  <motion.div
+                    key="metrics-tab"
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -15 }}
+                    transition={{ duration: 0.25 }}
+                    className="w-full max-w-4xl mx-auto flex flex-col gap-6"
+                  >
               <div className="relative w-full rounded-2xl border border-slate-900 bg-slate-950 overflow-hidden shadow-[0_20px_50px_rgba(30,41,59,0.15)] flex flex-col">
                 {/* Main Dashboard Workspace area */}
                 <div className="p-6 bg-slate-950 flex flex-col gap-6 min-h-[500px]">
@@ -377,7 +380,7 @@ export const ArchitectureDiagram = () => {
                   {loading ? (
                     <div className="flex flex-col items-center justify-center py-24 gap-4 text-slate-500 font-mono text-xs">
                       <div className="w-8 h-8 rounded-full border-2 border-slate-800 border-t-cyan-500 animate-spin" />
-                      <span>Retrieving live Prometheus metrics stream...</span>
+                      <span>Querying Prometheus...</span>
                     </div>
                   ) : isUnavailable ? (
                     <div className="flex flex-col items-center justify-center p-8 py-20 border border-slate-900 rounded-2xl text-center">
@@ -392,13 +395,13 @@ export const ArchitectureDiagram = () => {
                       </p>
                     </div>
                   ) : (
-                    /* Dynamic Snapshot Panels Grid */
+                    /* Dynamic metrics Panels Grid */
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {panels.length > 0 ? (
                         panels.map((panel, idx) => {
                           const metricsData = parsePanelMetrics(panel);
                           const keys = getMetricsKeys(metricsData);
-                          const title = panel.title || "Telemetry Panel";
+                          const title = panel.title || "Metrics Panel";
                           const unit = panel.unit || "";
 
                           // Default Timeseries Area Chart
@@ -506,7 +509,7 @@ export const ArchitectureDiagram = () => {
                     </div>
                   )}
 
-                  {/* Accordion view looking into the actual telemetry.json payload */}
+                  {/* Accordion view looking into the actual Prometheus metrics payload */}
                   <div className="mt-2 border-t border-slate-900 pt-4 flex flex-col">
                     <button
                       onClick={() => setShowRawJson(!showRawJson)}
