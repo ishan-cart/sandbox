@@ -232,3 +232,18 @@ resource "aws_vpc_security_group_egress_rule" "lb_all_self" {
   ip_protocol                  = "-1"
   referenced_security_group_id = aws_security_group.fe_lb.id
 }
+
+resource "aws_security_group" "efs" {
+  name        = "efs-security-group"
+  description = "EFS to EKS"
+  vpc_id      = aws_vpc.vpc_network.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow_2049_eks" {
+  description                  = "Allow 2049 inbound from EKS worker nodes"
+  security_group_id            = aws_security_group.efs.id
+  from_port                    = 2049
+  ip_protocol                  = "tcp"
+  to_port                      = 2049
+  referenced_security_group_id = aws_security_group.eks_worker_nodes.id
+}
