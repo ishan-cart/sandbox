@@ -63,7 +63,7 @@ service:
 ingress:
   enabled: true
   annotations:
-    haproxy.org/frontend-config-snippet: http-request redirect location https://ishans.au%[path] code 301 if { hdr(host) -i www.ishans.au }
+    haproxy.org/frontend-config-snippet: http-request redirect code 301 location https://ishans.au%[path] code 301 if { hdr(host) -i www.ishans.au }
   hosts:
     - host: ishans.au
       paths: &paths
