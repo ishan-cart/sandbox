@@ -11,7 +11,7 @@ resource "cloudflare_dns_record" "cname_root" {
   proxied = true
 }
 
-resource "cloudflare_dns_record" "cname_www" {
+resource "cloudflare_dns_record" "cname_wildcard" {
   zone_id = local.env_vars[var.environment].zone_id
   name    = "*"
   ttl     = 1
@@ -39,27 +39,27 @@ resource "aws_vpc_security_group_ingress_rule" "lb_https" {
   to_port           = 443
 }
 
-resource "cloudflare_page_rule" "redirect_www" {
-  zone_id = local.env_vars[var.environment].zone_id
-  target = "www.${local.env_vars[var.environment].zone_id}"
-  priority = 1
-  status = "active"
-  actions = {
-    forwarding_url = {
-      url = "https://${local.env_vars[var.environment].zone_id}"
-      status_code = 301
-    }
-  }
-}
+# resource "cloudflare_page_rule" "redirect_www" {
+#   zone_id  = local.env_vars[var.environment].zone_id
+#   target   = "www.${local.env_vars[var.environment].zone_id}"
+#   priority = 1
+#   status   = "active"
+#   actions = {
+#     forwarding_url = {
+#       url         = "https://${local.env_vars[var.environment].zone_id}"
+#       status_code = 301
+#     }
+#   }
+# }
 
-resource "cloudflare_bot_management" "example_bot_management" {
-  zone_id = "023e105f4ecef8ad9ca31a8372d0c353"
-  auto_update_model = true
-  ai_bots_protection = "block"
-  cf_robots_variant = "policy_only"
-  content_bots_protection = "disabled"
-  crawler_protection = "enabled"
-  enable_js = true
-  fight_mode = false
-  is_robots_txt_managed = true
-}
+# resource "cloudflare_bot_management" "example_bot_management" {
+#   zone_id                 = "023e105f4ecef8ad9ca31a8372d0c353"
+#   auto_update_model       = true
+#   ai_bots_protection      = "block"
+#   cf_robots_variant       = "policy_only"
+#   content_bots_protection = "disabled"
+#   crawler_protection      = "enabled"
+#   enable_js               = true
+#   fight_mode              = false
+#   is_robots_txt_managed   = true
+# }
