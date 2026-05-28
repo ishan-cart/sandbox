@@ -81,32 +81,6 @@ resource "aws_eip" "natgw_2" {
   domain = "vpc"
 }
 
-resource "aws_nat_gateway" "public_natgw_1" {
-  allocation_id = aws_eip.natgw_1.id
-  subnet_id     = aws_subnet.public_subnet_1.id
-
-  tags = {
-    Name = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-public-natgw-1"
-  }
-
-  # To ensure proper ordering, it is recommended to add an explicit dependency
-  # on the Internet Gateway for the VPC.
-  depends_on = [aws_internet_gateway.igw]
-}
-
-resource "aws_nat_gateway" "public_natgw_2" {
-  allocation_id = aws_eip.natgw_2.id
-  subnet_id     = aws_subnet.public_subnet_2.id
-
-  tags = {
-    Name = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-public-natgw-2"
-  }
-
-  # To ensure proper ordering, it is recommended to add an explicit dependency
-  # on the Internet Gateway for the VPC.
-  depends_on = [aws_internet_gateway.igw]
-}
-
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.vpc_network.id
 
@@ -126,13 +100,8 @@ resource "aws_route_table" "private_1" {
 
   tags = {
     Name = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-private-1"
+    Tier = "private"
   }
-}
-
-resource "aws_route" "private_1" {
-  route_table_id         = aws_route_table.private_1.id
-  destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.public_natgw_1.id
 }
 
 resource "aws_route_table" "private_2" {
@@ -140,13 +109,8 @@ resource "aws_route_table" "private_2" {
 
   tags = {
     Name = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-private-2"
+    Tier = "private"
   }
-}
-
-resource "aws_route" "private_2" {
-  route_table_id         = aws_route_table.private_2.id
-  destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = aws_nat_gateway.public_natgw_2.id
 }
 
 resource "aws_route_table_association" "public_subnet_1_route" {
