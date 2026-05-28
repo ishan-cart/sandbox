@@ -861,7 +861,7 @@ alertmanager:
 
     ## Scrape interval. If not set, the Prometheus default scrape interval is used.
     ##
-    interval: ""
+    interval: 60s
 
     ## Additional labels
     ##
@@ -1395,12 +1395,12 @@ grafana:
   ingress:
     ## If true, Grafana Ingress will be created
     ##
-    enabled: true
+    enabled: false
 
     ## IngressClassName for Grafana Ingress.
     ## Should be provided if Ingress is enable.
     ##
-    ingressClassName: haproxy
+    ingressClassName: ""
 
     ## Annotations for Grafana Ingress
     ##
@@ -1417,7 +1417,7 @@ grafana:
     ##
     # hosts:
     #   - grafana.domain.com
-    hosts: [grafana.ishans.au]
+    hosts: []
 
     ## Path for grafana ingress
     path: /
@@ -1583,7 +1583,7 @@ grafana:
 
     # Scrape interval. If not set, the Prometheus default scrape interval is used.
     #
-    interval: ""
+    interval: 60s
     scheme: http
     tlsConfig: {}
     scrapeTimeout: 30s
@@ -1607,12 +1607,12 @@ kubernetesServiceMonitors:
 ## Component scraping the kube api server
 ##
 kubeApiServer:
-  enabled: true
+  enabled: false
   tlsConfig:
     serverName: kubernetes
     insecureSkipVerify: false
   serviceMonitor:
-    enabled: true
+    enabled: false
     ## Scrape interval. If not set, the Prometheus default scrape interval is used.
     ##
     interval: ""
@@ -1936,7 +1936,7 @@ kubelet:
 ## Component scraping the kube controller manager
 ##
 kubeControllerManager:
-  enabled: true
+  enabled: false
 
   # Overrides the job selector in Grafana dashboards and Prometheus rules
   # For k3s clusters, change to k3s-server
@@ -1952,7 +1952,7 @@ kubeControllerManager:
   ## If using kubeControllerManager.endpoints only the port and targetPort are used
   ##
   service:
-    enabled: true
+    enabled: false
     ## If null or unset, the value is determined dynamically based on target Kubernetes version due to change
     ## of default port in Kubernetes 1.22.
     ##
@@ -1966,7 +1966,7 @@ kubeControllerManager:
     #   component: kube-controller-manager
 
   serviceMonitor:
-    enabled: true
+    enabled: false
     ## Scrape interval. If not set, the Prometheus default scrape interval is used.
     ##
     interval: ""
@@ -2047,7 +2047,7 @@ kubeControllerManager:
 ## Component scraping coreDns. Use either this or kubeDns
 ##
 coreDns:
-  enabled: true
+  enabled: false
   service:
     enabled: true
     port: 9153
@@ -2060,7 +2060,7 @@ coreDns:
     # selector:
     #   k8s-app: kube-dns
   serviceMonitor:
-    enabled: true
+    enabled: false
     ## Scrape interval. If not set, the Prometheus default scrape interval is used.
     ##
     interval: ""
@@ -3865,7 +3865,7 @@ prometheus:
 
     ## Scrape interval. If not set, the Prometheus default scrape interval is used.
     ##
-    interval: ""
+    interval: 60s
 
     ## Additional labels
     ##
@@ -3982,11 +3982,11 @@ prometheus:
     ## Defaults to 30s.
     ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/release-0.44/pkg/prometheus/promcfg.go#L180-L183
     ##
-    scrapeInterval: ""
+    scrapeInterval: 60s
 
     ## Number of seconds to wait for target to respond before erroring
     ##
-    scrapeTimeout: ""
+    scrapeTimeout: 30s
 
     ## List of scrape classes to expose to scraping objects such as
     ## PodMonitors, ServiceMonitors, Probes and ScrapeConfigs.
@@ -4277,11 +4277,11 @@ prometheus:
 
     ## How long to retain metrics
     ##
-    retention: 10d
+    retention: 7d
 
     ## Maximum size of metrics
     ## Unit format should be in the form of "50GiB"
-    retentionSize: ""
+    retentionSize: 20GiB
 
     ## Allow out-of-order/out-of-bounds samples ingested into Prometheus for a specified duration
     ## See https://prometheus.io/docs/prometheus/latest/configuration/configuration/#tsdb
