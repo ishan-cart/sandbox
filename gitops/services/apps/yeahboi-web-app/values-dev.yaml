@@ -62,16 +62,14 @@ service:
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:
   enabled: true
-  annotations:
-    haproxy.org/frontend-config-snippet: http-request redirect code 301 location https://ishans.au%[path] code 301 if { hdr(host) -i www.ishans.au }
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
   hosts:
     - host: ishans.au
-      paths: &paths
+      paths:
         - path: /
           pathType: Prefix
-    - host: www.ishans.au
-      paths: *paths
-
   tls: []
     # - secretName: chart-example-tls
     #   hosts:
