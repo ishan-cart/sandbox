@@ -66,13 +66,12 @@ ingress:
     haproxy.org/frontend-config-snippet: http-request redirect location https://ishans.au%[path] code 301 if { hdr(host) -i www.ishans.au }
   hosts:
     - host: ishans.au
-      paths:
+      paths: &paths
         - path: /
           pathType: Prefix
     - host: www.ishans.au
-      paths:
-        - path: /
-          pathType: Prefix
+      paths: *paths
+
   tls: []
     # - secretName: chart-example-tls
     #   hosts:
