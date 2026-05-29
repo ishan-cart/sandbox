@@ -2,6 +2,12 @@ services:
   megalinter:
     image: ghcr.io/oxsecurity/megalinter:v9.5.0
     profiles: [lint]
+    security_opt:
+      - label:disable
+    environment:
+      APPLY_FIXES: all
+      WORKSPACE: /tmp/lint # Forces the tool out of CI isolation mode
+      DEFAULT_WORKSPACE: /tmp/lint # Overrides internal script resets
     volumes:
       - ./:/tmp/lint
 
@@ -11,13 +17,13 @@ services:
       dockerfile: build/Dockerfile
       target: ${BUILD_TARGET:-production}
     restart: always
+    profiles: [web]
     ports:
       - 8080:8080
     volumes:
       - ./apps/web-app/src:/app/src # dev only
       - ./apps/web-app/nginx.conf.template:/etc/nginx/templates/nginx.conf.template
       - ./apps/web-app/public/data:/usr/share/nginx/html/data/
-      - data:/usr/share/nginx/html/data
 
   web-app-cron:
     image: curlimages/curl:8.20.0
@@ -29,7 +35,7 @@ services:
       QUERY: "sum(max by (cluster, namespace, pod, container)(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m)) by (namespace)"
     volumes:
       - ./.docker-compose/snapshot-cron/script.sh:/scripts/script.sh
-      - data:/data
+      - ./apps/web-app/public/data:/data/
     entrypoint: ["sh", "-c"]
     command: |
       curl -f -X POST "http://${PROMETHEUS_HOST}:${PROMETHEUS_PORT}/api/v1/query_range" \
@@ -40,6 +46,7 @@ services:
 
   prometheus:
     image: docker.io/prom/prometheus:v3.11.3
+    profiles: [web]
     ports:
       - 9090:9090
     healthcheck:
