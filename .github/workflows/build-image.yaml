@@ -39,13 +39,19 @@ jobs:
 
       - name: Build
         working-directory: apps/${{ inputs.application }}
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          APPLICATION: ${{ inputs.application }}
         run: |
           BUILD_VERSION="$(cat ./build/version)"
-          docker build -t ${{ steps.login-ecr.outputs.registry }}/yeahboi/apps/${{ inputs.application }}:${BUILD_VERSION} -f ./build/Dockerfile .
+          docker build -t "${ECR_REGISTRY}/yeahboi/apps/${APPLICATION}:${BUILD_VERSION}" -f ./build/Dockerfile .
 
       - name: Push
         if: ${{ inputs.push }}
         working-directory: apps/${{ inputs.application }}
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          APPLICATION: ${{ inputs.application }}
         run: |
           BUILD_VERSION="$(cat ./build/version)"
-          docker push ${{ steps.login-ecr.outputs.registry }}/yeahboi/apps/${{ inputs.application }}:${BUILD_VERSION}
+          docker push "${ECR_REGISTRY}/yeahboi/apps/${APPLICATION}:${BUILD_VERSION}"
