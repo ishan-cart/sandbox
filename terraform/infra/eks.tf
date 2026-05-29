@@ -59,12 +59,6 @@ resource "aws_launch_template" "eks_worker_nodes" {
       aws_security_group.eks_worker_nodes.id,
     ]
   }
-  block_device_mappings {
-    device_name = "/dev/sdf"
-    ebs {
-      volume_size = 20
-    }
-  }
 }
 
 resource "aws_eks_node_group" "node_group" {
