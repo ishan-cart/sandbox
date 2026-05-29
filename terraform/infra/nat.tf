@@ -18,12 +18,13 @@ resource "aws_iam_instance_profile" "nat_profile" {
 }
 
 resource "aws_instance" "diy-nat-gw" {
-  ami                    = data.aws_ami.al2023_arm64.id
-  instance_type          = "t4g.nano"
-  vpc_security_group_ids = [aws_security_group.diy_nat_sg.id]
-  subnet_id = aws_subnet.public_subnet_1.id # hardcode one of the public subnets
-  iam_instance_profile = aws_iam_instance_profile.nat_profile.name
+  ami                         = data.aws_ami.al2023_arm64.id
+  instance_type               = "t4g.nano"
+  vpc_security_group_ids      = [aws_security_group.diy_nat_sg.id]
+  subnet_id                   = aws_subnet.public_subnet_1.id # hardcode one of the public subnets
+  iam_instance_profile        = aws_iam_instance_profile.nat_profile.name
   associate_public_ip_address = true
+  source_dest_check           = false
 
   instance_market_options {
     market_type = "spot"
