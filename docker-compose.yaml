@@ -1,4 +1,10 @@
 services:
+  megalinter:
+    image: ghcr.io/oxsecurity/megalinter:v9.5.0
+    profiles: [lint]
+    volumes: 
+      - ./:/tmp/lint
+
   web-app:
     build:
       context: apps/web-app
@@ -11,34 +17,35 @@ services:
       - ./apps/web-app/src:/app/src # dev only
       - ./apps/web-app/nginx.conf.template:/etc/nginx/templates/nginx.conf.template
       - ./apps/web-app/public/data:/usr/share/nginx/html/data/
-      # - data:/usr/share/nginx/html/data
+      - data:/usr/share/nginx/html/data
 
-  # grafana:
-  #   image: docker.io/grafana/grafana:main
-  #   ports:
-  #     - 3000:3000
-  #   volumes:
-  #     - ./.docker-compose/grafana/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
-  #     - ./.docker-compose/grafana/dashboards:/var/lib/grafana/dashboards/
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost:3000"]
-  #     start_interval: 2s
+  web-app-cron:
+    image: curlimages/curl:8.20.0
+    profiles: [web]
+    environment:
+      PROMETHEUS_HOST: prometheus
+      PROMETHEUS_PORT: 9090
+      OUTPUT_FILE: /data/data.json
+      QUERY: "sum(max by (cluster, namespace, pod, container)(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m)) by (namespace)"
+    volumes:
+      - ./.docker-compose/snapshot-cron/script.sh:/scripts/script.sh
+      - data:/data
+    entrypoint: ["sh", "-c"]
+    command: |
+      curl -f -X POST "http://${PROMETHEUS_HOST}:${PROMETHEUS_PORT}/api/v1/query_range" \
+      --data-urlencode "query=${QUERY}" \
+      --data-urlencode "start=$(($(date +%s) - 600))" \
+      --data-urlencode "end=$(date +%s)" \
+      --data-urlencode "step=1m"
+
+  prometheus:
+    image: docker.io/prom/prometheus:v3.11.3
+    ports:
+      - 9090:9090
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9090"]
+      start_interval: 2s
   
-  # prometheus-cron:
-  #   build:
-  #     context: ./.docker-compose/snapshot-cron
-  #     dockerfile: Dockerfile
-  #   environment:
-  #     PROMETHEUS_HOST: localhost
-  #     PROMETHEUS_PORT: 9090
-  #     OUTPUT_FILE: /data/data.json
-  #     QUERY: "sum(max by (cluster, namespace, pod, container)(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_rate5m)) by (namespace)"
-  #   volumes:
-  #     - ./.docker-compose/snapshot-cron/script.sh:/scripts/script.sh
-  #     - data:/data
-      
-    # grafana:
-    #   condition: service_healthy
 
 volumes:
   data:
