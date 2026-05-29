@@ -3,9 +3,7 @@
   "Statement": [
     {
       "Effect": "Allow",
-      "Action": [
-        "iam:CreateServiceLinkedRole"
-      ],
+      "Action": ["iam:CreateServiceLinkedRole"],
       "Resource": "*",
       "Condition": {
         "StringEquals": {
@@ -81,16 +79,12 @@
     },
     {
       "Effect": "Allow",
-      "Action": [
-        "ec2:CreateSecurityGroup"
-      ],
+      "Action": ["ec2:CreateSecurityGroup"],
       "Resource": "*"
     },
     {
       "Effect": "Allow",
-      "Action": [
-        "ec2:CreateTags"
-      ],
+      "Action": ["ec2:CreateTags"],
       "Resource": "arn:aws:ec2:*:*:security-group/*",
       "Condition": {
         "StringEquals": {
@@ -103,10 +97,7 @@
     },
     {
       "Effect": "Allow",
-      "Action": [
-        "ec2:CreateTags",
-        "ec2:DeleteTags"
-      ],
+      "Action": ["ec2:CreateTags", "ec2:DeleteTags"],
       "Resource": "arn:aws:ec2:*:*:security-group/*",
       "Condition": {
         "Null": {
@@ -207,9 +198,7 @@
     },
     {
       "Effect": "Allow",
-      "Action": [
-        "elasticloadbalancing:AddTags"
-      ],
+      "Action": ["elasticloadbalancing:AddTags"],
       "Resource": [
         "arn:aws:elasticloadbalancing:*:*:targetgroup/*/*",
         "arn:aws:elasticloadbalancing:*:*:loadbalancer/net/*/*",
