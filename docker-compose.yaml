@@ -60,6 +60,3 @@ services:
       start_interval: 1s
       interval: 1s
       timeout: 1s
-
-volumes:
-  data:
