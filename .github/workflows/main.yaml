@@ -1,4 +1,4 @@
-name: 'Main'
+name: "Main"
 
 on:
   pull_request:
@@ -44,7 +44,7 @@ jobs:
     uses: ./.github/workflows/terraform.yaml
     with:
       application: ${{ matrix.application }}
-  
+
   build:
     needs: [changes, terraform]
     uses: ./.github/workflows/build-image.yaml

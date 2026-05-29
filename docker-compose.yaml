@@ -2,7 +2,7 @@ services:
   megalinter:
     image: ghcr.io/oxsecurity/megalinter:v9.5.0
     profiles: [lint]
-    volumes: 
+    volumes:
       - ./:/tmp/lint
 
   web-app:
@@ -45,7 +45,6 @@ services:
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9090"]
       start_interval: 2s
-  
 
 volumes:
   data:

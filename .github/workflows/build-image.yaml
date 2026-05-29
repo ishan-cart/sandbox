@@ -1,4 +1,4 @@
-name: 'Build Image'
+name: "Build Image"
 
 on:
   workflow_call:
@@ -6,7 +6,7 @@ on:
       application:
         description: "The application name"
         required: true
-        type: string 
+        type: string
       push:
         description: push image to registry
         required: false
@@ -32,11 +32,11 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::537239034666:role/github_oidc_role
           aws-region: "ap-southeast-2"
-        
+
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
-      
+
       - name: Build
         working-directory: apps/${{ inputs.application }}
         run: |

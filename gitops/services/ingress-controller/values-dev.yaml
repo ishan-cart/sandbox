@@ -60,14 +60,14 @@ aws:
 controller:
   name: controller
   image:
-    repository: docker.io/haproxytech/kubernetes-ingress    # can be changed to use CE or EE Controller images
-    tag: ""                                                 # overrides the image tag whose default is the chart appVersion
+    repository: docker.io/haproxytech/kubernetes-ingress # can be changed to use CE or EE Controller images
+    tag: "" # overrides the image tag whose default is the chart appVersion
     pullPolicy: IfNotPresent
 
   ## Deployment or DaemonSet pod mode
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/
-  kind: Deployment    # can be 'Deployment' or 'DaemonSet'
+  kind: Deployment # can be 'Deployment' or 'DaemonSet'
   replicaCount: 2
 
   ## minReadySeconds setting of Deployment or DaemonSet
@@ -181,7 +181,7 @@ controller:
   # k8s < 1.18: Ingress Class used, in multi-ingress environments, for ingress.class annotation to select ingress resources to implement.
   # k8s >= 1.18: Ingress Class used to target specific HAProxy Ingress Controller in multi-ingress envionments
   # ref: https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/#using-multiple-ingress-controllers
-  ingressClass: haproxy   # typically "haproxy" or null to receive all events
+  ingressClass: haproxy # typically "haproxy" or null to receive all events
 
   # Gateway API controller, not available in K8s as default but can be installed
   # ref: https://gateway-api.sigs.k8s.io/
@@ -227,9 +227,9 @@ controller:
   ## Compute Resources for controller container
   ## ref: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
   resources:
-  #  limits:
-  #    cpu: 250m
-  #    memory: 400Mi
+    #  limits:
+    #    cpu: 250m
+    #    memory: 400Mi
     requests:
       cpu: 250m
       memory: 400Mi
@@ -396,9 +396,9 @@ controller:
   ## Controller Service configuration
   ## ref: https://kubernetes.io/docs/concepts/services-networking/service/
   service:
-    enabled: true     # set to false when controller.kind is 'DaemonSet' and controller.daemonset.useHostPorts is true
+    enabled: true # set to false when controller.kind is 'DaemonSet' and controller.daemonset.useHostPorts is true
 
-    type: NodePort    # can be 'ClusterIP', 'NodePort' or 'LoadBalancer'
+    type: NodePort # can be 'ClusterIP', 'NodePort' or 'LoadBalancer'
 
     ## Service annotations
     ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
@@ -500,7 +500,7 @@ controller:
     ## Controller Metrics Service configuration
     ## ref: https://kubernetes.io/docs/concepts/services-networking/service/
     metrics:
-      type: ClusterIP    # can be 'ClusterIP', 'NodePort' or 'LoadBalancer'
+      type: ClusterIP # can be 'ClusterIP', 'NodePort' or 'LoadBalancer'
 
       ## Service annotations
       ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
@@ -513,7 +513,7 @@ controller:
   ## Controller Deployment configuration
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
   deployment:
-    useHostNetwork: false  # also modify dnsPolicy accordingly
+    useHostNetwork: false # also modify dnsPolicy accordingly
     useHostPort: false
     hostIP: null
     hostPorts:
@@ -524,7 +524,7 @@ controller:
   ## Controller DaemonSet configuration
   ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/
   daemonset:
-    useHostNetwork: false  # also modify dnsPolicy accordingly
+    useHostNetwork: false # also modify dnsPolicy accordingly
     useHostPort: false
     hostIP: null
     hostPorts:
@@ -650,13 +650,13 @@ controller:
   ## - 'default': the sync is done based on K8s informers (event based)
   ## - 'fetch':  the controller pulls data periodically (from K8s or from proxy)
   sync:
-    mode: default                                       # can be 'default' or 'fetch'
-    fetchParams:                                        # Mandatory if mode is 'fetch'
+    mode: default # can be 'default' or 'fetch'
+    fetchParams: # Mandatory if mode is 'fetch'
       # period: 3s                                      # optional, default is 5s
-      source: k8s                                       # possible values are: 'proxy', 'k8s'
-    proxyParams:                                        # Mandatory if source is 'proxy'
-      replicaCount: 3                                   # number of replicas of the proxy, mandatory if source is 'proxy'
-      proxySvcLabelSelector: run:haproxy-ingress-proxy  # label selector of the proxy service, mandatory if source is 'proxy'
+      source: k8s # possible values are: 'proxy', 'k8s'
+    proxyParams: # Mandatory if source is 'proxy'
+      replicaCount: 3 # number of replicas of the proxy, mandatory if source is 'proxy'
+      proxySvcLabelSelector: run:haproxy-ingress-proxy # label selector of the proxy service, mandatory if source is 'proxy'
 
 ## CRD job default values
 crdjob:
@@ -688,9 +688,9 @@ crdjob:
   ## Compute Resources for the CRD Job
   ## ref: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
   resources:
-  #  limits:
-  #    cpu: 250m
-  #    memory: 400Mi
+    #  limits:
+    #    cpu: 250m
+    #    memory: 400Mi
     requests:
       cpu: 250m
       memory: 400Mi
