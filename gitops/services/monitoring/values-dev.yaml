@@ -1691,7 +1691,7 @@ kubeApiServer:
 ## Component scraping the kubelet and kubelet-hosted cAdvisor
 ##
 kubelet:
-  enabled: true
+  enabled: false
   namespace: kube-system
 
   # Overrides the job selector in Grafana dashboards and Prometheus rules
@@ -1699,7 +1699,7 @@ kubelet:
   jobNameOverride: ""
 
   serviceMonitor:
-    enabled: true
+    enabled: false
     ## Enable scraping /metrics from kubelet's service
     kubelet: true
 
