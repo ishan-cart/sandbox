@@ -1,6 +1,8 @@
 import { motion } from "motion/react";
 import { Calendar } from "lucide-react";
 
+import { SectionHeader } from "./SectionHeader";
+
 export const Experience = () => {
   const experiences = [
     {
@@ -70,35 +72,12 @@ export const Experience = () => {
   return (
     <section className="pt-20 pb-16 px-6 bg-white" id="experience">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-20">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="flex items-center gap-3 mb-2"
-          >
-            <div className="w-12 h-1 bg-brand-primary rounded-full" />
-            <span className="text-[10px] font-mono tracking-widest text-slate-400 uppercase font-black">Professional Sequence</span>
-          </motion.div>
-          <motion.h2 
-            initial={{ opacity: 0, y: 30, scale: 0.9 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ type: "spring", stiffness: 100, damping: 20, delay: 0.1 }}
-            className="text-5xl md:text-6xl font-black text-slate-900 mb-4"
-          >
-            Professional <span className="text-slate-300">Experience.</span>
-          </motion.h2>
-          <motion.p 
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="text-slate-400 max-w-xl text-lg font-light"
-          >
-            A selective history of my professional contributions across various engineering disciplines.
-          </motion.p>
-        </div>
+        <SectionHeader
+          eyebrow="Professional Sequence"
+          title="Professional"
+          titleMuted="Experience."
+          description="A selective history of my professional contributions across various engineering disciplines."
+        />
 
         <motion.div 
           variants={containerVariants}
