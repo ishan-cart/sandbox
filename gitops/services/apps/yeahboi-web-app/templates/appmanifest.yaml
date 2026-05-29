@@ -40,7 +40,7 @@ spec:
             imagePullPolicy: IfNotPresent
             env:
             - name: PROMETHEUS_HOST
-              value: "prometheus-kube-prometheus-prometheus.monitoring.svc.cluster.local" # Use your cluster's Prometheus service name
+              value: "kube-prometheus-stack-prometheus.monitoring.svc.cluster.local"
             - name: PROMETHEUS_PORT
               value: "9090"
             - name: QUERY
