@@ -12,13 +12,8 @@ on:
         required: false
         type: boolean
         default: false
-
   workflow_dispatch:
     inputs: *shared_inputs
-
-permissions:
-  contents: read
-  id-token: write
 
 jobs:
   build:
