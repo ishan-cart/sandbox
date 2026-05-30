@@ -52,8 +52,8 @@ data "aws_iam_policy_document" "kms_key_policy" {
 }
 
 resource "aws_kms_key" "key" {
-  description             = "KMS Key"
-  policy = data.aws_iam_policy_document.kms_key_policy.json
+  description = "KMS Key"
+  policy      = data.aws_iam_policy_document.kms_key_policy.json
 }
 
 resource "aws_kms_alias" "key" {
