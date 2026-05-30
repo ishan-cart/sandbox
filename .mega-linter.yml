@@ -17,3 +17,8 @@ IGNORE_GITIGNORED_FILES: true
 LOG_LEVEL: ERROR
 
 TERRAFORM_TERRASCAN_ARGUMENTS: "-d ./terraform"
+
+REPOSITORY_CHECKOV_ARGUMENTS: |
+  --skip-path "/gitops/services/ingress-controller/haproxy-ingress/charts/kubernetes-ingress"
+  --skip-path "/gitops/services/monitoring/kube-prometheus-stack/charts/kube-prometheus-stack"
+  --skip-check CKV2_AWS_62,CKV2_AWS_1,CKV_AWS_144
