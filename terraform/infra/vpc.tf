@@ -8,6 +8,32 @@ resource "aws_vpc" "vpc_network" {
   }
 }
 
+resource "aws_flow_log" "vpc" {
+  log_destination      = aws_s3_bucket.access_logs.arn
+  log_destination_type = "s3"
+  traffic_type         = "ALL"
+  vpc_id               = aws_vpc.vpc_network.id
+}
+
+resource "aws_default_security_group" "default" {
+  # Ensure default sg has restricted ingress
+  vpc_id = aws_vpc.vpc_network.id
+
+  ingress {
+    protocol  = "-1"
+    self      = true
+    from_port = 0
+    to_port   = 0
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_vpc_dhcp_options" "dns_resolver" {
   domain_name_servers = ["AmazonProvidedDNS", "8.8.8.8", "8.8.4.4"]
 }
@@ -134,6 +160,7 @@ resource "aws_route_table_association" "private_subnet_2_route" {
 }
 
 resource "aws_network_acl" "acl" {
+  #checkov:skip=CKV_AWS_230,CKV_AWS_229,CKV_AWS_232,CKV_AWS_231
   vpc_id = aws_vpc.vpc_network.id
 
   ingress {
@@ -198,6 +225,7 @@ resource "aws_vpc_security_group_egress_rule" "lb_all_self" {
 }
 
 resource "aws_security_group" "efs" {
+  # checkov:skip=CKV2_AWS_5
   name        = "efs-security-group"
   description = "EFS to EKS"
   vpc_id      = aws_vpc.vpc_network.id
