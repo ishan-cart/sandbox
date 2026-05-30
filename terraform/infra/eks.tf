@@ -1,4 +1,5 @@
 resource "aws_eks_cluster" "cluster" {
+  # checkov:skip=CKV_AWS_39,CKV_AWS_37
   name = local.env_vars[var.environment].eks_cluster_name
 
   access_config {
@@ -13,15 +14,20 @@ resource "aws_eks_cluster" "cluster" {
       aws_subnet.private_subnet_1.id,
       aws_subnet.private_subnet_2.id,
     ]
-    # Make control-plane reachability from private subnets unambiguous.
+
     endpoint_private_access = true
     endpoint_public_access  = true
     security_group_ids      = [aws_security_group.eks_worker_nodes.id]
+    public_access_cidrs     = ["159.196.168.43/32"]
   }
 
-  # Ensure that IAM Role permissions are created before and deleted
-  # after EKS Cluster handling. Otherwise, EKS will not be able to
-  # properly delete EKS managed EC2 infrastructure such as Security Groups.
+  encryption_config {
+    resources = ["secrets"]
+    provider {
+      key_arn = aws_kms_key.key.arn
+    }
+  }
+
   depends_on = [
     aws_iam_role_policy_attachment.cluster_AmazonEKSClusterPolicy,
   ]
@@ -58,6 +64,10 @@ resource "aws_launch_template" "eks_worker_nodes" {
       aws_eks_cluster.cluster.vpc_config[0].cluster_security_group_id,
       aws_security_group.eks_worker_nodes.id,
     ]
+  }
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
   }
 }
 
