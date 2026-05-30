@@ -1,0 +1,13 @@
+{
+    "threshold": 0,
+    "reporters": ["html", "markdown"],
+    "ignore": [
+      "**/node_modules/**",
+      "**/.git/**",
+      "**/*.md",
+      "apps/web-app/src/components/SectionHeader.tsx",
+      "apps/web-app/src/components/Contact.tsx",
+      "gitops/",
+      ".github/workflows/"
+    ]
+}

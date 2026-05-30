@@ -5,3 +5,7 @@ terraform.tfstate*
 simpleproject*
 *.tgz
 *.lock
+
+megalinter-reports/
+
+apps/web-app/public/data/data.json

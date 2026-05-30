@@ -1,7 +1,7 @@
 FROM docker.io/node:26-alpine AS development
 
 WORKDIR /app
-COPY package.json package-lock.json index.html vite.config.ts tsconfig.json .
+COPY package.json package-lock.json index.html vite.config.ts tsconfig.json ./
 RUN npm clean-install
 COPY src/ src/
 COPY public/ public/

@@ -19,6 +19,10 @@ import {
   Legend
 } from "recharts";
 import DIAGRAM_URL from "../assets/images/Untitled-2026-05-16-2229.svg";
+import { getPinchTouchMetrics } from "../lib/touchMetrics";
+import { isMetricsLimitKey, metricsGradientId, metricsStrokeColor } from "../lib/metricsChart";
+import { SectionHeader } from "./SectionHeader";
+import { TabPanel } from "./TabPanel";
 
 export const ArchitectureDiagram = () => {
   const imgRef = useRef<HTMLImageElement>(null);
@@ -67,49 +71,39 @@ export const ArchitectureDiagram = () => {
     isZoomingRef.current = false;
 
     const onTouchStart = (e: TouchEvent) => {
-      if (e.touches.length === 2) {
-        if (e.cancelable) {
-          e.preventDefault();
-        }
-        const t1 = e.touches[0];
-        const t2 = e.touches[1];
-        const dx = t1.clientX - t2.clientX;
-        const dy = t1.clientY - t2.clientY;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        // Guard against single-point coordinates or extremely close fingers to avoid infinite scale
-        if (dist > 15) {
-          const cx = (t1.clientX + t2.clientX) / 2;
-          const cy = (t1.clientY + t2.clientY) / 2;
-
-          touchStartRef.current = { dist, cx, cy };
-          isZoomingRef.current = true;
-          setIsZooming(true);
-        }
+      const metrics = getPinchTouchMetrics(e.touches);
+      if (!metrics) {
+        return;
       }
+
+      if (e.cancelable) {
+        e.preventDefault();
+      }
+
+      touchStartRef.current = metrics;
+      isZoomingRef.current = true;
+      setIsZooming(true);
     };
 
     const onTouchMove = (e: TouchEvent) => {
-      if (isZoomingRef.current && e.touches.length === 2) {
-        if (e.cancelable) {
-          e.preventDefault();
-        }
-        const t1 = e.touches[0];
-        const t2 = e.touches[1];
-        const dx = t1.clientX - t2.clientX;
-        const dy = t1.clientY - t2.clientY;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        
-        const cx = (t1.clientX + t2.clientX) / 2;
-        const cy = (t1.clientY + t2.clientY) / 2;
-
-        // Clamp the zoom scale factor conservatively between 1 and 4.5
-        const scale = Math.min(4.5, Math.max(1, dist / touchStartRef.current.dist));
-        const x = cx - touchStartRef.current.cx;
-        const y = cy - touchStartRef.current.cy;
-
-        setZoomState({ scale, x, y });
+      if (!isZoomingRef.current) {
+        return;
       }
+
+      const metrics = getPinchTouchMetrics(e.touches);
+      if (!metrics) {
+        return;
+      }
+
+      if (e.cancelable) {
+        e.preventDefault();
+      }
+
+      const scale = Math.min(4.5, Math.max(1, metrics.dist / touchStartRef.current.dist));
+      const x = metrics.cx - touchStartRef.current.cx;
+      const y = metrics.cy - touchStartRef.current.cy;
+
+      setZoomState({ scale, x, y });
     };
 
     const onTouchEnd = () => {
@@ -262,35 +256,14 @@ export const ArchitectureDiagram = () => {
   return (
     <section className="pt-20 pb-20 px-6 relative overflow-hidden bg-white" id="architecture">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-12 text-left">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="flex items-center gap-3 mb-2"
-          >
-            <div className="w-12 h-1 bg-brand-primary rounded-full" />
-            <span className="text-[10px] font-mono tracking-widest text-slate-400 uppercase font-black">System Flow</span>
-          </motion.div>
-          <motion.h2 
-            initial={{ opacity: 0, y: 30, scale: 0.95 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ type: "spring", stiffness: 100, damping: 20 }}
-            className="text-5xl md:text-6xl font-black mb-4 text-slate-900 tracking-tighter"
-          >
-            How Did I <span className="text-slate-300">Deploy This?</span>
-          </motion.h2>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="text-slate-400 max-w-xl text-lg leading-relaxed font-light"
-          >
-            Below is a diagram of the system design. What began as a deep-dive into Kubernetes ultimately gave me the idea to deploy this site on it!
-          </motion.p>
-        </div>
+        <SectionHeader
+          className="mb-12 text-left"
+          eyebrow="System Flow"
+          title="How Did I"
+          titleMuted="Deploy This?"
+          titleClassName="text-5xl md:text-6xl font-black mb-4 text-slate-900 tracking-tighter"
+          description="Below is a diagram of the system design. What began as a deep-dive into Kubernetes ultimately gave me the idea to deploy this site on it!"
+        />
 
         {/* Dynamic Navigation Tabs */}
         <div className="flex justify-center mb-8">
@@ -323,12 +296,8 @@ export const ArchitectureDiagram = () => {
         {/* Tab Contents */}
         <AnimatePresence mode="wait">
           {activeTab === "diagram" ? (
-            <motion.div
-              key="diagram-tab"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.25 }}
+            <TabPanel
+              panelKey="diagram-tab"
               className="relative flex flex-col items-center w-full max-w-4xl lg:max-w-2xl mx-auto"
             >
               <div 
@@ -363,14 +332,10 @@ export const ArchitectureDiagram = () => {
                   />
                 </div>
               </div>
-            </motion.div>
+            </TabPanel>
           ) : (
-                  <motion.div
-                    key="metrics-tab"
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -15 }}
-                    transition={{ duration: 0.25 }}
+                  <TabPanel
+                    panelKey="metrics-tab"
                     className="w-full max-w-4xl mx-auto flex flex-col gap-6"
                   >
               <div className="relative w-full rounded-2xl border border-slate-900 bg-slate-950 overflow-hidden shadow-[0_20px_50px_rgba(30,41,59,0.15)] flex flex-col">
@@ -425,9 +390,8 @@ export const ArchitectureDiagram = () => {
                                     <AreaChart data={metricsData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
                                       <defs>
                                         {keys.map((key, index) => {
-                                          const colors = ["#06b6d4", "#3b82f6", "#10b981", "#8b5cf6", "#ec4899", "#f59e0b"];
-                                          const strokeColor = colors[index % colors.length];
-                                          const gradId = `dynamicGrad_${String(panel.id).replace(/[^a-zA-Z0-9]/g, "_")}_${key.replace(/[^a-zA-Z0-9]/g, "_")}`;
+                                          const strokeColor = metricsStrokeColor(index);
+                                          const gradId = metricsGradientId(panel.id, key);
                                           return (
                                             <linearGradient id={gradId} key={gradId} x1="0" y1="0" x2="0" y2="1">
                                               <stop offset="5%" stopColor={strokeColor} stopOpacity={0.25}/>
@@ -456,12 +420,10 @@ export const ArchitectureDiagram = () => {
                                       />
                                       <Legend wrapperStyle={{ fontSize: '9px', paddingTop: '8px' }} />
                                       {keys.map((key, index) => {
-                                        const colors = ["#06b6d4", "#3b82f6", "#10b981", "#8b5cf6", "#ec4899", "#f59e0b"];
-                                        const strokeColor = colors[index % colors.length];
-                                        const gradId = `dynamicGrad_${String(panel.id).replace(/[^a-zA-Z0-9]/g, "_")}_${key.replace(/[^a-zA-Z0-9]/g, "_")}`;
-                                        
-                                        const isLimit = key.toLowerCase().includes("limit") || key.toLowerCase().includes("thresh") || key.toLowerCase().includes("quota");
-                                        if (isLimit) {
+                                        const strokeColor = metricsStrokeColor(index);
+                                        const gradId = metricsGradientId(panel.id, key);
+
+                                        if (isMetricsLimitKey(key)) {
                                           return (
                                             <Area 
                                               key={key}
@@ -539,7 +501,7 @@ export const ArchitectureDiagram = () => {
               </div>
 
 
-            </motion.div>
+            </TabPanel>
           )}
         </AnimatePresence>
       </div>

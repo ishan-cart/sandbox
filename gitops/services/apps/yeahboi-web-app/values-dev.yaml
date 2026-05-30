@@ -10,7 +10,7 @@ image:
   tag: v1.0.0
 
 # This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-# imagePullSecrets: 
+# imagePullSecrets:
 #   - name: docker-ecr-secret
 
 env: []
@@ -52,7 +52,7 @@ securityContext: {}
   #   drop:
   #     - ALL
 
-containerPort: 8080  
+containerPort: 8080
 
 # This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
 service:
@@ -77,7 +77,7 @@ ingress:
 
 resources:
   limits:
-    cpu:  50m
+    cpu: 50m
     memory: 64Mi
   requests:
     cpu: 10m
@@ -88,8 +88,8 @@ startupProbe:
   httpGet:
     path: /
     port: http
-  failureThreshold: 15   # Try 15 times before giving up
-  periodSeconds: 3       # Check every 3 seconds (15 * 3 = 45s total max boot time)
+  failureThreshold: 15 # Try 15 times before giving up
+  periodSeconds: 3 # Check every 3 seconds (15 * 3 = 45s total max boot time)
   timeoutSeconds: 3
 livenessProbe:
   httpGet:

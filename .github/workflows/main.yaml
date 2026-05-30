@@ -1,14 +1,10 @@
-name: 'Main'
+name: "Main"
 
 on:
   pull_request:
     branches: [main]
   push:
     branches: [main]
-
-permissions:
-  contents: read
-  id-token: write
 
 jobs:
   changes:
@@ -38,17 +34,23 @@ jobs:
   terraform:
     needs: [changes]
     if: needs.changes.outputs.terraform != '[]'
+    permissions:
+      contents: read
+      id-token: write
     strategy:
       matrix:
         application: ${{ fromJson(needs.changes.outputs.terraform) }}
     uses: ./.github/workflows/terraform.yaml
     with:
       application: ${{ matrix.application }}
-  
+
   build:
     needs: [changes, terraform]
     uses: ./.github/workflows/build-image.yaml
     if: always() && (needs.terraform.result == 'success' || needs.terraform.result == 'skipped') && needs.changes.outputs.web-app == 'true'
+    permissions:
+      contents: read
+      id-token: write
     with:
       application: web-app
       push: ${{ github.ref_name == 'main' && github.event_name == 'push' }}
@@ -57,6 +59,9 @@ jobs:
     needs: [changes]
     if: ${{ needs.changes.outputs.helm-libraries == 'true' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout
         uses: Actions/checkout@v6
@@ -72,8 +77,10 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
       - name: Package & Push
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           helm package helm-libraries/common-library/ -d helm-libraries/
           # Not require for OCI registries
-          # helm repo index helm-libraries --url ${{ steps.login-ecr.outputs.registry }}/yeahboi/helm-libraries/
-          helm push helm-libraries/common-library-*.tgz oci://${{ steps.login-ecr.outputs.registry }}/yeahboi/helm-libraries/
+          # helm repo index helm-libraries --url "${ECR_REGISTRY}/yeahboi/helm-libraries/"
+          helm push helm-libraries/common-library-*.tgz "oci://${ECR_REGISTRY}/yeahboi/helm-libraries/"
