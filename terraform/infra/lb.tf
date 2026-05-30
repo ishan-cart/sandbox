@@ -32,7 +32,7 @@ resource "aws_lb_listener" "front_end_https" {
   load_balancer_arn = aws_lb.front_end.arn
   port              = 443
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  ssl_policy        = "ELBSecurityPolicy-TLS-1-1-2017-01"
   certificate_arn   = aws_acm_certificate.domain_cert.arn
 
   default_action {
@@ -41,15 +41,4 @@ resource "aws_lb_listener" "front_end_https" {
   }
 
   depends_on = [aws_acm_certificate_validation.cert_waiter]
-}
-
-resource "aws_load_balancer_policy" "tls" {
-  load_balancer_name = aws_lb.front_end.name
-  policy_name        = "ssl"
-  policy_type_name   = "SSLNegotiationPolicyType"
-
-  policy_attribute {
-    name  = "Reference-Security-Policy"
-    value = "ELBSecurityPolicy-TLS-1-1-2017-01"
-  }
 }
