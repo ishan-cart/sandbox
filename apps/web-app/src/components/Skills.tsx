@@ -2,6 +2,8 @@ import { motion } from "motion/react";
 import { useState } from "react";
 import { Cpu } from "lucide-react";
 
+import { SectionHeader } from "./SectionHeader";
+
 import amazonwebservicesLogo from "../assets/images/logos/amazonwebservices.svg";
 import argocdLogo from "../assets/images/logos/argocd.svg";
 import saltLogo from "../assets/images/logos/salt.svg";
@@ -130,35 +132,13 @@ export const Skills = () => {
   return (
     <section className="pt-20 pb-16 px-6 bg-slate-50" id="skills">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-16">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="flex items-center gap-3 mb-2"
-          >
-            <div className="w-12 h-1 bg-brand-primary rounded-full" />
-            <span className="text-[10px] font-mono tracking-widest text-slate-400 uppercase font-black">Architecture Toolkit</span>
-          </motion.div>
-          <motion.h2 
-            initial={{ opacity: 0, y: 30, scale: 0.9 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ type: "spring", stiffness: 100, damping: 20, delay: 0.1 }}
-            className="text-5xl md:text-6xl font-black text-slate-900 mb-4"
-          >
-            Tech <span className="text-slate-300">Stack.</span>
-          </motion.h2>
-          <motion.p 
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="text-slate-400 max-w-xl text-lg font-light"
-          >
-            A list of the tools and technologies I've worked with to build, monitor, and scale modern infra.
-          </motion.p>
-        </div>
+        <SectionHeader
+          className="mb-16"
+          eyebrow="Architecture Toolkit"
+          title="Tech"
+          titleMuted="Stack."
+          description="A list of the tools and technologies I've worked with to build, monitor, and scale modern infra."
+        />
 
         <motion.div 
           variants={containerVariants}

@@ -8,7 +8,7 @@ QUERY=${QUERY:-$BACKUP_QUERY}
 
 # Executing the POST request to query_range
 curl -f -X POST "http://${PROMETHEUS_HOST}:${PROMETHEUS_PORT}/api/v1/query_range" \
-    --data-urlencode "query=${QUERY}" \
-    --data-urlencode "start=$(($(date +%s) - 600))" \
-    --data-urlencode "end=$(date +%s)" \
-    --data-urlencode "step=1m"
+	--data-urlencode "query=${QUERY}" \
+	--data-urlencode "start=$(($(date +%s) - 600))" \
+	--data-urlencode "end=$(date +%s)" \
+	--data-urlencode "step=1m"

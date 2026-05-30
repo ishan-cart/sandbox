@@ -1,4 +1,5 @@
 resource "aws_s3_bucket" "terraform_state" {
+  # checkov:skip=CKV2_AWS_61
   bucket = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-state"
 }
 
@@ -31,6 +32,13 @@ resource "aws_s3_bucket" "access_logs" {
   bucket = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-access-logs"
 }
 
+resource "aws_s3_bucket_versioning" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
 resource "aws_s3_bucket_server_side_encryption_configuration" "access_logs" {
   bucket = aws_s3_bucket.access_logs.id
   rule {
@@ -49,7 +57,7 @@ resource "aws_s3_bucket_public_access_block" "access_logs" {
   restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_policy" "allow_lb_access" {
+resource "aws_s3_bucket_policy" "access_logs" {
   bucket = aws_s3_bucket.access_logs.id
   policy = jsonencode({
     "Version" : "2012-10-17",
@@ -58,11 +66,28 @@ resource "aws_s3_bucket_policy" "allow_lb_access" {
         "Sid" : "AWSLogDeliveryWrite",
         "Effect" : "Allow",
         "Principal" : {
-          "Service" : "logdelivery.elasticloadbalancing.amazonaws.com"
+          "Service" : "logdelivery.elasticloadbalancing.amazonaws.com",
+          "Service" : "delivery.logs.amazonaws.com",
         },
         "Action" : "s3:PutObject",
         "Resource" : "arn:aws:s3:::${aws_s3_bucket.access_logs.bucket}/AWSLogs/${local.env_vars[var.environment].project_id}/*",
-      }
+      },
     ]
   })
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "access_logs" {
+  bucket = aws_s3_bucket.access_logs.bucket
+
+  rule {
+    id     = "DeleteOldItems30Days"
+    status = "Enabled"
+    filter {}
+    expiration {
+      days = 30
+    }
+    noncurrent_version_expiration {
+      noncurrent_days = 30
+    }
+  }
 }

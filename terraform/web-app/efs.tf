@@ -8,10 +8,14 @@ data "aws_security_group" "efs" {
   name = "efs-security-group"
 }
 
+data "aws_kms_key" "key" {
+  key_id = "alias/${local.env_vars[var.environment].project}"
+}
+
 resource "aws_efs_file_system" "eks_efs" {
   creation_token = "${local.env_vars[var.environment].project}-web-app-nfs-storage"
   encrypted      = true # Enables encryption at rest
-  # kms_key_id     = "arn:aws:kms:region:account:key/your-key"
+  kms_key_id     = data.aws_kms_key.key.arn
 
   tags = {
     Name = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-efs"

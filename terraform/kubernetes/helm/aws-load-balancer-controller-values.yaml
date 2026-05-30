@@ -118,13 +118,13 @@ enableCertManager: false
 # Overrideable variables when enableCertManager is set to true
 certManager:
   # Webhook serving certificate configuration
-  duration: "8760h0m0s"  # 1 year
-  renewBefore: "720h0m0s"  # 30 days
+  duration: "8760h0m0s" # 1 year
+  renewBefore: "720h0m0s" # 30 days
   revisionHistoryLimit:
 
   # Root CA certificate configuration
   rootCert:
-    duration: "43800h0m0s"  # 5 years
+    duration: "43800h0m0s" # 5 years
 
   # Optional: custom issuer reference
   # issuerRef:
@@ -240,7 +240,6 @@ webhookConfig:
   ingressValidationNamespaceSelector:
     matchExpressions:
     matchLabels:
-
 
 # The TCP port the Webhook server binds to. (default 9443)
 webhookBindPort:
@@ -499,8 +498,8 @@ serviceMutatorWebhookConfig:
   #   - <value>
   # which operations trigger the webhook
   operations:
-  - CREATE
-    # - UPDATE
+    - CREATE
+      # - UPDATE
 
 # podMutatorWebhookConfig contains configurations specific to the service mutator webhook
 podMutatorWebhookConfig:

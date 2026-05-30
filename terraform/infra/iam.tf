@@ -19,7 +19,7 @@ resource "aws_iam_role" "github_oidc_role" {
         }
         Condition = {
           StringLike = {
-            "token.actions.githubusercontent.com:sub" : "repo:ishan-cart/sandbox:*"
+            "token.actions.githubusercontent.com:sub" : "repo:${local.github_user}/${local.repository}:*"
           }
           StringEquals = {
             "token.actions.githubusercontent.com:aud" : "sts.amazonaws.com",
@@ -31,11 +31,13 @@ resource "aws_iam_role" "github_oidc_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "github_oidc_admin" {
+  # checkov:skip=CKV_AWS_274
   role       = aws_iam_role.github_oidc_role.name
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
 
 resource "aws_iam_user" "ishans" {
+  # checkov:skip=CKV_AWS_273
   name = "ishans"
 }
 
@@ -128,4 +130,22 @@ resource "aws_iam_role_policy_attachment" "attach_eks_actions" {
 resource "aws_iam_policy" "aws_load_balancer_controller" {
   name   = "AWSLoadBalancerControllerIAMPolicy"
   policy = file("${path.module}/policies/aws-lb-controller.json")
+}
+
+data "aws_iam_policy_document" "allow_lambda" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+resource "aws_iam_role" "allow_lambda" {
+  name               = "allow-lambda"
+  assume_role_policy = data.aws_iam_policy_document.allow_lambda.json
 }

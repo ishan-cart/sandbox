@@ -6,23 +6,23 @@ metadata:
 spec:
   ingressClassName: haproxy
   rules:
-  - host: prometheus.ishans.au
-    http:
-      paths:
-      - pathType: Prefix
-        path: /
-        backend:
-          service:
-            name: prometheus-kube-prometheus-prometheus
-            port:
-              number: 9090
-  - host: grafana.ishans.au
-    http:
-      paths:
-      - pathType: Prefix
-        path: /
-        backend:
-          service:
-            name: prometheus-grafana
-            port:
-              number: 80
+    - host: prometheus.ishans.au
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: prometheus-kube-prometheus-prometheus
+                port:
+                  number: 9090
+    - host: grafana.ishans.au
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: prometheus-grafana
+                port:
+                  number: 80
