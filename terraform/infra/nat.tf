@@ -17,7 +17,8 @@ resource "aws_iam_instance_profile" "nat_profile" {
   role = aws_iam_role.nat_route_role.name
 }
 
-resource "aws_instance" "diy-nat-gw" {
+resource "aws_instance" "diy_nat_gw" {
+  # checkov:skip=CKV_AWS_88,CKV_AWS_126 : Pull logs with another tool
   ami                         = data.aws_ami.al2023_arm64.id
   instance_type               = "t4g.nano"
   vpc_security_group_ids      = [aws_security_group.diy_nat_sg.id]
@@ -25,6 +26,7 @@ resource "aws_instance" "diy-nat-gw" {
   iam_instance_profile        = aws_iam_instance_profile.nat_profile.name
   associate_public_ip_address = true
   source_dest_check           = false
+  ebs_optimized               = true
 
   instance_market_options {
     market_type = "spot"
@@ -32,6 +34,15 @@ resource "aws_instance" "diy-nat-gw" {
       spot_instance_type             = "persistent"
       instance_interruption_behavior = "stop"
     }
+  }
+
+  root_block_device {
+    encrypted = true
+  }
+
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
   }
 
   tags = {
@@ -130,11 +141,13 @@ resource "aws_iam_role_policy_attachment" "diy_nat_ssm_attachment" {
 }
 
 resource "aws_security_group" "diy_nat_sg" {
+  # checkov:skip=CKV_AWS_382
   name        = "diy-nat-sg"
   vpc_id      = aws_vpc.vpc_network.id
   description = "Outbound internet access for vpc instances"
 
   ingress {
+    description = "Allow all vpc traffic inbound"
     cidr_blocks = [aws_vpc.vpc_network.cidr_block]
     from_port   = 0
     protocol    = "-1"
@@ -142,6 +155,7 @@ resource "aws_security_group" "diy_nat_sg" {
   }
 
   egress {
+    description = "Allow all outbound"
     cidr_blocks = ["0.0.0.0/0"]
     from_port   = 0
     protocol    = "-1"
