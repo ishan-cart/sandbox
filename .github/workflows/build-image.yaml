@@ -31,14 +31,28 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
+      
+      - name: Ensure unique version tag
+        working-directory: apps/${{ inputs.application }}
+        id: version-check
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          APPLICATION: ${{ inputs.application }}
+        run: |
+          BUILD_VERSION="$(cat ./build/version)"
+          if docker manifest inspect "${ECR_REGISTRY}/yeahboi/apps/${APPLICATION}:${BUILD_VERSION}" > /dev/null; then
+            echo "::error::Tag '${BUILD_VERSION}' exists for this image"
+            exit 1
+          fi
+          echo "BUILD_VERSION=${BUILD_VERSION}" >> "$GITHUB_OUTPUT"
 
       - name: Build
         working-directory: apps/${{ inputs.application }}
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           APPLICATION: ${{ inputs.application }}
+          BUILD_VERSION: ${{ steps.version-check.outputs.BUILD_VERSION }}
         run: |
-          BUILD_VERSION="$(cat ./build/version)"
           docker build -t "${ECR_REGISTRY}/yeahboi/apps/${APPLICATION}:${BUILD_VERSION}" -f ./build/Dockerfile .
 
       - name: Push
@@ -47,6 +61,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           APPLICATION: ${{ inputs.application }}
+          BUILD_VERSION: ${{ steps.version-check.outputs.BUILD_VERSION }}
         run: |
           BUILD_VERSION="$(cat ./build/version)"
           docker push "${ECR_REGISTRY}/yeahboi/apps/${APPLICATION}:${BUILD_VERSION}"
