@@ -46,7 +46,7 @@ services:
         --data-urlencode "step=10s" \
         -o "${OUTPUT_FILE}"
 
-    depends_on: 
+    depends_on:
       prometheus:
         condition: service_healthy
 
@@ -56,7 +56,15 @@ services:
     ports:
       - 9090:9090
     healthcheck:
-      test: ["CMD", "wget", "-q", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "-q",
+          "--tries=1",
+          "--spider",
+          "http://localhost:9090/-/healthy",
+        ]
       start_interval: 1s
       interval: 1s
       timeout: 1s
