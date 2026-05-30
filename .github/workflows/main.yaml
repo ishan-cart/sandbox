@@ -6,9 +6,6 @@ on:
   push:
     branches: [main]
 
-permissions:
-  contents: read
-
 jobs:
   changes:
     runs-on: ubuntu-latest
@@ -37,6 +34,9 @@ jobs:
   terraform:
     needs: [changes]
     if: needs.changes.outputs.terraform != '[]'
+    permissions:
+      contents: read
+      id-token: write
     strategy:
       matrix:
         application: ${{ fromJson(needs.changes.outputs.terraform) }}
@@ -48,6 +48,9 @@ jobs:
     needs: [changes, terraform]
     uses: ./.github/workflows/build-image.yaml
     if: always() && (needs.terraform.result == 'success' || needs.terraform.result == 'skipped') && needs.changes.outputs.web-app == 'true'
+    permissions:
+      contents: read
+      id-token: write
     with:
       application: web-app
       push: ${{ github.ref_name == 'main' && github.event_name == 'push' }}
