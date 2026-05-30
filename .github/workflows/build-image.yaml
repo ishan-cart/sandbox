@@ -34,6 +34,7 @@ jobs:
       
       - name: Ensure unique version tag
         working-directory: apps/${{ inputs.application }}
+        id: version-check
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           APPLICATION: ${{ inputs.application }}
@@ -49,6 +50,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           APPLICATION: ${{ inputs.application }}
+          BUILD_VERSION: ${{ steps.version-check.outputs.BUILD_VERSION }}
         run: |
           docker build -t "${ECR_REGISTRY}/yeahboi/apps/${APPLICATION}:${BUILD_VERSION}" -f ./build/Dockerfile .
 
@@ -58,6 +60,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           APPLICATION: ${{ inputs.application }}
+          BUILD_VERSION: ${{ steps.version-check.outputs.BUILD_VERSION }}
         run: |
           BUILD_VERSION="$(cat ./build/version)"
           docker push "${ECR_REGISTRY}/yeahboi/apps/${APPLICATION}:${BUILD_VERSION}"
