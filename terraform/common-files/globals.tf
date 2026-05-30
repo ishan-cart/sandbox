@@ -1,4 +1,6 @@
 locals {
+  github_user = "ishan-cart"
+  repository  = "sandbox"
   env_vars = {
     "development" = {
       env_short        = "dev"
