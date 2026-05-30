@@ -1,10 +1,10 @@
 resource "aws_lb" "front_end" {
-  name               = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-lb"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.fe_lb.id]
-  subnets            = [aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
-
+  name                       = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-lb"
+  internal                   = false
+  load_balancer_type         = "application"
+  security_groups            = [aws_security_group.fe_lb.id]
+  subnets                    = [aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
+  drop_invalid_header_fields = true
   enable_deletion_protection = true
 
   access_logs {
@@ -20,6 +20,7 @@ resource "aws_lb_target_group" "eks_haproxy_backend_https" {
   target_type     = "ip"
   vpc_id          = aws_vpc.vpc_network.id
   ip_address_type = "ipv4"
+
   health_check {
     enabled = true
     path    = "/healthz"
@@ -39,21 +40,16 @@ resource "aws_lb_listener" "front_end_https" {
     target_group_arn = aws_lb_target_group.eks_haproxy_backend_https.arn
   }
 
-  # Tell Terraform it CANNOT start this until the cert is validated
   depends_on = [aws_acm_certificate_validation.cert_waiter]
 }
 
-resource "aws_lb_listener" "front_end_http" {
-  load_balancer_arn = aws_lb.front_end.arn
-  port              = 80
-  protocol          = "HTTP"
+resource "aws_load_balancer_policy" "tls" {
+  load_balancer_name = aws_lb.front_end.name
+  policy_name        = "ssl"
+  policy_type_name   = "SSLNegotiationPolicyType"
 
-  default_action {
-    type = "redirect"
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
+  policy_attribute {
+    name  = "Reference-Security-Policy"
+    value = "ELBSecurityPolicy-TLS-1-1-2017-01"
   }
 }
