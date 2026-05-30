@@ -111,6 +111,8 @@ jobs:
   plan:
     runs-on: ubuntu-latest
     needs: [vars, validate]
+    # Ignore Kubernetes for now as terraform requires the public endpoint. Setup self hosted runner to fix.
+    if: ${{ inputs.application != 'kubernetes' }}
     permissions:
       contents: read
       id-token: write
