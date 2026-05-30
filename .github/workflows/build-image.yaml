@@ -40,7 +40,7 @@ jobs:
           APPLICATION: ${{ inputs.application }}
         run: |
           BUILD_VERSION="$(cat ./build/version)"
-          if docker manifest inspect "${ECR_REGISTRY}/yeahboi/apps/${APPLICATION}:${BUILD_VERSION}"; then
+          if docker manifest inspect "${ECR_REGISTRY}/yeahboi/apps/${APPLICATION}:${BUILD_VERSION}" > /dev/null; then
             exit 1
           fi
           echo "BUILD_VERSION=${BUILD_VERSION}" >> "$GITHUB_OUTPUT"
