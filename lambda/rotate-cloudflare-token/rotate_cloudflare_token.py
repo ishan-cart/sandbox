@@ -1,174 +1,180 @@
-import os
 import json
 import urllib.request
 import urllib.error
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 import boto3
-from mypy_boto3_secretsmanager import SecretsManagerClient
 
-# Initialize the Secrets Manager client
-client: SecretsManagerClient = boto3.client('secretsmanager')
+# Configuration
+CF_BASE_URL = "https://api.cloudflare.com/client/v4/user/tokens"
+client = boto3.client("secretsmanager")
 
-CLOUDFLARE_BASE_URL = "https://api.cloudflare.com/client/v4/user/tokens"
 
-def lambda_handler(event: Dict[str, Any], context: Any) -> None:
-    """AWS Lambda handler for Secrets Manager rotation using Dynamic Policy Cloning."""
-    arn: str = event['SecretId']
-    token: str = event['ClientRequestToken']
-    step: str = event['Step']
+def handler(event: Dict[str, Any], context: Any) -> None:
+    arn, token, step = event["SecretId"], event["ClientRequestToken"], event["Step"]
 
-    metadata = client.describe_secret(SecretId=arn)
-    if not metadata.get('RotationEnabled', True):
-        raise ValueError(f"Rotation is not enabled for secret {arn}")
+    if not client.describe_secret(SecretId=arn).get("RotationEnabled", False):
+        print(f"Secret {arn} is not enabled for rotation")
+        return
 
     if step == "createSecret":
         create_secret(arn, token)
-    elif step == "setSecret":
-        set_secret(arn, token)
     elif step == "testSecret":
         test_secret(arn, token)
     elif step == "finishSecret":
         finish_secret(arn, token)
-    else:
-        raise ValueError(f"Invalid rotation step: {step}")
+    elif step == "setSecret":
+        print("setSecret: Skipping.")
+
 
 def create_secret(arn: str, token: str) -> None:
-    """Fetches current token policies from Cloudflare and creates an identical AWSPENDING token."""
-    current_token_value: str = ""
-    current_token_id: str = ""
-    
     try:
-        current_secret = client.get_secret_value(SecretId=arn, VersionStage="AWSCURRENT")
-        if 'SecretString' in current_secret:
-            secret_json = json.loads(current_secret['SecretString'])
-            current_token_value = secret_json.get('token', '')
-            current_token_id = secret_json.get('token_id', '')
+        client.get_secret_value(SecretId=arn, VersionId=token)
+        print(f"createSecret: Version {token} exists. Skipping.")
+        return
     except Exception:
-        # Fallback if executing for the very first time before a rotation has run
-        current_token_value = os.environ.get("INITIAL_CLOUDFLARE_TOKEN", "")
-        current_token_id = os.environ.get("INITIAL_CLOUDFLARE_TOKEN_ID", "")
-
-    if not current_token_value or not current_token_id:
-        raise ValueError("Both current token value and token ID must be available to dynamically clone policies.")
-
-    # Idempotency check: Check if the pending secret already exists
-    try:
-        client.get_secret_value(SecretId=arn, VersionId=token, VersionStage="AWSPENDING")
-        return 
-    except client.exceptions.ResourceNotFoundException:
         pass
 
-    # STEP 1: Dynamically fetch policies attached to the current token
-    detail_url = f"{CLOUDFLARE_BASE_URL}/{current_token_id}"
-    detail_req = urllib.request.Request(
-        detail_url,
-        headers={"Authorization": f"Bearer {current_token_value}"},
-        method="GET"
+    secret_dict = json.loads(
+        client.get_secret_value(SecretId=arn, VersionStage="AWSCURRENT")["SecretString"]
     )
+    app_token = secret_dict.get("CLOUDFLARE_API_TOKEN")
+    master_token = secret_dict.get("LAMBDA_ROTATOR_TOKEN")
+
+    if not app_token or not master_token:
+        raise ValueError("Missing 'CLOUDFLARE_API_TOKEN' or 'LAMBDA_ROTATOR_TOKEN'")
 
     try:
-        with urllib.request.urlopen(detail_req) as response:
-            token_data = json.loads(response.read().decode())
-            current_policies = token_data.get("result", {}).get("policies", [])
-            if not current_policies:
-                raise ValueError(f"No active policies found on token {current_token_id} to clone.")
-    except urllib.error.HTTPError as e:
-        raise RuntimeError(f"Cloudflare API error fetching current token details: {e.read().decode()}")
+        # Get Token ID
+        req = urllib.request.Request(
+            f"{CF_BASE_URL}/verify", headers={"Authorization": f"Bearer {app_token}"}
+        )
+        with urllib.request.urlopen(req) as r:
+            token_id = json.loads(r.read().decode())["result"]["id"]
 
-    # STEP 2: Create a new token with the cloned policies
-    payload: Dict[str, Any] = {
-        "name": f"Rotated-Token-{token[:8]}",
-        "policies": current_policies
-    }
-    
-    create_req = urllib.request.Request(
-        CLOUDFLARE_BASE_URL, 
-        data=json.dumps(payload).encode('utf-8'),
-        headers={
-            "Authorization": f"Bearer {current_token_value}",
-            "Content-Type": "application/json"
-        },
-        method="POST"
-    )
+        # Get existing policies
+        req = urllib.request.Request(
+            f"{CF_BASE_URL}/{token_id}",
+            headers={"Authorization": f"Bearer {master_token}"},
+        )
+        with urllib.request.urlopen(req) as r:
+            current_policies = json.loads(r.read().decode())["result"]["policies"]
 
-    try:
-        with urllib.request.urlopen(create_req) as response:
-            res_data: Dict[str, Any] = json.loads(response.read().decode())
-            new_token_value: str = res_data['result']['value']
-            new_token_id: str = res_data['result']['id']
-            
-            secret_dict: Dict[str, str] = {
-                "token": new_token_value,
-                "token_id": new_token_id
+        # Sanitize policies
+        sanitized_policies = [
+            {
+                "effect": p.get("effect", "allow"),
+                "resources": p.get("resources", {}),
+                "permission_groups": [
+                    {"id": g.get("id")}
+                    for g in p.get("permission_groups", [])
+                    if g.get("id")
+                ],
             }
-            
-            client.put_secret_value(
-                SecretId=arn, 
-                ClientRequestToken=token, 
-                SecretString=json.dumps(secret_dict), 
-                VersionStages=['AWSPENDING']
-            )
-    except urllib.error.HTTPError as e:
-        raise RuntimeError(f"Cloudflare API error during new token creation: {e.read().decode()}")
+            for p in current_policies
+        ]
 
-def set_secret(arn: str, token: str) -> None:
-    """Verifies that the AWSPENDING secret exists."""
-    try:
-        client.get_secret_value(SecretId=arn, VersionId=token, VersionStage="AWSPENDING")
-    except client.exceptions.ResourceNotFoundException:
-        raise ValueError(f"Pending secret for token {token} not found during setSecret step.")
+        # Create new token
+        payload = {
+            "name": f"Automated-Rotated-Token-{token[:8]}",
+            "policies": sanitized_policies,
+        }
+        req = urllib.request.Request(
+            CF_BASE_URL,
+            data=json.dumps(payload).encode(),
+            headers={
+                "Authorization": f"Bearer {master_token}",
+                "Content-Type": "application/json",
+            },
+            method="POST",
+        )
+        with urllib.request.urlopen(req) as r:
+            secret_dict["CLOUDFLARE_API_TOKEN"] = json.loads(r.read().decode())[
+                "result"
+            ]["value"]
+
+    except urllib.error.HTTPError as e:
+        raise RuntimeError(f"Cloudflare error: {e.read().decode()}")
+    except Exception as e:
+        raise RuntimeError(f"API interaction failed: {str(e)}")
+
+    client.put_secret_value(
+        SecretId=arn,
+        ClientRequestToken=token,
+        SecretString=json.dumps(secret_dict),
+        VersionStages=["AWSPENDING"],
+    )
+    print("createSecret: Saved to AWSPENDING.")
+
 
 def test_secret(arn: str, token: str) -> None:
-    """Validates the AWSPENDING Cloudflare token against Cloudflare's verify endpoint."""
-    pending = client.get_secret_value(SecretId=arn, VersionId=token, VersionStage="AWSPENDING")
-    if 'SecretString' not in pending:
-        raise ValueError("Pending secret does not contain a SecretString.")
-        
-    secret_dict: Dict[str, str] = json.loads(pending['SecretString'])
-    
-    url = f"{CLOUDFLARE_BASE_URL}/verify"
-    req = urllib.request.Request(
-        url, 
-        headers={"Authorization": f"Bearer {secret_dict['token']}"},
-        method="GET"
+    secret_dict = json.loads(
+        client.get_secret_value(
+            SecretId=arn, VersionId=token, VersionStage="AWSPENDING"
+        )["SecretString"]
     )
-    
-    try:
-        with urllib.request.urlopen(req) as response:
-            res_data: Dict[str, Any] = json.loads(response.read().decode())
-            if res_data.get("result", {}).get("status") != "active":
-                raise ValueError("New Cloudflare token is verified but not active.")
-    except urllib.error.HTTPError as e:
-        raise RuntimeError(f"Cloudflare token verification failed: {e.read().decode()}")
+    req = urllib.request.Request(
+        f"{CF_BASE_URL}/verify",
+        headers={"Authorization": f"Bearer {secret_dict.get('CLOUDFLARE_API_TOKEN')}"},
+    )
+
+    with urllib.request.urlopen(req) as r:
+        if json.loads(r.read().decode()).get("success"):
+            print("testSecret: Token verification successful!")
+        else:
+            raise RuntimeError("testSecret: Verification failed.")
+
 
 def finish_secret(arn: str, token: str) -> None:
-    """Promotes AWSPENDING to AWSCURRENT and deletes the old token from Cloudflare."""
-    current_secret = client.get_secret_value(SecretId=arn, VersionStage="AWSCURRENT")
-    
-    if current_secret.get('VersionId') == token:
-        return
-
-    current_dict: Dict[str, str] = json.loads(current_secret['SecretString'])
-    old_token_id: Optional[str] = current_dict.get("token_id")
-
-    client.update_secret_version_stage(
-        SecretId=arn, 
-        VersionStage="AWSCURRENT", 
-        MoveToVersionId=token, 
-        RemoveFromVersionId=current_secret.get('VersionId')
+    metadata = client.describe_secret(SecretId=arn)
+    current_version = next(
+        (
+            v
+            for v, stages in metadata.get("VersionIdsToStages", {}).items()
+            if "AWSCURRENT" in stages
+        ),
+        None,
     )
 
-    if old_token_id:
-        new_secret = client.get_secret_value(SecretId=arn, VersionStage="AWSCURRENT")
-        new_token_value: str = json.loads(new_secret['SecretString'])['token']
-        
-        url = f"{CLOUDFLARE_BASE_URL}/{old_token_id}"
-        req = urllib.request.Request(
-            url,
-            headers={"Authorization": f"Bearer {new_token_value}"},
-            method="DELETE"
-        )
+    if current_version == token:
+        print("finishSecret: Already active.")
+        return
+
+    # FIX: Read and secure the old token data BEFORE updating any production stages
+    old_dict = json.loads(
+        client.get_secret_value(SecretId=arn, VersionId=current_version)["SecretString"]
+    )
+    old_app_token = old_dict.get("CLOUDFLARE_API_TOKEN")
+    master_token = old_dict.get("LAMBDA_ROTATOR_TOKEN")
+
+    # Update production stage mapping to the new token
+    client.update_secret_version_stage(
+        SecretId=arn,
+        VersionStage="AWSCURRENT",
+        MoveToVersionId=token,
+        RemoveFromVersionId=current_version,
+    )
+    print(f"finishSecret: Promoted version {token} to AWSCURRENT.")
+
+    # Cleanup the old token inside Cloudflare using the isolated old configurations
+    if old_app_token and master_token:
         try:
-            urllib.request.urlopen(req)
-        except urllib.error.HTTPError as e:
-            print(f"Warning: Failed to delete old Cloudflare token {old_token_id}: {e.read().decode()}")
+            # Resolve the old token's Cloudflare ID string using its own token string
+            req = urllib.request.Request(
+                f"{CF_BASE_URL}/verify",
+                headers={"Authorization": f"Bearer {old_app_token}"},
+            )
+            with urllib.request.urlopen(req) as r:
+                old_token_id = json.loads(r.read().decode())["result"]["id"]
+
+            # Delete the token via the Master token administrator profile
+            req = urllib.request.Request(
+                f"{CF_BASE_URL}/{old_token_id}",
+                headers={"Authorization": f"Bearer {master_token}"},
+                method="DELETE",
+            )
+            with urllib.request.urlopen(req) as r:
+                print(
+                    f"Successfully deleted old token ID from Cloudflare: {old_token_id}"
+                )
+        except Exception as e:
+            print(f"Cleanup warning: Old token not deleted from Cloudflare: {str(e)}")
