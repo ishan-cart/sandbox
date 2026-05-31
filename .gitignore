@@ -12,3 +12,5 @@ apps/web-app/public/data/data.json
 
 __pycache__
 .pytest_cache
+
+.zip
