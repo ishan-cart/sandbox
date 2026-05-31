@@ -28,6 +28,12 @@ data "aws_iam_role" "efs_csi_controller" {
   name = "allow-eks-efs-access"
 }
 
+data "aws_efs_file_system" "eks_efs" {
+  tags = {
+    Name = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-efs"
+  }
+}
+
 resource "kubernetes_namespace_v1" "ingress" {
   metadata {
     name = "ingress-haproxy"
@@ -295,7 +301,7 @@ resource "kubernetes_manifest" "efs_storage_class" {
       "basePath"              = "/dynamic_provisioning"
       "directoryPerms"        = "700"
       "ensureUniqueDirectory" = "true"
-      "fileSystemId"          = "fs-0ae8c10f6c888d6cc"
+      "fileSystemId"          = data.aws_efs_file_system.eks_efs.id
       "gidRangeEnd"           = "70000"
       "gidRangeStart"         = "50000"
       "provisioningMode"      = "efs-ap"
@@ -304,6 +310,7 @@ resource "kubernetes_manifest" "efs_storage_class" {
     }
     "provisioner"       = "efs.csi.aws.com"
     "volumeBindingMode" = "WaitForFirstConsumer"
+    # "mountOptions"      = ["iam"] 
   }
 }
 
