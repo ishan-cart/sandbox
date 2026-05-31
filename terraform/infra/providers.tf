@@ -8,9 +8,15 @@ terraform {
       source  = "cloudflare/cloudflare"
       version = "~> 5"
     }
+    archive = {
+      source  = "hashicorp/archive"
+      version = "~> 2.8.0"
+    }
   }
   backend "s3" {}
 }
+
+
 
 provider "aws" {
   region = var.region
