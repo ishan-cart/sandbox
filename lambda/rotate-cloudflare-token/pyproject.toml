@@ -1,0 +1,26 @@
+[project]
+name = "rotate-cloudflare-token"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "ishan"}
+]
+requires-python = ">=3.14"
+dependencies = [
+    "boto3 (>=1.43.18,<2.0.0)",
+    "mypy-boto3-secretsmanager (>=1.43.0,<2.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "pytest (>=9.0.3,<10.0.0)",
+    "types-boto3-secretsmanager (>=1.43.0,<2.0.0)"
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
