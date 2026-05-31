@@ -54,7 +54,7 @@ data "aws_iam_policy_document" "kms_key_policy" {
     sid    = "AllowEksEfsCsiDriverToUseKey"
     effect = "Allow"
     principals {
-      type = "AWS"
+      type        = "AWS"
       identifiers = [aws_iam_role.efs_csi_controller.arn] # hardcode due to cycle condition.
     }
     actions = [
