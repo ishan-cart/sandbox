@@ -76,6 +76,10 @@ data "aws_iam_policy_document" "kms_key_policy" {
       "kms:DescribeKey",
       "kms:GenerateDataKey"
     ]
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.lambda_secrets_access.arn]
+    }
     resources = ["*"]
     condition {
       test     = "StringEquals"
