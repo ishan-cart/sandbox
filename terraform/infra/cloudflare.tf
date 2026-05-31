@@ -51,6 +51,16 @@ resource "aws_secretsmanager_secret_rotation" "rotation" {
   rotation_rules {
     automatically_after_days = 30
   }
+
+  depends_on = [aws_lambda_permission.allow_cloudflare_secret]
+}
+
+resource "aws_lambda_permission" "allow_cloudflare_secret" {
+  statement_id  = "AllowExecutionFromSecretsManager"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.rotate_cloudflare_token.function_name
+  principal     = "secretsmanager.amazonaws.com"
+  source_arn    = aws_secretsmanager_secret.cloudflare_token.arn
 }
 
 data "archive_file" "rotate_cloudflare_token" {
@@ -62,9 +72,11 @@ data "archive_file" "rotate_cloudflare_token" {
 resource "aws_lambda_function" "rotate_cloudflare_token" {
   filename      = data.archive_file.rotate_cloudflare_token.output_path
   function_name = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-rotate-cloudflare-token"
+  description   = "Automate rotation of cloudflare api token"
   role          = aws_iam_role.lambda_secrets_access.arn
   handler       = "rotate_cloudflare_token.handler"
   code_sha256   = data.archive_file.rotate_cloudflare_token.output_base64sha256
+  timeout = 30
 
   runtime = "python3.14"
 
@@ -82,19 +94,28 @@ resource "aws_lambda_function" "rotate_cloudflare_token" {
 }
 
 resource "aws_iam_role" "lambda_secrets_access" {
-  name               = "allow-lambda-secrets-access"
+  name = "allow-lambda-secrets-access"
   assume_role_policy = jsonencode({
-    Effect = "Allow"
-    Principal = {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
-    }
-    Action = ["sts:AssumeRole"]
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = ["lambda.amazonaws.com"]
+        }
+        Action = ["sts:AssumeRole"]
+      }
+    ]
   })
 }
 
-resource "aws_iam_policy" "lambda_secrets_access_policy" {
+resource "aws_iam_policy" "lambda_secrets_access" {
   name        = "AWSLambdaSecretsManagerRotationPolicy"
   description = "Allow Lambda to read/rotate secrets"
   policy      = file("./policies/lambda-sm-access.json")
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_secrets_access_attachment" {
+  role       = aws_iam_role.lambda_secrets_access.name
+  policy_arn = aws_iam_policy.lambda_secrets_access.arn
 }
