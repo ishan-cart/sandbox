@@ -49,6 +49,22 @@ data "aws_iam_policy_document" "kms_key_policy" {
     ]
     resources = ["*"]
   }
+
+  statement {
+    sid    = "AllowLambdaSecretRotation"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey",
+      "kms:GenerateDataKey"
+    ]
+    resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "kms:EncryptionContext:SecretARN"
+      values   = [aws_secretsmanager_secret.cloudflare_token.arn]
+    }
+  }
 }
 
 resource "aws_kms_key" "key" {
