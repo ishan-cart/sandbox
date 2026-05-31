@@ -339,11 +339,11 @@ resource "aws_iam_role" "efs_csi_controller" {
         }
         Condition = {
           StringLike = {
-            "${aws_iam_openid_connect_provider.eks_cluster.url}:sub" = "system:serviceaccount:kube-system:efs-csi-*",
+            "${aws_iam_openid_connect_provider.eks_cluster.url}:sub" = ["system:serviceaccount:kube-system:efs-csi-*"]
             "${aws_iam_openid_connect_provider.eks_cluster.url}:aud" = "sts.amazonaws.com",
           }
         }
-      },
+      }
     ]
   })
 }
@@ -353,3 +353,28 @@ resource "aws_iam_role_policy_attachment" "efs_csi_controller_attachment" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEFSCSIDriverPolicy"
 }
 
+resource "aws_iam_role_policy_attachment" "efs_csi_controller_kms_attachment" {
+  role       = aws_iam_role.efs_csi_controller.name
+  policy_arn = aws_iam_policy.efs_csi_driver_kms.arn
+}
+
+resource "aws_iam_policy" "efs_csi_driver_kms" {
+  name        = "efs_csi_driver_kms"
+  description = "Allow EFS csi driver to use kms key"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid    = "AllowEksEfsCsiDriverToUseKey"
+      Effect = "Allow"
+      Action = [
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:CreateGrant",
+        "kms:DescribeKey"
+      ]
+      Resource = [aws_kms_key.key.arn]
+    }]
+  })
+}
