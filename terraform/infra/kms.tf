@@ -98,28 +98,3 @@ resource "aws_kms_key_policy" "key_attachment" {
   key_id = aws_kms_key.key.id
   policy = data.aws_iam_policy_document.kms_key_policy.json
 }
-
-# resource "aws_kms_key_policy" "efs_csi_driver_kms" {
-#   key_id = aws_kms_key.key.id
-#   policy = jsonencode({
-#     Id    = "AllowEksEfsCsiDriverToUseKey"
-#     Statement = [
-#       {
-#         Effect = "Allow"
-#         Principal = {
-#           AWS = aws_iam_role.efs_csi_controller.arn
-#         }
-#         Action = [
-#           "kms:Encrypt",
-#           "kms:Decrypt",
-#           "kms:ReEncrypt*",
-#           "kms:GenerateDataKey*",
-#           "kms:CreateGrant",
-#           "kms:DescribeKey"
-#         ]
-#         Resource = ["arn:aws:elasticfilesystem:${var.region}:${local.env_vars[var.environment].project_id}:file-system/*"]
-#       }
-#     ]
-#   })
-# }
-
