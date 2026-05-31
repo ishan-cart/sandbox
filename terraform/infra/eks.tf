@@ -361,7 +361,7 @@ resource "aws_iam_role_policy_attachment" "efs_csi_controller_kms_attachment" {
 resource "aws_iam_policy" "efs_csi_driver_kms" {
   name        = "efs_csi_driver_kms"
   description = "Allow EFS csi driver to use kms key"
-  policy      = jsonencode({
+  policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
       Sid    = "AllowEksEfsCsiDriverToUseKey"

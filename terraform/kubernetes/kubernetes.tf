@@ -301,7 +301,7 @@ resource "kubernetes_manifest" "efs_storage_class" {
       "basePath"              = "/dynamic_provisioning"
       "directoryPerms"        = "700"
       "ensureUniqueDirectory" = "true"
-      "fileSystemId"          = data.aws_efs_file_system.eks_efs.id 
+      "fileSystemId"          = data.aws_efs_file_system.eks_efs.id
       "gidRangeEnd"           = "70000"
       "gidRangeStart"         = "50000"
       "provisioningMode"      = "efs-ap"
