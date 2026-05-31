@@ -27,6 +27,20 @@
       ],
       "Resource": "*",
       "Effect": "Allow"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+          "kms:Decrypt",
+          "kms:DescribeKey",
+          "kms:GenerateDataKey"
+      ],
+      "Resource": "arn:aws:kms:*",
+      "Condition": {
+          "StringEquals": {
+              "kms:EncryptionContext:SecretARN": "arn:aws:secretsmanager:*"
+          }
+      }
     }
   ]
 }
