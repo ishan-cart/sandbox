@@ -67,6 +67,26 @@ data "aws_iam_policy_document" "kms_key_policy" {
     ]
     resources = ["*"]
   }
+
+  statement {
+    sid    = "AllowLambdaSecretRotation"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey",
+      "kms:GenerateDataKey"
+    ]
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.lambda_secrets_access.arn]
+    }
+    resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "kms:EncryptionContext:SecretARN"
+      values   = [aws_secretsmanager_secret.cloudflare_token.arn]
+    }
+  }
 }
 
 resource "aws_kms_key" "key" {
@@ -82,28 +102,3 @@ resource "aws_kms_key_policy" "key_attachment" {
   key_id = aws_kms_key.key.id
   policy = data.aws_iam_policy_document.kms_key_policy.json
 }
-
-# resource "aws_kms_key_policy" "efs_csi_driver_kms" {
-#   key_id = aws_kms_key.key.id
-#   policy = jsonencode({
-#     Id    = "AllowEksEfsCsiDriverToUseKey"
-#     Statement = [
-#       {
-#         Effect = "Allow"
-#         Principal = {
-#           AWS = aws_iam_role.efs_csi_controller.arn
-#         }
-#         Action = [
-#           "kms:Encrypt",
-#           "kms:Decrypt",
-#           "kms:ReEncrypt*",
-#           "kms:GenerateDataKey*",
-#           "kms:CreateGrant",
-#           "kms:DescribeKey"
-#         ]
-#         Resource = ["arn:aws:elasticfilesystem:${var.region}:${local.env_vars[var.environment].project_id}:file-system/*"]
-#       }
-#     ]
-#   })
-# }
-
