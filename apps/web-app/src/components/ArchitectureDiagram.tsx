@@ -259,10 +259,10 @@ export const ArchitectureDiagram = () => {
         <SectionHeader
           className="mb-12 text-left"
           eyebrow="System Flow"
-          title="How Did I"
-          titleMuted="Deploy This?"
+          title="How Am I"
+          titleMuted="Running This?"
           titleClassName="text-5xl md:text-6xl font-black mb-4 text-slate-900 tracking-tighter"
-          description="Below is a diagram of the system design. It's primarily running in AWS EKS with no Autopilot as I wanted to gain a better understanding of Kubernetes. Feel free to view the metrics!"
+          description="I'm running this in AWS, using EKS so i could gain a deeper understanding of Kubernetes. Below is a diagram of the system design!"
         />
 
         {/* Dynamic Navigation Tabs */}
