@@ -262,7 +262,7 @@ export const ArchitectureDiagram = () => {
           title="How Did I"
           titleMuted="Deploy This?"
           titleClassName="text-5xl md:text-6xl font-black mb-4 text-slate-900 tracking-tighter"
-          description="Below is a diagram of the system design. What began as a deep-dive into Kubernetes ultimately gave me the idea to deploy this site on it!"
+          description="Below is a diagram of the system design. It's primarily running in AWS EKS with no Autopilot as I wanted to gain a better understanding of Kubernetes. Feel free to view the metrics!"
         />
 
         {/* Dynamic Navigation Tabs */}
@@ -478,7 +478,7 @@ export const ArchitectureDiagram = () => {
                       className="text-left py-2 text-[10px] font-mono uppercase tracking-wider text-slate-500 hover:text-slate-300 flex items-center gap-1.5 cursor-pointer self-start select-none transition-colors"
                     >
                       <Code className="w-3.5 h-3.5" />
-                      {showRawJson ? "[- Hide Prometheus JSON]" : "[+ View Raw Prometheus JSON]"}
+                      {showRawJson ? "[- Hide Prometheus response payload]" : "[+ View Prometheus response payload]"}
                     </button>
 
                     <AnimatePresence>
