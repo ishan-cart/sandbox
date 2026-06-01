@@ -12,7 +12,8 @@ jobs:
     outputs:
       web-app: ${{ steps.filter.outputs.web-app }}
       helm-libraries: ${{ steps.filter.outputs.helm-libraries }}
-      terraform: ${{ steps.changes.outputs.changes }}
+      terraform: ${{ steps.changes.outputs.terraform }}
+      lambda: ${{ steps.changes.outputs.lambda }}
     permissions:
       contents: read
       pull-requests: read
@@ -43,6 +44,18 @@ jobs:
     uses: ./.github/workflows/terraform.yaml
     with:
       application: ${{ matrix.application }}
+
+  test-lambda:
+    needs: [changes]
+    if: needs.changes.outputs.lambda != '[]'
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        lambda: ${{ fromJson(needs.changes.outputs.lambda) }}
+    uses: ./.github/workflows/test-lambda.yaml
+    with:
+      lambda: ${{ matrix.lambda }}
 
   build:
     needs: [changes, terraform]

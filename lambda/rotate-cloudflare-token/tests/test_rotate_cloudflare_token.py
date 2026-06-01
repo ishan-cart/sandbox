@@ -2,7 +2,6 @@ import json
 import unittest
 from unittest.mock import MagicMock, patch
 
-# Assumes your main script is named 'rotate_cloudflare_token.py'
 import rotate_cloudflare_token
 
 
@@ -13,10 +12,10 @@ class TestCloudflareTokenRotation(unittest.TestCase):
         self.token_uuid = "12345678-abcd-1234-abcd-1234567890af"
         
         # Test configurations
-        self.old_app_token = "old-mock-app-token-123"
-        self.master_token = "super-secret-master-rotator-token-abc"
-        self.new_app_token = "brand-new-rotated-cloudflare-token-xyz"
-        self.old_token_id = "old-cloudflare-token-id-000"
+        self.old_app_token = "someoldtoken"
+        self.master_token = "somemastertoken"
+        self.new_app_token = "somenewtoken"
+        self.old_token_id = "someoldtokenid"
 
         self.mock_secret_dict = {
             "CLOUDFLARE_API_TOKEN": self.old_app_token,
