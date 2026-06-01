@@ -127,7 +127,7 @@ export default function App() {
             
             <div className="flex flex-wrap justify-center gap-3 mb-10">
               {[
-                { label: "How did I deploy this?", link: "#architecture" },
+                { label: "How am i running this?", link: "#architecture" },
                 { label: "Stack", link: "#skills" },
                 { label: "Experience", link: "#experience" }
               ].map((item) => (
