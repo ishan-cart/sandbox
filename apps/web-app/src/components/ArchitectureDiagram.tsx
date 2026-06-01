@@ -262,7 +262,7 @@ export const ArchitectureDiagram = () => {
           title="How Did I"
           titleMuted="Deploy This?"
           titleClassName="text-5xl md:text-6xl font-black mb-4 text-slate-900 tracking-tighter"
-          description="Below is a diagram of the system design. It's primarily running in a Kubernetes cluster (AWS EKS) with no Autopilot as I wanted to gain a better understanding of it."
+          description="Below is a diagram of the system design. It's primarily running in AWS EKS with no Autopilot as I wanted to gain a better understanding of Kubernetes!"
         />
 
         {/* Dynamic Navigation Tabs */}
