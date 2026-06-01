@@ -76,7 +76,7 @@ export const Experience = () => {
           eyebrow="Professional Sequence"
           title="Professional"
           titleMuted="Experience."
-          description="A selective history of my professional contributions across various engineering disciplines."
+          description="A brief history of my professional contributions in past engineering roles."
         />
 
         <motion.div 
