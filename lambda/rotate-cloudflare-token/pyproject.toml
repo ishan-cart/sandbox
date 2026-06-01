@@ -8,7 +8,7 @@ authors = [
 requires-python = ">=3.14"
 dependencies = [
     "boto3 (>=1.43.18,<2.0.0)",
-    "mypy-boto3-secretsmanager (>=1.43.0,<2.0.0)"
+    "pytest-env (>=1.6.0,<2.0.0)"
 ]
 
 
@@ -18,8 +18,12 @@ build-backend = "poetry.core.masonry.api"
 
 [dependency-groups]
 dev = [
-    "pytest (>=9.0.3,<10.0.0)",
+    "pytest (>=9.0.3,<10.0.0)"
 ]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
+
+[tool.pytest_env]
+AWS_DEFAULT_REGION = "ap-southeast-2"
+AWS_REGION = "ap-southeast-2"
