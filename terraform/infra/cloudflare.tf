@@ -76,7 +76,7 @@ resource "aws_lambda_function" "rotate_cloudflare_token" {
   role          = aws_iam_role.lambda_secrets_access.arn
   handler       = "rotate_cloudflare_token.handler"
   code_sha256   = data.archive_file.rotate_cloudflare_token.output_base64sha256
-  timeout = 30
+  timeout       = 30
 
   runtime = "python3.14"
 
