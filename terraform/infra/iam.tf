@@ -131,21 +131,3 @@ resource "aws_iam_policy" "aws_load_balancer_controller" {
   name   = "AWSLoadBalancerControllerIAMPolicy"
   policy = file("${path.module}/policies/aws-lb-controller.json")
 }
-
-data "aws_iam_policy_document" "allow_lambda" {
-  statement {
-    effect = "Allow"
-
-    principals {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
-    }
-
-    actions = ["sts:AssumeRole"]
-  }
-}
-
-resource "aws_iam_role" "allow_lambda" {
-  name               = "allow-lambda"
-  assume_role_policy = data.aws_iam_policy_document.allow_lambda.json
-}

@@ -2,10 +2,16 @@
 .terraform*
 terraform.tfstate*
 
-simpleproject*
 *.tgz
 *.lock
 
 megalinter-reports/
 
 apps/web-app/public/data/data.json
+
+__pycache__
+.pytest_cache
+
+*.zip
+
+.vscode/
