@@ -15,6 +15,12 @@ for f in ./terraform/*; do
 	fi
 done
 
+for f in ./lambda/*; do
+	if [ -d "$f" ]; then
+		echo "lambda-${f##*/}: $f/**"
+	fi
+done
+
 echo 'helm-libraries: helm-libraries/common-library/**'
 
 echo 'EOF'

@@ -1,0 +1,42 @@
+name: "Test lambda function"
+
+on:
+  workflow_call:
+    inputs:
+      lambda:
+        description: "The lambda function name"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  test-lambda:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: Actions/checkout@v6
+        with:
+          sparse-checkout: lambda/${{ inputs.lambda }}
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version-file: lambda/${{ inputs.lambda }}/pyproject.toml
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1.4.2
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          virtualenvs-path: .venv
+          installer-parallel: true
+
+      - name: Install dependencies
+        working-directory: lambda/${{ inputs.lambda }}
+        run: poetry install --no-interaction --no-root
+
+      - name: Run tests
+        working-directory: lambda/${{ inputs.lambda }}
+        run: poetry run pytest
