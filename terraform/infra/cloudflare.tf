@@ -129,8 +129,9 @@ resource "aws_iam_role_policy_attachment" "lambda_secrets_access_attachment" {
 }
 
 resource "aws_security_group" "lambda" {
-  name   = "lambda-sg"
-  vpc_id = aws_vpc.vpc_network.id
+  name        = "lambda-sg"
+  description = "Lambdas within VPC security group"
+  vpc_id      = aws_vpc.vpc_network.id
 }
 
 resource "aws_vpc_security_group_egress_rule" "allow_lambda_outbound" {
