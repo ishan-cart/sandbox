@@ -1,0 +1,7 @@
+http://*
+
+https://github.com/prometheus-operator/prometheus-operator/blob/*
+https://gateway-api.sigs.k8s.io/reference/spec/*
+https://kubernetes.default.svc/
+
+https://github.com/ishan-cart/sandbox.git
