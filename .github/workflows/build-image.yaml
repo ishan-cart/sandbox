@@ -2,18 +2,25 @@ name: "Build Image"
 
 on:
   workflow_call:
-    inputs: &shared_inputs
+    inputs: 
       application:
         description: "The application name"
         required: true
         type: string
-      push:
+      push: &push_inputs
         description: push image to registry
         required: false
         type: boolean
         default: false
   workflow_dispatch:
-    inputs: *shared_inputs
+    inputs:
+      application:
+        description: "The application name"
+        required: true
+        type: choice
+        options:
+          - web-app
+      push: *push_inputs
 
 jobs:
   build:
@@ -31,7 +38,7 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
-      
+
       - name: Ensure unique version tag
         working-directory: apps/${{ inputs.application }}
         id: version-check

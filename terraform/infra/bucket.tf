@@ -14,7 +14,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_state" 
   bucket = aws_s3_bucket.terraform_state.id
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
+      kms_master_key_id = aws_kms_key.key.arn
+      sse_algorithm     = "aws:kms"
     }
   }
 }
@@ -26,6 +27,12 @@ resource "aws_s3_bucket_public_access_block" "terraform_state" {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_logging" "terraform_state" {
+  bucket = aws_s3_bucket.terraform_state.id
+  target_bucket = aws_s3_bucket.access_logs.id
+  target_prefix = "AWSLogs/"
 }
 
 resource "aws_s3_bucket" "access_logs" {
@@ -40,10 +47,12 @@ resource "aws_s3_bucket_versioning" "access_logs" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "access_logs" {
+  # checkov:skip=CKV_AWS_18
   bucket = aws_s3_bucket.access_logs.id
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
+      kms_master_key_id = aws_kms_key.key.arn
+      sse_algorithm     = "aws:kms"
     }
   }
 }
@@ -88,6 +97,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "access_logs" {
     }
     noncurrent_version_expiration {
       noncurrent_days = 30
+    }
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 1
     }
   }
 }

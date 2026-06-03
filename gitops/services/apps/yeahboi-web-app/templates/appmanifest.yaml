@@ -1,10 +1,10 @@
-{{- include "common-library._deployment.tpl" . }}
+{ { - include "common-library._deployment.tpl" . } }
 ---
-{{- include "common-library._hpa.tpl" . }}
+{ { - include "common-library._hpa.tpl" . } }
 ---
-{{- include "common-library._service.tpl" . }}
+{ { - include "common-library._service.tpl" . } }
 ---
-{{- include "common-library._ingress.tpl" . }}
+{ { - include "common-library._ingress.tpl" . } }
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -25,7 +25,7 @@ metadata:
   name: yeahboi-web-app-snapshot
 spec:
   schedule: "*/5 * * * *" # Runs every 1 minutes
-  concurrencyPolicy: Forbid 
+  concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 1
   jobTemplate:
@@ -35,32 +35,32 @@ spec:
           securityContext:
             fsGroup: 1000
           containers:
-          - name: curl
-            image: curlimages/curl:latest
-            imagePullPolicy: IfNotPresent
-            env:
-            - name: PROMETHEUS_HOST
-              value: "kube-prometheus-stack-prometheus.monitoring.svc.cluster.local"
-            - name: PROMETHEUS_PORT
-              value: "9090"
-            - name: QUERY
-              value: "sum(max by (cluster, namespace, pod, container) (container_memory_rss{job=\"kubelet\", metrics_path=\"/metrics/cadvisor\", container!=\"\"})) by (namespace)"
-            - name: OUTPUT_FILE
-              value: "/data/data.json"
-            command: ["sh", "-c"]
-            args:
-            - |
-              curl -f -X POST http://${PROMETHEUS_HOST}:${PROMETHEUS_PORT}/api/v1/query_range \
-                --data-urlencode "query=${QUERY}" \
-                --data-urlencode "start=$(($(date +%s) - 600))" \
-                --data-urlencode "end=$(date +%s)" \
-                --data-urlencode "step=1m" \
-                -o "${OUTPUT_FILE}"
-            volumeMounts:
-            - mountPath: /data
-              name: snapshots
+            - name: curl
+              image: curlimages/curl:latest
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: PROMETHEUS_HOST
+                  value: "kube-prometheus-stack-prometheus.monitoring.svc.cluster.local"
+                - name: PROMETHEUS_PORT
+                  value: "9090"
+                - name: QUERY
+                  value: 'sum(max by (cluster, namespace, pod, container) (container_memory_rss{job="kubelet", metrics_path="/metrics/cadvisor", container!=""})) by (namespace)'
+                - name: OUTPUT_FILE
+                  value: "/data/data.json"
+              command: ["sh", "-c"]
+              args:
+                - |
+                  curl -f -X POST http://${PROMETHEUS_HOST}:${PROMETHEUS_PORT}/api/v1/query_range \
+                    --data-urlencode "query=${QUERY}" \
+                    --data-urlencode "start=$(($(date +%s) - 600))" \
+                    --data-urlencode "end=$(date +%s)" \
+                    --data-urlencode "step=1m" \
+                    -o "${OUTPUT_FILE}"
+              volumeMounts:
+                - mountPath: /data
+                  name: snapshots
           volumes:
-          - name: snapshots
-            persistentVolumeClaim:
-              claimName: yeahboi-web-app-snapshot
+            - name: snapshots
+              persistentVolumeClaim:
+                claimName: yeahboi-web-app-snapshot
           restartPolicy: OnFailure

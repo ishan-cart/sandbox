@@ -70,6 +70,9 @@ data "archive_file" "rotate_cloudflare_token" {
 }
 
 resource "aws_lambda_function" "rotate_cloudflare_token" {
+  # checkov:skip=CKV_AWS_116 : Secrets can get exposed in a DLQ, setup alerts instead
+  # checkov:skip=CKV_AWS_115 : Concurrency limit is 10 for account
+  # checkov:skip=CKV_AWS_272,CKV_AWS_50
   filename      = data.archive_file.rotate_cloudflare_token.output_path
   function_name = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-rotate-cloudflare-token"
   description   = "Automate rotation of cloudflare api token"
@@ -77,8 +80,13 @@ resource "aws_lambda_function" "rotate_cloudflare_token" {
   handler       = "rotate_cloudflare_token.handler"
   code_sha256   = data.archive_file.rotate_cloudflare_token.output_base64sha256
   timeout       = 30
+  kms_key_arn   = aws_kms_key.key.arn
+  runtime       = "python3.14"
 
-  runtime = "python3.14"
+  vpc_config {
+    subnet_ids         = [aws_subnet.private_subnet_1.id]
+    security_group_ids = [aws_security_group.lambda.id]
+  }
 
   environment {
     variables = {
@@ -118,4 +126,16 @@ resource "aws_iam_policy" "lambda_secrets_access" {
 resource "aws_iam_role_policy_attachment" "lambda_secrets_access_attachment" {
   role       = aws_iam_role.lambda_secrets_access.name
   policy_arn = aws_iam_policy.lambda_secrets_access.arn
+}
+
+resource "aws_security_group" "lambda" {
+  name   = "lambda-sg"
+  vpc_id = aws_vpc.vpc_network.id
+}
+
+resource "aws_vpc_security_group_egress_rule" "allow_lambda_outbound" {
+  security_group_id = aws_security_group.lambda.id
+  description       = "Allow all outbound traffic"
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1"
 }

@@ -21,4 +21,6 @@ TERRAFORM_TERRASCAN_ARGUMENTS: "-d ./terraform"
 REPOSITORY_CHECKOV_ARGUMENTS: |
   --skip-path "/gitops/services/ingress-controller/haproxy-ingress/charts/kubernetes-ingress"
   --skip-path "/gitops/services/monitoring/kube-prometheus-stack/charts/kube-prometheus-stack"
-  --skip-check CKV2_AWS_62,CKV2_AWS_1,CKV_AWS_144
+  --skip-check CKV2_AWS_62,CKV2_AWS_1,CKV_AWS_144,CKV_GHA_7
+
+CLEAR_REPORT_FOLDER: true

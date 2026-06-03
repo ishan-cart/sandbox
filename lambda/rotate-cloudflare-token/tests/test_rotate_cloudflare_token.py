@@ -9,7 +9,7 @@ class TestCloudflareTokenRotation(unittest.TestCase):
 
     def setUp(self):
         self.secret_arn = "arn:aws:secretsmanager:us-east-1:123456789012:secret:cloudflare-test"
-        self.token_uuid = "12345678-abcd-1234-abcd-1234567890af"
+        self.token_uuid = "12345678-abcd-1234-abcd-1234567890af" # gitleaks:allow
         
         # Test configurations
         self.old_app_token = "someoldtoken"

@@ -14,3 +14,10 @@ COPY --from=development /app/dist /usr/share/nginx/html/
 COPY nginx.conf.template /etc/nginx/templates/
 
 EXPOSE 8080
+
+RUN useradd -m app -s /usr/bin/bash
+
+ENTRYPOINT ["nginx"]
+
+HEALTHCHECK --interval=5s --timeout=3s\
+    CMD curl -f http://localhost:8080 || exit 1
