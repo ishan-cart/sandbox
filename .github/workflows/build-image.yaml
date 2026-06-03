@@ -2,7 +2,7 @@ name: "Build Image"
 
 on:
   workflow_call:
-    inputs: 
+    inputs:
       application:
         description: "The application name"
         required: true
@@ -21,6 +21,8 @@ on:
         options:
           - web-app
       push: *push_inputs
+
+permissions: read-all
 
 jobs:
   build:
