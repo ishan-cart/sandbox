@@ -16,8 +16,9 @@ COPY nginx.conf.template /etc/nginx/templates/
 EXPOSE 8080
 
 RUN useradd -m app -s /usr/bin/bash
+USER app
 
 ENTRYPOINT ["nginx"]
 
-HEALTHCHECK --interval=5s --timeout=3s\
+HEALTHCHECK --interval=5s --timeout=3s \
     CMD curl -f http://localhost:8080 || exit 1
