@@ -1,4 +1,5 @@
 #!/bin/sh
+# DevSkim: ignore DS162092 - Localhost fallback is explicitly intended for local testing environments
 PROMETHEUS_HOST=${PROMETHEUS_HOST:-localhost}
 PROMETHEUS_PORT=${PROMETHEUS_PORT:-9090}
 
@@ -7,6 +8,7 @@ BACKUP_QUERY='sum(max by (cluster, namespace, pod, container) (container_memory_
 QUERY=${QUERY:-$BACKUP_QUERY}
 
 # Executing the POST request to query_range
+# DevSkim: ignore DS137138 - HTTP protocol is safe for local, non-production metrics testing
 curl -f -X POST "http://${PROMETHEUS_HOST}:${PROMETHEUS_PORT}/api/v1/query_range" \
 	--data-urlencode "query=${QUERY}" \
 	--data-urlencode "start=$(($(date +%s) - 600))" \
