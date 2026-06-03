@@ -1,0 +1,7 @@
+{
+    "Globs": [
+      "**/.git/**",
+      "**/megalinter-reports/**",
+      "docker-compose.yaml"      
+    ]
+}
