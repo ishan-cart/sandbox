@@ -1,7 +1,8 @@
 import json
-import urllib.request
 import urllib.error
+import urllib.request
 from typing import Any, Dict
+
 import boto3
 
 # Configuration
