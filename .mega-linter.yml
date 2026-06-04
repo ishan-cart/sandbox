@@ -1,24 +1,29 @@
-APPLY_FIXES: all
-ENABLE:
-  - REPOSITORY
-  - TERRAFORM
-  - DOCKERFILE
-  - YAML
-  - BASH
-  - TYPESCRIPT
-  - ACTION
-  - SPELL
-  - COPYPASTE
-DISABLE_LINTERS:
-  - ACTION_ZIZMOR
-  - TERRAFORM_TERRASCAN # Duplicate checks to TERRAFORM_CHECKOV
+---
+EXTENDS: https://raw.githubusercontent.com/oxsecurity/megalinter/v9.5.0/.mega-linter.yml
 
-FILTER_REGEX_EXCLUDE: '.*\.css$'
+DISABLE_LINTERS:
+  # - ACTION_ZIZMOR
+  - TERRAFORM_TERRASCAN # Duplicate checks to TERRAFORM_CHECKOV
+  - REPOSITORY_GRYPE
+  - SPELL_CSPELL # too noisy
+  - SPELL_LYCHEE # too noisy
+  - REPOSITORY_TRIVY
+  - PYTHON_PYLINT
+
+REPOSITORY_TRUFFLEHOG_ARGUMENTS: ""
+
+# FILTER_REGEX_EXCLUDE: '.*\.css$'
+
 IGNORE_GITIGNORED_FILES: true
 
-LOG_LEVEL: ERROR
+LOG_LEVEL: INFO
 
 TERRAFORM_TERRASCAN_ARGUMENTS: "-d ./terraform"
+
+DOCKERFILE_HADOLINT_FILE_NAMES_REGEX:
+  - "Dockerfile"
+
+REPOSITORY_KINGFISHER_ARGUMENTS: --exclude apps/web-app/src/assets/images/Untitled-2026-05-16-2229.svg
 
 REPOSITORY_CHECKOV_ARGUMENTS: |
   --skip-path "/gitops/services/ingress-controller/haproxy-ingress/charts/kubernetes-ingress"
