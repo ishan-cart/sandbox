@@ -1,3 +1,5 @@
-# Ignore historical mock Python key
-aaa86fc6ba8dde4a8d1d363c3626441888f08d1d
-36c6ad159fac70ffca91d71f0987a6668982e8ef
+# Python test fixtures — mock UUIDs, not real secrets
+lambda/rotate-cloudflare-token/tests/test_rotate_cloudflare_token.py:generic-api-key:13
+
+# Rotated Grafana API key removed in 830be37; only exists in historical commit
+31dd9cf239d1cea5baf3f07e78b4e161b478444b:gitops/services/apps/yeahboi-web-app/templates/appmanifest.yaml:grafana-service-account-token:46
