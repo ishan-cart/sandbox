@@ -8,17 +8,13 @@ COPY public/ public/
 RUN npm run build
 CMD ["npm", "run", "dev"]
 
-FROM docker.io/nginx:1.30.2-alpine as production
+FROM docker.io/nginxinc/nginx-unprivileged:1.30.2-alpine as production
 
 COPY --from=development /app/dist /usr/share/nginx/html/
-COPY nginx.conf.template /etc/nginx/templates/
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 8080
 
-RUN useradd -m app -s /usr/bin/bash
-USER app
+USER nginx
 
-ENTRYPOINT ["nginx"]
-
-HEALTHCHECK --interval=5s --timeout=3s \
-    CMD curl -f http://localhost:8080 || exit 1
+CMD ["nginx", "-g", "daemon off;"]
