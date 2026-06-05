@@ -22,7 +22,6 @@ services:
       - 8080:8080
     volumes:
       - ./apps/web-app/src:/app/src # dev only
-      - ./apps/web-app/nginx.conf.template:/etc/nginx/templates/nginx.conf.template
       - ./apps/web-app/public/data:/usr/share/nginx/html/data/
 
   web-app-cron:
