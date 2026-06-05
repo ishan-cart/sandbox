@@ -22,13 +22,15 @@ on:
           - web-app
       push: *push_inputs
 
-permissions: {}
+permissions:
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      id-token: write
     steps:
       - name: Checkout repo
         uses: Actions/checkout@v6
