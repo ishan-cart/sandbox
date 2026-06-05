@@ -81,7 +81,7 @@ resource "helm_release" "aws_load_balancer_controller" {
     },
     {
       name  = "serviceAccount.name"
-      value = kubernetes_service_account_v1.aws_load_balancer_controller.metadata.0.name
+      value = kubernetes_service_account_v1.aws_load_balancer_controller.metadata[0].name
     },
     {
       name  = "region"
@@ -151,7 +151,7 @@ resource "kubernetes_manifest" "eso_ecr_token_generator" {
       auth = {
         jwt = {
           serviceAccountRef = {
-            name = kubernetes_service_account_v1.external_secrets_ecr.metadata.0.name
+            name = kubernetes_service_account_v1.external_secrets_ecr.metadata[0].name
           }
         }
       }

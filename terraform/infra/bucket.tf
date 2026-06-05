@@ -75,8 +75,7 @@ resource "aws_s3_bucket_policy" "access_logs" {
         "Sid" : "AWSLogDeliveryWrite",
         "Effect" : "Allow",
         "Principal" : {
-          "Service" : "logdelivery.elasticloadbalancing.amazonaws.com",
-          "Service" : "delivery.logs.amazonaws.com",
+          "Service" : ["logdelivery.elasticloadbalancing.amazonaws.com", "delivery.logs.amazonaws.com"]
         },
         "Action" : "s3:PutObject",
         "Resource" : "arn:aws:s3:::${aws_s3_bucket.access_logs.bucket}/AWSLogs/${local.env_vars[var.environment].project_id}/*",

@@ -1,3 +1,4 @@
+# tflint-ignore-file: terraform_unused_declarations
 locals {
   github_user = "ishan-cart"
   repository  = "sandbox"
