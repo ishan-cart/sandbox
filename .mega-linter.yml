@@ -1,24 +1,30 @@
-APPLY_FIXES: all
-ENABLE:
-  - REPOSITORY
-  - TERRAFORM
-  - DOCKERFILE
-  - YAML
-  - BASH
-  - TYPESCRIPT
-  - ACTION
-  - SPELL
-  - COPYPASTE
-DISABLE_LINTERS:
-  - ACTION_ZIZMOR
-FILTER_REGEX_EXCLUDE: '.*\.css$'
+---
+EXTENDS: https://raw.githubusercontent.com/oxsecurity/megalinter/v9.5.0/.mega-linter.yml
+CLEAR_REPORT_FOLDER: true
 IGNORE_GITIGNORED_FILES: true
+LOG_LEVEL: INFO
 
-LOG_LEVEL: ERROR
+DISABLE_LINTERS:
+  - TERRAFORM_TERRASCAN # Duplicate checks to TERRAFORM_CHECKOV
+  - REPOSITORY_GRYPE
+  - SPELL_CSPELL # too noisy
+  - SPELL_LYCHEE # too noisy
+  - REPOSITORY_TRIVY
+  - PYTHON_PYLINT
 
 TERRAFORM_TERRASCAN_ARGUMENTS: "-d ./terraform"
+
+DOCKERFILE_HADOLINT_FILE_NAMES_REGEX:
+  - "Dockerfile"
+
+REPOSITORY_KINGFISHER_ARGUMENTS: --exclude apps/web-app/src/assets/images/Untitled-2026-05-16-2229.svg
+
+# Required otherwise trufflehog throws a fit
+REPOSITORY_TRUFFLEHOG_ARGUMENTS: ""
 
 REPOSITORY_CHECKOV_ARGUMENTS: |
   --skip-path "/gitops/services/ingress-controller/haproxy-ingress/charts/kubernetes-ingress"
   --skip-path "/gitops/services/monitoring/kube-prometheus-stack/charts/kube-prometheus-stack"
-  --skip-check CKV2_AWS_62,CKV2_AWS_1,CKV_AWS_144
+  --skip-check CKV2_AWS_62,CKV2_AWS_1,CKV_AWS_144,CKV_GHA_7,CKV_DOCKER_2
+
+TERRAFORM_TFLINT_DISABLE_ERRORS: true

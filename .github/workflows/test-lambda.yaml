@@ -19,6 +19,7 @@ jobs:
     steps:
       - uses: Actions/checkout@v6
         with:
+          persist-credentials: false
           sparse-checkout: lambda/${{ inputs.lambda }}
 
       - uses: actions/setup-python@v6

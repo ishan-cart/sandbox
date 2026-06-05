@@ -1,5 +1,5 @@
 {
-  "Version":"2012-10-17",
+  "Version": "2012-10-17",
   "Statement": [
     {
       "Effect": "Allow",
@@ -13,9 +13,7 @@
     },
     {
       "Effect": "Allow",
-      "Action": [
-        "secretsmanager:GetRandomPassword"
-      ],
+      "Action": ["secretsmanager:GetRandomPassword"],
       "Resource": "*"
     },
     {
@@ -30,16 +28,12 @@
     },
     {
       "Effect": "Allow",
-      "Action": [
-          "kms:Decrypt",
-          "kms:DescribeKey",
-          "kms:GenerateDataKey"
-      ],
+      "Action": ["kms:Decrypt", "kms:DescribeKey", "kms:GenerateDataKey"],
       "Resource": "arn:aws:kms:*",
       "Condition": {
-          "StringEquals": {
-              "kms:EncryptionContext:SecretARN": "arn:aws:secretsmanager:*"
-          }
+        "StringEquals": {
+          "kms:EncryptionContext:SecretARN": "arn:aws:secretsmanager:*"
+        }
       }
     }
   ]

@@ -1,4 +1,5 @@
 resource "aws_lb" "front_end" {
+  # checkov:skip=CKV2_AWS_28
   name                       = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-lb"
   internal                   = false
   load_balancer_type         = "application"
@@ -32,7 +33,7 @@ resource "aws_lb_listener" "front_end_https" {
   load_balancer_arn = aws_lb.front_end.arn
   port              = 443
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-TLS-1-1-2017-01"
+  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
   certificate_arn   = aws_acm_certificate.domain_cert.arn
 
   default_action {

@@ -1,0 +1,9 @@
+{
+  "Globs": [
+    "**/.git/**",
+    "**/megalinter-reports/**",
+    "**/.docker-compose/**",
+    "docker-compose.yaml",
+    "gitops/services/apps/yeahboi-web-app/templates/appmanifest.yaml"
+  ]
+}

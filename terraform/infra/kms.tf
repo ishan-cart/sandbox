@@ -90,6 +90,7 @@ data "aws_iam_policy_document" "kms_key_policy" {
 }
 
 resource "aws_kms_key" "key" {
+  # checkov:skip=CKV_AWS_7 : save $
   description = "KMS Key"
 }
 

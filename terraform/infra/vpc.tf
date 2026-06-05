@@ -16,22 +16,9 @@ resource "aws_flow_log" "vpc" {
 }
 
 resource "aws_default_security_group" "default" {
-  # Ensure default sg has restricted ingress
-  vpc_id = aws_vpc.vpc_network.id
-
-  ingress {
-    protocol  = "-1"
-    self      = true
-    from_port = 0
-    to_port   = 0
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  vpc_id  = aws_vpc.vpc_network.id
+  ingress = []
+  egress  = []
 }
 
 resource "aws_vpc_dhcp_options" "dns_resolver" {
@@ -97,14 +84,6 @@ resource "aws_internet_gateway" "igw" {
   tags = {
     Name = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-igw"
   }
-}
-
-resource "aws_eip" "natgw_1" {
-  domain = "vpc"
-}
-
-resource "aws_eip" "natgw_2" {
-  domain = "vpc"
 }
 
 resource "aws_route_table" "public" {

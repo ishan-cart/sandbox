@@ -1383,6 +1383,7 @@ grafana:
     ## Name of the secret. Can be templated.
     existingSecret: ""
     userKey: admin-user
+    # checkov:skip=CKV_SECRET_6 : Not a secret string
     passwordKey: admin-password
 
   rbac:
