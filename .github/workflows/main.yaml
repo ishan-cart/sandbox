@@ -22,14 +22,19 @@ jobs:
     steps:
       - name: Checkout
         uses: Actions/checkout@v6
+        with:
+          persist-credentials: false
+
       - name: Get Paths
         id: paths
         run: ./.github/scripts/get-paths.sh | tee -a "$GITHUB_OUTPUT"
+
       - name: Path Check
         uses: dorny/paths-filter@v4
         id: filter
         with:
           filters: ${{ steps.paths.outputs.paths }}
+
       - name: Output Changes
         id: changes
         run: ./.github/scripts/output-changes.sh ${{ join(fromJson(steps.filter.outputs.changes), ' ') }} | tee -a "$GITHUB_OUTPUT"
@@ -81,16 +86,20 @@ jobs:
       - name: Checkout
         uses: Actions/checkout@v6
         with:
+          persist-credentials: false
           sparse-checkout: |
             helm-libraries
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v6.1.0
         with:
           role-to-assume: arn:aws:iam::537239034666:role/github_oidc_role
           aws-region: "ap-southeast-2"
+
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
+
       - name: Package & Push
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
