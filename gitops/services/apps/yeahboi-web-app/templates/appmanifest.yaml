@@ -6,6 +6,8 @@
 ---
 { { - include "common-library._ingress.tpl" . } }
 ---
+{ { - include "common-library._servicemonitor.tpl" . } }
+---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

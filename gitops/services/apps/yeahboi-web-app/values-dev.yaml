@@ -75,6 +75,13 @@ ingress:
     #   hosts:
     #     - chart-example.local
 
+serviceMonitor:
+  enabled: true
+  path: /metrics
+  port: 9113
+  targetPort: 9113
+  interval: 60s
+
 resources:
   limits:
     cpu: 50m
