@@ -1,3 +1,4 @@
+{{- define "common-library._servicemonitor.tpl" -}}
 {{- if .Values.serviceMonitor.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
@@ -27,3 +28,4 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
 {{- end }}
+{{- end -}}
