@@ -5,9 +5,7 @@ data "aws_subnets" "private_subnets" {
 }
 
 data "aws_security_group" "efs" {
-  tags = {
-    Name = "efs-sg"
-  }
+  name = "efs-security-group"
 }
 
 data "aws_kms_key" "key" {
