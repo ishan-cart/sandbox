@@ -8,7 +8,7 @@ COPY public/ public/
 RUN npm run build
 CMD ["npm", "run", "dev"]
 
-FROM docker.io/nginxinc/nginx-unprivileged:1.30.2-alpine as production
+FROM docker.io/nginxinc/nginx-unprivileged:1.30.2-alpine AS production
 
 COPY --from=development /app/dist /usr/share/nginx/html/
 COPY nginx.conf /etc/nginx/conf.d/default.conf

@@ -9,7 +9,7 @@ resource "aws_ecr_repository_creation_template" "repo_template" {
 
   image_tag_mutability_exclusion_filter {
     filter_type = "WILDCARD"
-    filter      = "v*"
+    filter      = "main-v*"
   }
 
   encryption_configuration {

@@ -20,9 +20,15 @@ services:
     profiles: [web]
     ports:
       - 8080:8080
+      - 9113:9113
     volumes:
       - ./apps/web-app/src:/app/src # dev only
       - ./apps/web-app/public/data:/usr/share/nginx/html/data/
+
+  web-app-exporter:
+    image: docker.io/nginx/nginx-prometheus-exporter:1.5.1
+    profiles: [web]
+    network_mode: service:web-app
 
   web-app-cron:
     image: curlimages/curl:8.20.0
@@ -44,7 +50,6 @@ services:
         --data-urlencode "end=$(date +%s)" \
         --data-urlencode "step=10s" \
         -o "${OUTPUT_FILE}"
-
     depends_on:
       prometheus:
         condition: service_healthy
@@ -52,6 +57,8 @@ services:
   prometheus:
     image: docker.io/prom/prometheus:v3.11.3
     profiles: [web]
+    volumes:
+      - ./.docker-compose/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - 9090:9090
     healthcheck:
