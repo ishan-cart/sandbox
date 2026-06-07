@@ -53,7 +53,6 @@ jobs:
         env:
           APPLICATION: ${{ inputs.application }}
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          GIT_REF_NAME: ${{ github.ref_name }}
         run: |
           BUILD_VERSION="$(cat ./build/version)"
           if docker manifest inspect "${ECR_REGISTRY}/yeahboi/apps/${APPLICATION}:main-${BUILD_VERSION}" > /dev/null; then
@@ -68,9 +67,8 @@ jobs:
           APPLICATION: ${{ inputs.application }}
           BUILD_VERSION: ${{ steps.version-check.outputs.BUILD_VERSION }}
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          GIT_REF_NAME: ${{ github.ref_name }}
         run: |
-          docker build -t "${ECR_REGISTRY}/yeahboi/apps/${APPLICATION}:${GIT_REF_NAME}-${BUILD_VERSION}" -f ./build/Dockerfile .
+          docker build -t "${ECR_REGISTRY}/yeahboi/apps/${APPLICATION}:${GITHUB_REF_NAME}-${BUILD_VERSION}" -f ./build/Dockerfile .
 
       - name: Push
         if: ${{ inputs.push }}
@@ -79,7 +77,6 @@ jobs:
           APPLICATION: ${{ inputs.application }}
           BUILD_VERSION: ${{ steps.version-check.outputs.BUILD_VERSION }}
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          GIT_REF_NAME: ${{ github.ref_name }}
         run: |
           BUILD_VERSION="$(cat ./build/version)"
-          docker push "${ECR_REGISTRY}/yeahboi/apps/${APPLICATION}:${GIT_REF_NAME}-${BUILD_VERSION}"
+          docker push "${ECR_REGISTRY}/yeahboi/apps/${APPLICATION}:${GITHUB_REF_NAME}-${BUILD_VERSION}"
