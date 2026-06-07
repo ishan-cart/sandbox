@@ -142,23 +142,33 @@ resource "aws_iam_role_policy_attachment" "diy_nat_ssm_attachment" {
 
 resource "aws_security_group" "diy_nat_sg" {
   # checkov:skip=CKV_AWS_382
-  name        = "diy-nat-sg"
+  name_prefix = "diy-nat-sg-"
   vpc_id      = aws_vpc.vpc_network.id
   description = "Outbound internet access for vpc instances"
 
-  ingress {
-    description = "Allow all vpc traffic inbound"
-    cidr_blocks = [aws_vpc.vpc_network.cidr_block]
-    from_port   = 0
-    protocol    = "-1"
-    to_port     = 0
+  lifecycle {
+    create_before_destroy = true
   }
 
-  egress {
-    description = "Allow all outbound"
-    cidr_blocks = ["0.0.0.0/0"]
-    from_port   = 0
-    protocol    = "-1"
-    to_port     = 0
+  tags = {
+    Name = "diy-nat-sg"
   }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "nat_vpc_inbound" {
+  description       = "Allow all vpc traffic inbound"
+  security_group_id = aws_security_group.diy_nat_sg.id
+  cidr_ipv4         = aws_vpc.vpc_network.cidr_block
+  from_port         = 0
+  ip_protocol       = "-1"
+  to_port           = 0
+}
+
+resource "aws_vpc_security_group_egress_rule" "nat_all_outbound" {
+  description       = "Allow all outbound"
+  security_group_id = aws_security_group.diy_nat_sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 0
+  ip_protocol       = "-1"
+  to_port           = 0
 }

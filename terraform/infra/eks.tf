@@ -205,9 +205,17 @@ resource "aws_iam_role_policy_attachment" "attach_aws_lbc_role" {
 }
 
 resource "aws_security_group" "eks_worker_nodes" {
-  name        = "eks-worker-nodes"
+  name_prefix = "eks-worker-nodes-"
   description = "EKS worker nodes"
   vpc_id      = aws_vpc.vpc_network.id
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = {
+    Name = "eks-worker-nodes"
+  }
 }
 
 resource "aws_vpc_security_group_ingress_rule" "backend_all_self" {
