@@ -129,7 +129,7 @@ resource "aws_iam_role_policy_attachment" "lambda_secrets_access_attachment" {
 }
 
 resource "aws_security_group" "lambda" {
-  name_prefix = "lambda-sg-" 
+  name_prefix = "lambda-sg-"
   description = "Lambdas within VPC security group"
   vpc_id      = aws_vpc.vpc_network.id
 

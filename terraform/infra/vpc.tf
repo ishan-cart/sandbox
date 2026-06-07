@@ -184,9 +184,17 @@ resource "aws_ec2_subnet_cidr_reservation" "k8s_private_2_reservation" {
 }
 
 resource "aws_security_group" "fe_lb" {
-  name        = "fe-loadbalancer"
+  name_prefix = "fe-loadbalancer-sg-"
   description = "Frontend LB to EKS"
   vpc_id      = aws_vpc.vpc_network.id
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = {
+    Name = "fe-loadbalancer-sg"
+  }
 }
 
 resource "aws_vpc_security_group_ingress_rule" "lb_all_self" {
@@ -205,9 +213,17 @@ resource "aws_vpc_security_group_egress_rule" "lb_all_self" {
 
 resource "aws_security_group" "efs" {
   # checkov:skip=CKV2_AWS_5
-  name        = "efs-security-group"
+  name_prefix = "efs-sg-"
   description = "EFS to EKS"
   vpc_id      = aws_vpc.vpc_network.id
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = {
+    Name = "efs-sg"
+  }
 }
 
 resource "aws_vpc_security_group_ingress_rule" "allow_2049_eks" {
