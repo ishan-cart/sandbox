@@ -47,6 +47,7 @@ jobs:
       contents: read
       id-token: write
     strategy:
+      max-parallel: 1
       matrix:
         application: ${{ fromJson(needs.changes.outputs.terraform) }}
     uses: ./.github/workflows/terraform.yaml
