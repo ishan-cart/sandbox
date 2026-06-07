@@ -24,7 +24,7 @@ services:
     volumes:
       - ./apps/web-app/src:/app/src # dev only
       - ./apps/web-app/public/data:/usr/share/nginx/html/data/
-  
+
   web-app-exporter:
     image: docker.io/nginx/nginx-prometheus-exporter:1.5.1
     profiles: [web]
