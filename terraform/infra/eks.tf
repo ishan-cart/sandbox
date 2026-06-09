@@ -82,7 +82,7 @@ resource "aws_eks_node_group" "node_group" {
 
   launch_template {
     id      = aws_launch_template.eks_worker_nodes.id
-    version = "1"
+    version = "$Latest"
   }
 
   scaling_config {
