@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: kube-prometheus-stack
+  name: yeahboi-web-app
   # You'll usually want to add your resources to the argocd namespace.
   namespace: argocd
   # Add this finalizer ONLY if you want these to cascade delete.
@@ -12,7 +12,7 @@ metadata:
     # - resources-finalizer.argocd.argoproj.io/background
   # Add labels to your application object.
   labels:
-    name: kube-prometheus-stack
+    name: yeahboi-web-app
     environment: development
 spec:
   # The project the application belongs to.
@@ -22,11 +22,30 @@ spec:
   source:
     repoURL: https://github.com/ishan-cart/sandbox.git # Can point to either a Helm chart repo or a git repo.
     targetRevision: main # For Helm, this refers to the chart version.
-    path: gitops/services/monitoring # This has no meaning for Helm charts pulled directly from a Helm repo instead of git.
+    path: gitops/apps/yeahboi-web-app # This has no meaning for Helm charts pulled directly from a Helm repo instead of git.
 
     # # helm specific config
     # chart: chart-name  # Set this when pulling directly from a Helm repo. DO NOT set for git-hosted Helm charts.
     helm:
+      #   passCredentials: false # If true then adds --pass-credentials to Helm commands to pass credentials to all domains
+      #   # Extra parameters to set (same as setting through values.yaml, but these take precedence)
+      #   parameters:
+      #   - name: "nginx-ingress.controller.service.annotations.external-dns\\.alpha\\.kubernetes\\.io/hostname"
+      #     value: mydomain.example.com
+      #   - name: "ingress.annotations.kubernetes\\.io/tls-acme"
+      #     value: "true"
+      #     forceString: true # ensures that value is treated as a string
+
+      #   # Use the contents of files as parameters (uses Helm's --set-file)
+      #   fileParameters:
+      #   - name: config
+      #     path: files/config.json
+
+      #   # Release name override (defaults to application name)
+      #   releaseName: guestbook
+
+      #   # Helm values files for overriding values in the helm chart
+      #   # The path is relative to the spec.source.path directory defined above
       valueFiles:
         - values-dev.yaml
 
@@ -199,7 +218,7 @@ spec:
     # or cluster name
     name: in-cluster
     # The namespace will only be set for namespace-scoped resources that have not set a value for .metadata.namespace
-    namespace: monitoring
+    namespace: website
 
   # Extra information to show in the Argo CD Application details tab
   # info:

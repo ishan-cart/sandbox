@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: yeahboi-web-app
+  name: infra-dev-app-of-apps
   # You'll usually want to add your resources to the argocd namespace.
   namespace: argocd
   # Add this finalizer ONLY if you want these to cascade delete.
@@ -12,7 +12,7 @@ metadata:
     # - resources-finalizer.argocd.argoproj.io/background
   # Add labels to your application object.
   labels:
-    name: yeahboi-web-app
+    name: infra-apps
     environment: development
 spec:
   # The project the application belongs to.
@@ -22,32 +22,32 @@ spec:
   source:
     repoURL: https://github.com/ishan-cart/sandbox.git # Can point to either a Helm chart repo or a git repo.
     targetRevision: main # For Helm, this refers to the chart version.
-    path: gitops/services/apps/yeahboi-web-app # This has no meaning for Helm charts pulled directly from a Helm repo instead of git.
+    path: gitops/argocd/infra/dev # This has no meaning for Helm charts pulled directly from a Helm repo instead of git.
 
     # # helm specific config
     # chart: chart-name  # Set this when pulling directly from a Helm repo. DO NOT set for git-hosted Helm charts.
-    helm:
-      #   passCredentials: false # If true then adds --pass-credentials to Helm commands to pass credentials to all domains
-      #   # Extra parameters to set (same as setting through values.yaml, but these take precedence)
-      #   parameters:
-      #   - name: "nginx-ingress.controller.service.annotations.external-dns\\.alpha\\.kubernetes\\.io/hostname"
-      #     value: mydomain.example.com
-      #   - name: "ingress.annotations.kubernetes\\.io/tls-acme"
-      #     value: "true"
-      #     forceString: true # ensures that value is treated as a string
+    # helm:
+    #   passCredentials: false # If true then adds --pass-credentials to Helm commands to pass credentials to all domains
+    #   # Extra parameters to set (same as setting through values.yaml, but these take precedence)
+    #   parameters:
+    #   - name: "nginx-ingress.controller.service.annotations.external-dns\\.alpha\\.kubernetes\\.io/hostname"
+    #     value: mydomain.example.com
+    #   - name: "ingress.annotations.kubernetes\\.io/tls-acme"
+    #     value: "true"
+    #     forceString: true # ensures that value is treated as a string
 
-      #   # Use the contents of files as parameters (uses Helm's --set-file)
-      #   fileParameters:
-      #   - name: config
-      #     path: files/config.json
+    #   # Use the contents of files as parameters (uses Helm's --set-file)
+    #   fileParameters:
+    #   - name: config
+    #     path: files/config.json
 
-      #   # Release name override (defaults to application name)
-      #   releaseName: guestbook
+    #   # Release name override (defaults to application name)
+    #   releaseName: guestbook
 
-      #   # Helm values files for overriding values in the helm chart
-      #   # The path is relative to the spec.source.path directory defined above
-      valueFiles:
-        - values-dev.yaml
+    #   # Helm values files for overriding values in the helm chart
+    #   # The path is relative to the spec.source.path directory defined above
+    #   valueFiles:
+    #   - values-prod.yaml
 
     #   # Ignore locally missing valueFiles when installing Helm chart. Defaults to false
     #   ignoreMissingValueFiles: false
@@ -218,7 +218,7 @@ spec:
     # or cluster name
     name: in-cluster
     # The namespace will only be set for namespace-scoped resources that have not set a value for .metadata.namespace
-    namespace: website
+    namespace: argocd
 
   # Extra information to show in the Argo CD Application details tab
   # info:
@@ -240,16 +240,15 @@ spec:
       - RespectIgnoreDifferences=true # When syncing changes, respect fields ignored by the ignoreDifferences configuration
       - ApplyOutOfSyncOnly=true # Only sync out-of-sync resources, rather than applying every object in the application
       - SkipDryRunOnMissingResource=true # Allow skip dry run on missing resource
-      - ServerSideApply=true
     # - Replace=true # Argo CD will use kubectl replace or kubectl create command to apply changes.
-    # managedNamespaceMetadata: # Sets the metadata for the application namespace. Only valid if CreateNamespace=true (see above), otherwise it's a no-op.
-    #   labels: # The labels to set on the application namespace
-    #     any: label
-    #     you: like
-    #   annotations: # The annotations to set on the application namespace
-    #     the: same
-    #     applies: for
-    #     annotations: on-the-namespace
+    managedNamespaceMetadata: # Sets the metadata for the application namespace. Only valid if CreateNamespace=true (see above), otherwise it's a no-op.
+      labels: # The labels to set on the application namespace
+        any: label
+        you: like
+      annotations: # The annotations to set on the application namespace
+        the: same
+        applies: for
+        annotations: on-the-namespace
 
     # The retry feature is available since v1.7
     retry:
