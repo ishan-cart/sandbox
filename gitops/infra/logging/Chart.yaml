@@ -1,0 +1,11 @@
+apiVersion: v2
+name: kube-prometheus-stack
+version: 1.0.0
+description: A Helm chart for Fluent Operator
+type: application
+dependencies:
+  - name: fluent-operator
+    version: 4.2.0
+    repository: https://fluent.github.io/helm-charts/
+# annotations:
+# example: A list of annotations keyed by name (optional).
