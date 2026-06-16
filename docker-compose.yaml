@@ -24,11 +24,36 @@ services:
     volumes:
       - ./apps/web-app/src:/app/src # dev only
       - ./apps/web-app/public/data:/usr/share/nginx/html/data/
+    depends_on: &dependencies
+      fluent-bit:
+        condition: service_started
+      prometheus:
+        condition: service_healthy
 
-  web-app-exporter:
+  prometheus-web-exporter:
     image: docker.io/nginx/nginx-prometheus-exporter:1.5.1
     profiles: [web]
     network_mode: service:web-app
+    depends_on: *dependencies
+
+  fluent-bit:
+    image: docker.io/fluent/fluent-bit:5.0.7
+    profiles: [web]
+    user: "${UID}:${GID}" # mimic daemonset, so needs access to container runtime env logs
+    volumes:
+      - ./.docker-compose/fluent-bit/:/fluent-bit/fb/
+      - /var/log/journal/:/var/log/journal/:ro
+    environment:
+      LOGS_PATH: /var/log/journal/
+      DB_PATH: /fluent-bit/fb/fluent-bit.db
+      REPO_NAME: sandbox
+      METRICS_APP: prometheus
+      WEB_APP: web-app
+      WEB_CRON: web-app-cron
+    command: ["-c", "/fluent-bit/fb/fluent-bit.yaml"]
+    depends_on:
+      elastic-search:
+        condition: service_healthy
 
   web-app-cron:
     image: curlimages/curl:8.20.0
@@ -50,9 +75,7 @@ services:
         --data-urlencode "end=$(date +%s)" \
         --data-urlencode "step=10s" \
         -o "${OUTPUT_FILE}"
-    depends_on:
-      prometheus:
-        condition: service_healthy
+    depends_on: *dependencies
 
   prometheus:
     image: docker.io/prom/prometheus:v3.11.3
@@ -74,3 +97,32 @@ services:
       start_interval: 1s
       interval: 1s
       timeout: 1s
+  
+  elastic-search:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.4.2
+    profiles: [web]
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: false
+      xpack.security.enrollment.enabled: false
+      xpack.security.http.ssl.enabled: false
+      xpack.security.transport.ssl.enabled: false
+    ports:
+      - 9200:9200
+      - 5601:5601
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health | grep -qv '\"status\":\"red\"'"]
+      start_interval: 1s
+      interval: 1s
+      timeout: 1s
+  
+  kibana:
+    image: docker.elastic.co/kibana/kibana:9.4.2
+    profiles: [web]
+    network_mode: service:elastic-search
+    environment:
+      ELASTICSEARCH_HOSTS: '["http://localhost:9200"]'
