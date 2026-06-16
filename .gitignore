@@ -15,3 +15,5 @@ __pycache__
 *.zip
 
 .vscode/
+
+./.docker-compose/fluent-bit/*.db
