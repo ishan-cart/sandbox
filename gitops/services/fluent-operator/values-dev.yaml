@@ -156,7 +156,7 @@ fluent-operator:
       annotations: {}
     serviceMonitor:
       # -- Enable Prometheus ServiceMonitor for Fluent Bit
-      enable: false
+      enable: true
       # -- Scrape interval
       interval: 30s
       # -- Metrics path
@@ -466,7 +466,7 @@ fluent-operator:
       # See https://docs.fluentbit.io/manual/pipeline/outputs/loki
       loki:
         # -- Enable Loki output
-        enable: false
+        enable: true
         # -- Retry limit for Loki output
         retryLimit: "no_limits"
         # -- Log level for Loki output
@@ -573,7 +573,7 @@ fluent-operator:
         # -- Enable Kubernetes metadata filter
         enable: true
         # -- Include Kubernetes labels in logs
-        labels: false
+        labels: true
         # -- Include Kubernetes annotations in logs
         annotations: false
       containerd:
