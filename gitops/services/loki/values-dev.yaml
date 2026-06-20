@@ -764,7 +764,15 @@ loki:
           account_key: null
 
     # -- Check https://grafana.com/docs/loki/latest/configuration/#schema_config for more info on how to configure schemas
-    schemaConfig: {}
+    schemaConfig:
+      configs:
+        - from: 2026-01-01
+          store: tsdb
+          object_store: '{{ .Values.loki.storage.type }}'
+          schema: v13
+          index:
+            prefix: loki_index_
+            period: 24h       # Rotates index tables every 24 hours
     # -- a real Loki install requires a proper schemaConfig defined above this, however for testing or playing around
     # you can enable useTestSchema
     useTestSchema: false
