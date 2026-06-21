@@ -45,9 +45,9 @@ loki:
         # -- Check https://grafana.com/docs/loki/latest/configure/#s3_storage_config for more info on how to provide a backoff_config
         backoff_config: {}
         disable_dualstack: false
-    serviceAccount:
-      annotations:
-        eks.amazonaws.com/role-arn: "arn:aws:iam::537239034666:role/allow_loki_s3_access"
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: "arn:aws:iam::537239034666:role/allow_loki_s3_access"
 
   #gateway:
   #  ingress:
