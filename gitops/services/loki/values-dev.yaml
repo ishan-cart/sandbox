@@ -27,36 +27,12 @@ loki:
         ruler: yeahboi-dev-loki
       type: s3
       s3:
-        # @schema type:[string, null]
-        s3: null
-        # @schema type:[string, null]
-        endpoint: null
-        # @schema type:[string, null]
-        region: null
-        # @schema type:[string, null]
-        secretAccessKey: null
-        # @schema type:[string, null]
-        accessKeyId: null
-        # @schema type:[string, null]
-        signatureVersion: v4
-        s3ForcePathStyle: false
-        insecure: false
-        http_config: {}
-        # -- Check https://grafana.com/docs/loki/latest/configure/#s3_storage_config for more info on how to provide a backoff_config
-        backoff_config: {}
-        disable_dualstack: false
+        region: ap-southeast-2
+
   serviceAccount:
+    create: true
     annotations:
       eks.amazonaws.com/role-arn: "arn:aws:iam::537239034666:role/allow_loki_s3_access"
-
-  #gateway:
-  #  ingress:
-  #    enabled: true
-  #    hosts:
-  #      - host: FIXME
-  #        paths:
-  #          - path: /
-  #            pathType: Prefix
 
   deploymentMode: Monolithic
   singleBinary:
