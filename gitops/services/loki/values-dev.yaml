@@ -1884,7 +1884,7 @@ loki:
   # Configuration for the single binary node(s)
   singleBinary:
     # -- Enable the single binary component. Requires `loki.deploymentMode` to be set to `SingleBinary`.
-    enabled: true
+    enabled: false
       # -- Kind of read deployment. StatefulSet and Deployment are supported.
     kind: StatefulSet
     # @schema type:[integer, null]
