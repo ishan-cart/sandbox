@@ -30,7 +30,17 @@ loki:
       s3:
         region: ap-southeast-2
     limits_config:
-      volume_enabled: true
+      retention_period: 720h # 30 days
+
+  compactor:
+    retention_enabled: true
+    retention_delete_delay: 2h
+    retention_delete_worker_count: 150
+    shared_store: s3
+
+  limits_config:
+
+    volume_enabled: true
 
   serviceAccount:
     create: true
@@ -51,6 +61,8 @@ loki:
       # Keep a little bit lower than memory limits
       - name: GOMEMLIMIT
         value: 80MiB
+    persistence:
+      enabled: false
 
   chunksCache:
     # default is 500MB, with limited memory keep this smaller
