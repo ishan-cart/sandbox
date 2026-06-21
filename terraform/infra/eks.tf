@@ -386,3 +386,53 @@ resource "aws_iam_policy" "efs_csi_driver_kms" {
     }]
   })
 }
+
+resource "aws_iam_role" "loki_role" {
+  name = "allow_loki_s3_access"
+
+  # Terraform's "jsonencode" function converts a
+  # Terraform expression result to valid JSON syntax.
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Federated = aws_iam_openid_connect_provider.eks_cluster.arn
+        }
+      },
+    ]
+  })
+}
+
+resource "aws_iam_policy" "loki_s3" {
+  name        = "LokiS3Access"
+  description = "Allow Loki to access its own log bucket"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "KMSAccess"
+        Effect = "Allow"
+        Action = [
+          "kms:GenerateDataKey",
+          "kms:Decrypt"
+        ]
+        Resource = [aws_kms_key.key.arn]
+      },
+      {
+        Sid    = "ListObjectsInBucket"
+        Effect = "Allow"
+        Action = "s3:ListBucket"
+        Resource = [aws_s3_bucket.loki_logs.arn]
+      },
+      {
+        Sid    = "AllObjectActions"
+        Effect = "Allow"
+        Action = "s3:*Object"
+        Resource = ["${aws_s3_bucket.loki_logs.arn}/*"]
+      },
+    ]
+  })
+}

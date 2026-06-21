@@ -102,3 +102,53 @@ resource "aws_s3_bucket_lifecycle_configuration" "access_logs" {
     }
   }
 }
+
+
+resource "aws_s3_bucket" "loki_logs" {
+  bucket = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-loki"
+}
+
+resource "aws_s3_bucket_versioning" "loki_logs" {
+  bucket = aws_s3_bucket.loki_logs.id
+  versioning_configuration {
+    status = "Disabled"
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "loki_logs" {
+  bucket = aws_s3_bucket.loki_logs.id
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = aws_kms_key.key.arn
+      sse_algorithm     = "aws:kms"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "loki_logs" {
+  bucket = aws_s3_bucket.loki_logs.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "loki_logs" {
+  bucket = aws_s3_bucket.access_logs.bucket
+
+  rule {
+    id     = "DeleteOldItems30Days"
+    status = "Enabled"
+    filter {}
+    expiration {
+      days = 30
+    }
+    noncurrent_version_expiration {
+      noncurrent_days = 30
+    }
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 1
+    }
+  }
+}
