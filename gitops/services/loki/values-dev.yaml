@@ -29,6 +29,8 @@ loki:
       type: s3
       s3:
         region: ap-southeast-2
+    limits_config:
+      volume_enabled: true
 
   serviceAccount:
     create: true
