@@ -523,7 +523,7 @@ fluent-operator:
           - logtag
           - time
         # labelMapPath: '' # String, path to file, ex /here/it/is
-        # dropSingleKey: off
+        dropSingleKey: on
         lineFormat: json
         # autoKubernetesLabels: on
         # tenantIDKey:   # String
