@@ -2099,7 +2099,7 @@ loki:
       # -- Enable StatefulSetAutoDeletePVC feature
       enableStatefulSetAutoDeletePVC: true
       # -- Enable persistent disk
-      enabled: true
+      enabled: false
       # -- Set access modes on the PersistentVolumeClaim
       accessModes:
         - ReadWriteOnce
