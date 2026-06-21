@@ -510,12 +510,21 @@ fluent-operator:
         #       key: value
         #       name: bearerTokenSecret
         #       optional: true
-        # labels: []      # String list of <name>=<value>
+        labels:      # String list of <name>=<value>
+          - job=fluentbit
+          - env=dev
+          - "namespace=$kubernetes['namespace_name']"
+          - "app=$kubernetes['labels']['app.kubernetes.io/name']"
+          - "zone=$kubernetes['labels']['topology.kubernetes.io/zone']"
+          
         # labelKeys: []   # String list of <key>
-        # removeKeys: []  # String list of <key>
+        removeKeys:  # String list of <key>
+          - kubernetes
+          - logtag
+          - time
         # labelMapPath: '' # String, path to file, ex /here/it/is
         # dropSingleKey: off
-        # lineFormat: '' # String
+        lineFormat: json
         # autoKubernetesLabels: on
         # tenantIDKey:   # String
         # tls: {}        # *plugins.TLS fluentbit docs
