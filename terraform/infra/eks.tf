@@ -18,7 +18,7 @@ resource "aws_eks_cluster" "cluster" {
     endpoint_private_access = true
     endpoint_public_access  = true
     security_group_ids      = [aws_security_group.eks_worker_nodes.id]
-    public_access_cidrs     = ["159.196.168.43/32"]
+    public_access_cidrs     = ["157.211.44.151/32"]
   }
 
   encryption_config {
@@ -387,7 +387,7 @@ resource "aws_iam_policy" "efs_csi_driver_kms" {
   })
 }
 
-resource "aws_iam_role" "loki_role" {
+resource "aws_iam_role" "loki" {
   name = "allow_loki_s3_access"
 
   # Terraform's "jsonencode" function converts a
@@ -396,7 +396,7 @@ resource "aws_iam_role" "loki_role" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action = "sts:AssumeRole"
+        Action = "sts:AssumeRoleWithWebIdentity"
         Effect = "Allow"
         Principal = {
           Federated = aws_iam_openid_connect_provider.eks_cluster.arn
@@ -435,4 +435,9 @@ resource "aws_iam_policy" "loki_s3" {
       },
     ]
   })
+}
+
+resource "aws_iam_role_policy_attachment" "loki_s3_attachment" {
+  role       = aws_iam_role.loki.name
+  policy_arn = aws_iam_policy.loki_s3.arn
 }
