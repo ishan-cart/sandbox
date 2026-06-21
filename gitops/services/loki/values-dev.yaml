@@ -1130,7 +1130,8 @@ loki:
     imagePullSecrets: []
     # @schema additionalProperties:{"type":"string"}
     # -- Annotations for the service account
-    annotations: {}
+    annotations:
+      eks.amazonaws.com/role-arn: "arn:aws:iam::537239034666:role/allow_loki_s3_access"
     # @schema additionalProperties:{"type":"string"}
     # -- Labels for the service account
     labels: {}
@@ -1220,7 +1221,7 @@ loki:
   # Configuration for the gateway
   gateway:
     # -- Specifies whether the gateway should be enabled
-    enabled: true
+    enabled: false
     # -- Number of replicas for the gateway
     replicas: 1
     # -- Default container port
