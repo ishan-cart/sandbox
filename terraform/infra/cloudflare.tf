@@ -38,7 +38,7 @@ resource "aws_vpc_security_group_ingress_rule" "lb_cloudflare_ips" {
 resource "aws_vpc_security_group_ingress_rule" "lb_https" {
   security_group_id = aws_security_group.fe_lb.id
   description       = "Allow https inbound from my ip"
-  cidr_ipv4         = "159.196.168.43/32"
+  cidr_ipv4         = "157.211.44.151/32"
   from_port         = 443
   ip_protocol       = "tcp"
   to_port           = 443
