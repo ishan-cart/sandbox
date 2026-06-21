@@ -1554,7 +1554,6 @@ kube-prometheus-stack:
         editable: false
         jsonData:
             tlsSkipVerify: true
-        orgId: 1
         type: loki
         url: loki.monitoring.svc.cluster.local:3100
         version: 1
