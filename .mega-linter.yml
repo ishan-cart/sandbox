@@ -35,7 +35,7 @@ REPOSITORY_TRUFFLEHOG_COMMAND_REMOVE_ARGUMENTS: filesystem .
 REPOSITORY_TRUFFLEHOG_ARGUMENTS: git file:///tmp/lint --exclude-paths=.trufflehogignore
 
 REPOSITORY_CHECKOV_ARGUMENTS: |
-  --skip-path "/gitops/services/haproxy-ingress/charts/kubernetes-ingress"
+  --skip-path "/gitops/services/haproxy-ingress/haproxy/charts/kubernetes-ingress"
   --skip-path "/gitops/services/kube-prometheus-stack/charts/kube-prometheus-stack"
   --skip-path "/gitops/services/fluent-operator/charts/fluent-operator"
   --skip-check CKV2_AWS_62,CKV2_AWS_1,CKV_AWS_144,CKV_GHA_7,CKV_DOCKER_2
