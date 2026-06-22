@@ -1,0 +1,31 @@
+config {
+  call_module_type = "local"
+  force            = false
+}
+
+plugin "terraform" {
+  enabled = true
+  preset  = "recommended"
+}
+
+plugin "azurerm" {
+  enabled = true
+  version = "0.32.0"
+  source  = "github.com/terraform-linters/tflint-ruleset-azurerm"
+}
+
+plugin "aws" {
+  enabled = true
+  version = "0.47.0"
+  source  = "github.com/terraform-linters/tflint-ruleset-aws"
+}
+
+plugin "google" {
+  enabled = true
+  version = "0.39.0"
+  source  = "github.com/terraform-linters/tflint-ruleset-google"
+}
+
+rule "terraform_required_providers" {
+  enabled = false
+}

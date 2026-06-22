@@ -101,9 +101,9 @@ data "aws_iam_policy_document" "kms_key_policy" {
     }
     resources = ["*"]
     condition {
-      test = "ArnEquals"
+      test     = "ArnEquals"
       variable = "kms:EncryptionContext:aws:s3:arn"
-      values = [aws_s3_bucket.loki_logs.arn]
+      values   = [aws_s3_bucket.loki_logs.arn]
     }
   }
 }

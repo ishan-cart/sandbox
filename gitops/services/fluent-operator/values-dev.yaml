@@ -105,8 +105,7 @@ fluent-operator:
     # -- Disable specific component controllers. Value can be "fluent-bit" or "fluentd" to disable that controller
     disableComponentControllers: ""
     # -- Extra arguments for the Fluent Operator controller
-    extraArgs:
-      []
+    extraArgs: []
       # - --watch-namespaces=logging
 
     service:
@@ -510,15 +509,15 @@ fluent-operator:
         #       key: value
         #       name: bearerTokenSecret
         #       optional: true
-        labels:      # String list of <name>=<value>
+        labels: # String list of <name>=<value>
           - job=fluentbit
           - env=dev
           - "namespace=$kubernetes['namespace_name']"
           - "app=$kubernetes['labels']['app.kubernetes.io/name']"
           - "zone=$kubernetes['labels']['topology.kubernetes.io/zone']"
-          
+
         # labelKeys: []   # String list of <key>
-        removeKeys:  # String list of <key>
+        removeKeys: # String list of <key>
           - kubernetes
           - logtag
           - time

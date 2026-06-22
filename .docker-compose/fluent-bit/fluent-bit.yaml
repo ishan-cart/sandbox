@@ -29,11 +29,11 @@ pipeline:
     - name: rewrite_tag
       match: journal.logs
       rule: $CONTAINER_NAME ^${REPO_NAME}_(?!fluent-bit|loki|grafana)([a-zA-Z0-9-]+)_[0-9]+ app.$1 false
-    
+
     - name: record_modifier
       match: app.*
       allowlist_key: MESSAGE
-    
+
     - name: parser
       match: app.*
       key_name: MESSAGE
@@ -52,7 +52,7 @@ pipeline:
     - name: record_modifier
       match: app.${WEB_CRON}
       allowlist_key: MESSAGE
-  
+
     - name: lua
       match: app.*
       code: |

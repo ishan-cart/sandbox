@@ -1553,7 +1553,7 @@ kube-prometheus-stack:
         # basicAuthUser: daco
         editable: false
         jsonData:
-            tlsSkipVerify: true
+          tlsSkipVerify: true
         type: loki
         url: http://loki.monitoring.svc.cluster.local:3100
         version: 1

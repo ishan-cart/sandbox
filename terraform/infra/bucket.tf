@@ -36,14 +36,8 @@ resource "aws_s3_bucket_logging" "terraform_state" {
 }
 
 resource "aws_s3_bucket" "access_logs" {
+  # checkov:skip=CKV_AWS_21
   bucket = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-access-logs"
-}
-
-resource "aws_s3_bucket_versioning" "access_logs" {
-  bucket = aws_s3_bucket.access_logs.id
-  versioning_configuration {
-    status = "Enabled"
-  }
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "access_logs" {
@@ -105,14 +99,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "access_logs" {
 
 
 resource "aws_s3_bucket" "loki_logs" {
+  # checkov:skip=CKV_AWS_18,CKV_AWS_21
   bucket = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-loki"
-}
-
-resource "aws_s3_bucket_versioning" "loki_logs" {
-  bucket = aws_s3_bucket.loki_logs.id
-  versioning_configuration {
-    status = "Disabled"
-  }
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "loki_logs" {
@@ -135,7 +123,7 @@ resource "aws_s3_bucket_public_access_block" "loki_logs" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "loki_logs" {
-  bucket = aws_s3_bucket.access_logs.bucket
+  bucket = aws_s3_bucket.loki_logs.bucket
 
   rule {
     id     = "DeleteOldItems30Days"

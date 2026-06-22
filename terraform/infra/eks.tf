@@ -422,15 +422,15 @@ resource "aws_iam_policy" "loki_s3" {
         Resource = [aws_kms_key.key.arn]
       },
       {
-        Sid    = "ListObjectsInBucket"
-        Effect = "Allow"
-        Action = "s3:ListBucket"
+        Sid      = "ListObjectsInBucket"
+        Effect   = "Allow"
+        Action   = "s3:ListBucket"
         Resource = [aws_s3_bucket.loki_logs.arn]
       },
       {
-        Sid    = "AllObjectActions"
-        Effect = "Allow"
-        Action = "s3:*Object"
+        Sid      = "AllObjectActions"
+        Effect   = "Allow"
+        Action   = "s3:*Object"
         Resource = ["${aws_s3_bucket.loki_logs.arn}/*"]
       },
     ]
