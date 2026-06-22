@@ -75,6 +75,10 @@ resource "aws_iam_role" "eks_role" {
   })
 }
 
+output "eks_role_arn" {
+    value = aws_iam_role.eks_role.arn
+}
+
 resource "aws_iam_group_policy" "admins" {
   name  = "allow_assume_eks_role"
   group = aws_iam_group.admins.name
