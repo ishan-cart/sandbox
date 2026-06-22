@@ -1,3 +1,5 @@
+.cursor/
+
 .terraform
 .terraform*
 terraform.tfstate*
