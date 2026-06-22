@@ -1,9 +1,7 @@
 ---
 description: Verify MegaLinter fixes via podman, targeting only the failing linter
-globs: megalinter-reports/linters_logs/**
 alwaysApply: false
 ---
-
 # MegaLinter verification
 
 When fixing errors from `megalinter-reports/linters_logs/`:
