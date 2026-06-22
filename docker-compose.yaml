@@ -26,13 +26,7 @@ services:
       - ./apps/web-app/index.html:/app/index.html # dev only
       - ./apps/web-app/public/data:/usr/share/nginx/html/data
     healthcheck:
-      test:
-        [
-          "CMD",
-          "curl",
-          "-fs",
-          "http://localhost:8080",
-        ]
+      test: ["CMD", "curl", "-fs", "http://localhost:8080"]
       interval: 3s
       timeout: 2s
       retries: 10
