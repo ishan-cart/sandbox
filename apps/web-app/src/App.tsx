@@ -9,6 +9,7 @@ import {
   ArrowRight,
   Home 
 } from "lucide-react";
+import sydneyHarborImage from "./assets/images/sydney_harbor_refined_bg_1782136462280.jpg";
 
 export default function App() {
   const { scrollY } = useScroll();
@@ -84,9 +85,21 @@ export default function App() {
       {/* Hero Section - Full Height */}
       <header className="relative min-h-[100dvh] flex items-center justify-center py-20 px-6 overflow-hidden bg-white">
         <div className="absolute inset-0 z-0">
-          <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-blue-100 rounded-full blur-[120px] opacity-40 animate-pulse" />
-          <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-indigo-100 rounded-full blur-[120px] opacity-40 animate-pulse delay-700" />
-          <div className="absolute inset-0 opacity-[0.4] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#e2e8f0 1px, transparent 0)', backgroundSize: '32px 32px' }} />
+          <img 
+            src={sydneyHarborImage} 
+            alt="Sydney Harbour Blueprint Background" 
+            className="w-full h-full object-cover opacity-25 md:opacity-25 blur-[0.5px] pointer-events-none mix-blend-multiply"
+            referrerPolicy="no-referrer"
+          />
+          {/* Subtle central fade mask to keep foreground typography highly legible */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.75)_0%,rgba(255,255,255,0)_80%)] pointer-events-none" />
+          
+          {/* Highly transparent ambient blue and indigo glows */}
+          <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-blue-50/40 rounded-full blur-[120px] opacity-35 animate-pulse pointer-events-none" />
+          <div className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] bg-indigo-50/40 rounded-full blur-[120px] opacity-35 animate-pulse delay-700 pointer-events-none" />
+          
+          {/* Smooth transition to the rest of the page */}
+          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent pointer-events-none" />
         </div>
 
         <div className="max-w-4xl mx-auto text-center relative z-10">
@@ -110,7 +123,7 @@ export default function App() {
             </motion.h1>
             <motion.h1 
               style={{ x: lastNameX, y: lastNameY, opacity: nameOpacity, scale: nameScale }}
-              className="text-6xl md:text-9xl font-black tracking-tighter leading-[0.8] text-slate-200 uppercase"
+              className="text-6xl md:text-9xl font-black tracking-tighter leading-[0.8] text-slate-200 md:text-slate-300 uppercase"
             >
               Sawant.
             </motion.h1>
@@ -127,7 +140,7 @@ export default function App() {
             
             <div className="flex flex-wrap justify-center gap-3 mb-10">
               {[
-                { label: "How am i running this?", link: "#architecture" },
+                { label: "How am I running this?", link: "#architecture" },
                 { label: "Stack", link: "#skills" },
                 { label: "Experience", link: "#experience" }
               ].map((item) => (
