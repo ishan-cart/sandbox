@@ -36,7 +36,6 @@ loki:
       retention_enabled: true
       retention_delete_delay: 2h
       retention_delete_worker_count: 150
-      shared_store: s3
 
   limits_config:
     volume_enabled: true
