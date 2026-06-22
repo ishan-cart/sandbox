@@ -1,0 +1,2 @@
+# Mock credentials in Lambda tests — not real secrets
+lambda/rotate-cloudflare-token/tests/

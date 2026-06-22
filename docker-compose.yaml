@@ -24,11 +24,40 @@ services:
     volumes:
       - ./apps/web-app/src:/app/src # dev only
       - ./apps/web-app/public/data:/usr/share/nginx/html/data/
+    depends_on: &dependencies
+      fluent-bit:
+        condition: service_started
+      prometheus:
+        condition: service_healthy
 
-  web-app-exporter:
+  prometheus-web-exporter:
     image: docker.io/nginx/nginx-prometheus-exporter:1.5.1
     profiles: [web]
     network_mode: service:web-app
+    depends_on: *dependencies
+
+  fluent-bit:
+    image: docker.io/fluent/fluent-bit:5.0.7
+    profiles: [web]
+    user: "${UID}:${GID}" # mimic daemonset, so needs access to container runtime env logs
+    volumes:
+      - ./.docker-compose/fluent-bit/:/fluent-bit/fb/
+      - /var/log/journal/:/var/log/journal/:ro
+    ports:
+      - 2020:2020
+    environment:
+      LOGS_PATH: /var/log/journal/
+      DB_PATH: /fluent-bit/fb/fluent-bit.db
+      REPO_NAME: sandbox
+      METRICS_APP: prometheus
+      WEB_APP: web-app
+      WEB_CRON: web-app-cron
+    command: ["-c", "/fluent-bit/fb/fluent-bit.yaml"]
+    depends_on:
+      loki:
+        condition: service_healthy
+      grafana:
+        condition: service_healthy
 
   web-app-cron:
     image: curlimages/curl:8.20.0
@@ -50,9 +79,7 @@ services:
         --data-urlencode "end=$(date +%s)" \
         --data-urlencode "step=10s" \
         -o "${OUTPUT_FILE}"
-    depends_on:
-      prometheus:
-        condition: service_healthy
+    depends_on: *dependencies
 
   prometheus:
     image: docker.io/prom/prometheus:v3.11.3
@@ -71,6 +98,39 @@ services:
           "--spider",
           "http://localhost:9090/-/healthy",
         ]
-      start_interval: 1s
-      interval: 1s
-      timeout: 1s
+      interval: 3s
+      timeout: 2s
+      retries: 10
+
+  grafana:
+    image: docker.io/grafana/grafana:12.4.1
+    profiles: [web]
+    volumes:
+      - ./.docker-compose/grafana/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
+    ports:
+      - 3000:3000
+    healthcheck:
+      test:
+        ["CMD-SHELL", "curl -fs http://localhost:3000/api/health | grep -q ok"]
+      interval: 3s
+      timeout: 2s
+      retries: 10
+
+  loki:
+    image: docker.io/grafana/loki:3.7.2
+    profiles: [web]
+    volumes:
+      - ./.docker-compose/loki/loki-config.yaml:/etc/loki/local-config.yaml
+    ports:
+      - 3100:3100
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "/usr/bin/loki",
+          "-health",
+          "-health.url=http://localhost:3100/ready",
+        ]
+      interval: 3s
+      timeout: 2s
+      retries: 20

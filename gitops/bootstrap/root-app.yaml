@@ -12,7 +12,7 @@ metadata:
     # - resources-finalizer.argocd.argoproj.io/background
   # Add labels to your application object.
   labels:
-    name: yeahboi-dev-app-of-apps
+    name: apps
     environment: development
 spec:
   # The project the application belongs to.

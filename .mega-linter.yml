@@ -11,20 +11,33 @@ DISABLE_LINTERS:
   - SPELL_LYCHEE # too noisy
   - REPOSITORY_TRIVY
   - PYTHON_PYLINT
-
-TERRAFORM_TERRASCAN_ARGUMENTS: "-d ./terraform"
+  # Python — covered by PYTHON_RUFF (+ BLACK for format)
+  - PYTHON_FLAKE8
+  - PYTHON_ISORT
+  - PYTHON_BANDIT # noisy; test false positives; security covered elsewhere
+  # Supply chain — OSV_SCANNER kept for CVE signal
+  - REPOSITORY_SYFT
+  - REPOSITORY_TRIVY_SBOM
+  # Security — false positives on in-cluster HTTP URLs
+  - REPOSITORY_DEVSKIM
+  # HTML — single index.html in web-app
+  - HTML_DJLINT
+  - HTML_HTMLHINT
 
 DOCKERFILE_HADOLINT_FILE_NAMES_REGEX:
   - "Dockerfile"
 
 REPOSITORY_KINGFISHER_ARGUMENTS: --exclude apps/web-app/src/assets/images/Untitled-2026-05-16-2229.svg
 
-# Required otherwise trufflehog throws a fit
-REPOSITORY_TRUFFLEHOG_ARGUMENTS: ""
+REPOSITORY_OSV_SCANNER_DISABLE_ERRORS: true
+
+REPOSITORY_TRUFFLEHOG_COMMAND_REMOVE_ARGUMENTS: filesystem .
+REPOSITORY_TRUFFLEHOG_ARGUMENTS: git file:///tmp/lint --exclude-paths=.trufflehogignore
 
 REPOSITORY_CHECKOV_ARGUMENTS: |
   --skip-path "/gitops/services/ingress-controller/haproxy-ingress/charts/kubernetes-ingress"
   --skip-path "/gitops/services/monitoring/kube-prometheus-stack/charts/kube-prometheus-stack"
+  --skip-path "/gitops/services/fluent-operator/charts/fluent-operator"
   --skip-check CKV2_AWS_62,CKV2_AWS_1,CKV_AWS_144,CKV_GHA_7,CKV_DOCKER_2
 
-TERRAFORM_TFLINT_DISABLE_ERRORS: true
+TERRAFORM_TFLINT_ARGUMENTS: --chdir=terraform/ --recursive --color

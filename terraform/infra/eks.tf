@@ -18,7 +18,7 @@ resource "aws_eks_cluster" "cluster" {
     endpoint_private_access = true
     endpoint_public_access  = true
     security_group_ids      = [aws_security_group.eks_worker_nodes.id]
-    public_access_cidrs     = ["159.196.168.43/32"]
+    public_access_cidrs     = ["157.211.44.151/32"]
   }
 
   encryption_config {
@@ -385,4 +385,59 @@ resource "aws_iam_policy" "efs_csi_driver_kms" {
       Resource = [aws_kms_key.key.arn]
     }]
   })
+}
+
+resource "aws_iam_role" "loki" {
+  name = "allow_loki_s3_access"
+
+  # Terraform's "jsonencode" function converts a
+  # Terraform expression result to valid JSON syntax.
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Effect = "Allow"
+        Principal = {
+          Federated = aws_iam_openid_connect_provider.eks_cluster.arn
+        }
+      },
+    ]
+  })
+}
+
+resource "aws_iam_policy" "loki_s3" {
+  name        = "LokiS3Access"
+  description = "Allow Loki to access its own log bucket"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "KMSAccess"
+        Effect = "Allow"
+        Action = [
+          "kms:GenerateDataKey",
+          "kms:Decrypt"
+        ]
+        Resource = [aws_kms_key.key.arn]
+      },
+      {
+        Sid      = "ListObjectsInBucket"
+        Effect   = "Allow"
+        Action   = "s3:ListBucket"
+        Resource = [aws_s3_bucket.loki_logs.arn]
+      },
+      {
+        Sid      = "AllObjectActions"
+        Effect   = "Allow"
+        Action   = "s3:*Object"
+        Resource = ["${aws_s3_bucket.loki_logs.arn}/*"]
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "loki_s3_attachment" {
+  role       = aws_iam_role.loki.name
+  policy_arn = aws_iam_policy.loki_s3.arn
 }

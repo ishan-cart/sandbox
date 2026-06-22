@@ -1,0 +1,112 @@
+---
+loki:
+  loki:
+    auth_enabled: false
+    commonConfig:
+      replication_factor: 1
+    schemaConfig:
+      configs:
+        - from: 2024-01-01
+          store: tsdb
+          object_store: s3
+          schema: v13
+          index:
+            prefix: loki_index_
+            period: 24h
+    ingester:
+      chunk_encoding: snappy
+    tracing:
+      enabled: true
+    querier:
+      # Default is 4, if you have enough memory and CPU you can increase, reduce if OOMing
+      max_concurrent: 2
+    storage:
+      # Loki requires a bucket for chunks and the ruler.
+      # Please provide these values if you are using object storage.
+      bucketNames:
+        chunks: yeahboi-dev-loki
+        ruler: yeahboi-dev-loki
+      type: s3
+      s3:
+        region: ap-southeast-2
+    limits_config:
+      retention_period: 720h # 30 days
+
+    compactor:
+      retention_enabled: true
+      retention_delete_delay: 2h
+      retention_delete_worker_count: 150
+      shared_store: s3
+
+  limits_config:
+    volume_enabled: true
+
+  serviceAccount:
+    create: true
+    annotations:
+      eks.amazonaws.com/role-arn: "arn:aws:iam::537239034666:role/allow_loki_s3_access"
+
+  deploymentMode: Monolithic
+  singleBinary:
+    replicas: 1
+    resources:
+      limits:
+        cpu: 200m
+        memory: 100Mi
+      requests:
+        cpu: 100m
+        memory: 50Mi
+    extraEnv:
+      # Keep a little bit lower than memory limits
+      - name: GOMEMLIMIT
+        value: 80MiB
+    persistence:
+      enabled: false
+
+  chunksCache:
+    # default is 500MB, with limited memory keep this smaller
+    writebackSizeLimit: 10MB
+
+  gateway:
+    enabled: false
+
+  # Enable minio for storage
+  minio:
+    enabled: false
+
+  # Zero out replica counts of other deployment modes
+  backend:
+    replicas: 0
+  read:
+    replicas: 0
+  write:
+    replicas: 0
+
+  ingester:
+    replicas: 0
+  querier:
+    replicas: 0
+  queryFrontend:
+    replicas: 0
+  queryScheduler:
+    replicas: 0
+  distributor:
+    replicas: 0
+  compactor:
+    replicas: 0
+  indexGateway:
+    replicas: 0
+  bloomCompactor:
+    replicas: 0
+  bloomGateway:
+    replicas: 0
+
+  monitoring:
+    # Dashboards for monitoring Loki
+    dashboards:
+      # -- If enabled, create configmap with dashboards for monitoring Loki
+      enabled: true
+    serviceMonitor:
+      # -- If enabled, ServiceMonitor resources for Prometheus Operator are created
+      enabled: true
+      interval: 15s

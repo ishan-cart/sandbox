@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: haproxy
+  name: fluent-operator
   # You'll usually want to add your resources to the argocd namespace.
   namespace: argocd
   # Add this finalizer ONLY if you want these to cascade delete.
@@ -12,7 +12,7 @@ metadata:
     # - resources-finalizer.argocd.argoproj.io/background
   # Add labels to your application object.
   labels:
-    name: haproxy-ingress-controller
+    name: fluent-operator
     environment: development
 spec:
   # The project the application belongs to.
@@ -22,7 +22,7 @@ spec:
   source:
     repoURL: https://github.com/ishan-cart/sandbox.git # Can point to either a Helm chart repo or a git repo.
     targetRevision: main # For Helm, this refers to the chart version.
-    path: gitops/services/ingress-controller
+    path: gitops/services/fluent-operator
 
     # helm specific config
     # chart: chart-name  # Set this when pulling directly from a Helm repo. DO NOT set for git-hosted Helm charts.
@@ -82,7 +82,7 @@ spec:
     # or cluster name
     name: in-cluster
     # The namespace will only be set for namespace-scoped resources that have not set a value for .metadata.namespace
-    namespace: ingress-haproxy
+    namespace: monitoring
 
   # Sync policy
   syncPolicy:

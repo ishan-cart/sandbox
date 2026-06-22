@@ -1,0 +1,11 @@
+apiVersion: v2
+name: loki
+version: 1.0.0
+description: A Helm chart for Loki
+type: application
+dependencies:
+  - name: loki
+    version: 17.4.7
+    repository: https://grafana-community.github.io/helm-charts
+# annotations:
+# example: A list of annotations keyed by name (optional).

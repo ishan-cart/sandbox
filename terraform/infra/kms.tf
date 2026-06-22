@@ -87,6 +87,25 @@ data "aws_iam_policy_document" "kms_key_policy" {
       values   = [aws_secretsmanager_secret.cloudflare_token.arn]
     }
   }
+
+  statement {
+    sid    = "AllowLokiS3Access"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey"
+    ]
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.loki.arn]
+    }
+    resources = ["*"]
+    condition {
+      test     = "ArnEquals"
+      variable = "kms:EncryptionContext:aws:s3:arn"
+      values   = [aws_s3_bucket.loki_logs.arn]
+    }
+  }
 }
 
 resource "aws_kms_key" "key" {
