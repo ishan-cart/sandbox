@@ -12,15 +12,9 @@ export const Contact = () => {
             className="w-full bg-brand-primary rounded-[2.5rem] p-8 md:p-14 text-white flex flex-col md:flex-row items-center md:justify-center shadow-2xl shadow-blue-600/20 gap-10 md:gap-60"
           >
             <div className="text-center md:text-left">
-              <motion.h2 
-                initial={{ opacity: 0, y: 30, scale: 0.9 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ type: "spring", stiffness: 100, damping: 20 }}
-                className="text-5xl font-black mb-6 leading-[0.9] tracking-tighter"
-              >
+              <h2 className="text-5xl font-black mb-6 leading-[0.9] tracking-tighter">
                 Let's chat!
-              </motion.h2>
+              </h2>
               <p className="text-white/80 text-lg max-w-xs leading-relaxed font-light">
                 Ready to engineer resilient, automated cloud systems that run themselves.
               </p>

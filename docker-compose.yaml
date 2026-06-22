@@ -23,18 +23,18 @@ services:
       - 9113:9113
     volumes:
       - ./apps/web-app/src:/app/src # dev only
-      - ./apps/web-app/public/data:/usr/share/nginx/html/data/
-    depends_on: &dependencies
-      fluent-bit:
-        condition: service_started
-      prometheus:
-        condition: service_healthy
+      - ./apps/web-app/index.html:/app/index.html # dev only
+      - ./apps/web-app/public/data:/usr/share/nginx/html/data
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "http://localhost:8080"]
+      interval: 3s
+      timeout: 2s
+      retries: 10
 
   prometheus-web-exporter:
     image: docker.io/nginx/nginx-prometheus-exporter:1.5.1
     profiles: [web]
     network_mode: service:web-app
-    depends_on: *dependencies
 
   fluent-bit:
     image: docker.io/fluent/fluent-bit:5.0.7
@@ -56,8 +56,6 @@ services:
     depends_on:
       loki:
         condition: service_healthy
-      grafana:
-        condition: service_healthy
 
   web-app-cron:
     image: curlimages/curl:8.20.0
@@ -73,13 +71,20 @@ services:
     entrypoint: ["sh", "-c"]
     command:
       - |
-        sleep 30 && curl -f -X POST "http://${PROMETHEUS_HOST}:${PROMETHEUS_PORT}/api/v1/query_range" \
-        --data-urlencode "query=${QUERY}" \
-        --data-urlencode "start=$(($(date +%s) - 60))" \
-        --data-urlencode "end=$(date +%s)" \
-        --data-urlencode "step=10s" \
-        -o "${OUTPUT_FILE}"
-    depends_on: *dependencies
+        while true; do
+          curl -f -X POST "http://${PROMETHEUS_HOST}:${PROMETHEUS_PORT}/api/v1/query_range" \
+          --data-urlencode "query=${QUERY}" \
+          --data-urlencode "start=$(($(date +%s) - 60))" \
+          --data-urlencode "end=$(date +%s)" \
+          --data-urlencode "step=10s" \
+          -o "${OUTPUT_FILE}"
+          sleep 60
+        done
+    depends_on:
+      web-app:
+        condition: service_healthy
+      prometheus:
+        condition: service_healthy
 
   prometheus:
     image: docker.io/prom/prometheus:v3.11.3
