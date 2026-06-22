@@ -5,8 +5,7 @@ import { Cpu } from "lucide-react";
 import { SectionHeader } from "./SectionHeader";
 
 import amazonwebservicesLogo from "../assets/images/logos/amazonwebservices.svg";
-import argocdLogo from "../assets/images/logos/argocd.svg";
-import saltLogo from "../assets/images/logos/salt.svg";
+import grafanalokiLogo from "../assets/images/logos/grafanaloki.svg";
 
 interface Skill {
   name: string;
@@ -15,8 +14,7 @@ interface Skill {
 
 const LOCAL_LOGOS: Record<string, string> = {
   amazonwebservices: amazonwebservicesLogo,
-  argocd: argocdLogo,
-  salt: saltLogo,
+  grafanaloki: grafanalokiLogo,
 };
 
 const SkillIcon = ({ skill }: { skill: Skill }) => {
@@ -59,7 +57,7 @@ export const Skills = () => {
       title: "IaC",
       skills: [
         { name: "Terraform", slug: "terraform" },
-        { name: "Salt", slug: "salt" }
+        { name: "Salt", slug: "saltproject" }
       ]
     },
     {
@@ -81,7 +79,7 @@ export const Skills = () => {
       title: "CI/CD",
       skills: [
         { name: "Github Actions", slug: "githubactions" },
-        { name: "Argo CD", slug: "argocd" }
+        { name: "Argo CD", slug: "argo" }
       ]
     },
     {
@@ -89,7 +87,9 @@ export const Skills = () => {
       skills: [
         { name: "Splunk", slug: "splunk" },
         { name: "Prometheus", slug: "prometheus" },
-        { name: "Grafana", slug: "grafana" }
+        { name: "Grafana", slug: "grafana" },
+        { name: "Fluent Bit", slug: "fluentbit" },
+        { name: "Loki", slug: "grafanaloki" }
       ]
     },
     {
