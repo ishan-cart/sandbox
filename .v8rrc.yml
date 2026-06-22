@@ -1,0 +1,10 @@
+# Argo CD Application manifests live under gitops/argocd/ but are often named
+# after the deployed service (e.g. loki.yaml). Schema Store matches those names
+# to unrelated schemas (Loki config), so route this path explicitly.
+customCatalog:
+  schemas:
+    - name: Argo CD
+      description: Argo CD Application manifests
+      fileMatch:
+        - "gitops/argocd/**/*.yaml"
+      location: https://raw.githubusercontent.com/argoproj/argo-schema-generator/main/schema/argo_cd_kustomize_schema.json
