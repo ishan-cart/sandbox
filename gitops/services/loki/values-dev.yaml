@@ -18,11 +18,8 @@ loki:
     tracing:
       enabled: true
     querier:
-      # Default is 4, if you have enough memory and CPU you can increase, reduce if OOMing
       max_concurrent: 2
     storage:
-      # Loki requires a bucket for chunks and the ruler.
-      # Please provide these values if you are using object storage.
       bucketNames:
         chunks: yeahboi-dev-loki
         ruler: yeahboi-dev-loki
@@ -36,6 +33,7 @@ loki:
       retention_enabled: true
       retention_delete_delay: 2h
       retention_delete_worker_count: 150
+      delete_request_store: s3
 
   limits_config:
     volume_enabled: true
@@ -51,20 +49,30 @@ loki:
     resources:
       limits:
         cpu: 200m
-        memory: 100Mi
+        memory: 125Mi
       requests:
         cpu: 100m
-        memory: 50Mi
+        memory: 75Mi
     extraEnv:
       # Keep a little bit lower than memory limits
       - name: GOMEMLIMIT
-        value: 80MiB
+        value: 100MiB
     persistence:
       enabled: false
 
   chunksCache:
-    # default is 500MB, with limited memory keep this smaller
+    enabled: true
     writebackSizeLimit: 10MB
+    allocatedMemory: 32
+    allocatedCPU: 50m
+    defaultValidity: 24h
+    
+  resultsCache:
+    enabled: true
+    writebackSizeLimit: 10MB
+    allocatedMemory: 16
+    allocatedCPU: 50m
+    defaultValidity: 15m 
 
   gateway:
     enabled: false
@@ -108,4 +116,5 @@ loki:
     serviceMonitor:
       # -- If enabled, ServiceMonitor resources for Prometheus Operator are created
       enabled: true
-      interval: 15s
+      interval: 1m
+      scrapeTimeout: 50s
