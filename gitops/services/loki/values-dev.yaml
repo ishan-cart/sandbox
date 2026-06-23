@@ -62,13 +62,14 @@ loki:
 
   chunksCache:
     enabled: true
-    writebackSizeLimit: 0
+    writebackSizeLimit: 10MB
     allocatedMemory: 32
     allocatedCPU: 50m
     defaultValidity: 24h
     
   resultsCache:
     enabled: true
+    writebackSizeLimit: 10MB
     allocatedMemory: 16
     allocatedCPU: 50m
     defaultValidity: 15m 
