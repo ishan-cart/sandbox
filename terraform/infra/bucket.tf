@@ -17,6 +17,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_state" 
       kms_master_key_id = aws_kms_key.key.arn
       sse_algorithm     = "aws:kms"
     }
+    bucket_key_enabled = true
   }
 }
 
@@ -48,6 +49,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "access_logs" {
       kms_master_key_id = aws_kms_key.key.arn
       sse_algorithm     = "aws:kms"
     }
+    bucket_key_enabled = true
   }
 }
 
@@ -110,7 +112,9 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "loki_logs" {
       kms_master_key_id = aws_kms_key.key.arn
       sse_algorithm     = "aws:kms"
     }
+    bucket_key_enabled = true
   }
+  
 }
 
 resource "aws_s3_bucket_public_access_block" "loki_logs" {
