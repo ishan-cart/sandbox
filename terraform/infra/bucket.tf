@@ -114,7 +114,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "loki_logs" {
     }
     bucket_key_enabled = true
   }
-  
+
 }
 
 resource "aws_s3_bucket_public_access_block" "loki_logs" {
