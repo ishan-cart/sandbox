@@ -50,3 +50,82 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #353535;
 }
+
+/* Precise Blueprint Water Wave Animations */
+@keyframes blueprint-slide-layer1 {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-1650px, 0, 0); }
+}
+
+@keyframes blueprint-slide-layer2-reverse {
+  0% { transform: translate3d(-1350px, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes blueprint-slide-layer3 {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-1650px, 0, 0); }
+}
+
+@keyframes blueprint-slide-layer4-reverse {
+  0% { transform: translate3d(-1290px, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+.animate-blueprint-wave-1 {
+  animation: blueprint-slide-layer1 58s linear infinite;
+}
+
+.animate-blueprint-wave-2 {
+  animation: blueprint-slide-layer2-reverse 42s linear infinite;
+}
+
+.animate-blueprint-wave-3 {
+  animation: blueprint-slide-layer3 28s linear infinite;
+}
+
+.animate-blueprint-wave-4 {
+  animation: blueprint-slide-layer4-reverse 23s linear infinite;
+}
+
+/* Stylized Blueprint Seagull Flight Animations */
+@keyframes seagull-horizontal {
+  0% {
+    transform: translate3d(-15vw, 130px, 0) scale(0.44);
+    opacity: 0;
+  }
+  5% {
+    transform: translate3d(-10vw, 130px, 0) scale(0.446);
+    opacity: 0.45;
+  }
+  50% {
+    transform: translate3d(50vw, 130px, 0) scale(0.52);
+    opacity: 0.45;
+  }
+  95% {
+    transform: translate3d(108vw, 130px, 0) scale(0.446);
+    opacity: 0.45;
+  }
+  100% {
+    transform: translate3d(115vw, 130px, 0) scale(0.44);
+    opacity: 0;
+  }
+}
+
+@keyframes seagull-vertical {
+  0%, 100% {
+    transform: translate3d(0, -25px, 0) rotate(-4deg);
+  }
+  50% {
+    transform: translate3d(0, 25px, 0) rotate(5deg);
+  }
+}
+
+.animate-seagull-horizontal {
+  animation: seagull-horizontal 26s linear infinite;
+}
+
+.animate-seagull-vertical {
+  animation: seagull-vertical 5.5s ease-in-out infinite;
+}
+
