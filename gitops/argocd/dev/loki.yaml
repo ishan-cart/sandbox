@@ -21,7 +21,7 @@ spec:
   # Source of the application manifests
   source:
     repoURL: https://github.com/ishan-cart/sandbox.git # Can point to either a Helm chart repo or a git repo.
-    targetRevision: main # For Helm, this refers to the chart version.
+    targetRevision: enable-bucket-keys # For Helm, this refers to the chart version.
     path: gitops/services/loki
 
     # helm specific config
