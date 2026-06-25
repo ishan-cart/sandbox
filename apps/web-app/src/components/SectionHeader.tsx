@@ -17,11 +17,11 @@ export const SectionHeader = ({
 }: SectionHeaderProps) => (
   <div className={className}>
     <div className="flex items-center gap-3 mb-2">
-      <div className="w-12 h-1 bg-brand-primary rounded-full" />
+      <div className="w-12 h-1 bg-brand-primary rounded-full section-header-line" />
       <span className="text-[10px] font-mono tracking-widest text-slate-400 uppercase font-black">{eyebrow}</span>
     </div>
     <h2 className={titleClassName}>
-      {title} <span className="text-slate-300">{titleMuted}</span>
+      {title} <span className="text-slate-300 section-header-muted">{titleMuted}</span>
     </h2>
     <p className="text-slate-400 max-w-xl text-lg font-light">
       {description}

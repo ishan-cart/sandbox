@@ -270,24 +270,24 @@ export const ArchitectureDiagram = () => {
           <div className="inline-flex p-1.5 bg-slate-100 rounded-3xl border border-slate-200/60 shadow-sm">
             <button
               onClick={() => setActiveTab("diagram")}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-bold tracking-wider uppercase transition-all duration-200 ${
+              className={`sys-toggle-btn flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-bold tracking-wider uppercase transition-all duration-100 ${
                 activeTab === "diagram"
                   ? "bg-white text-slate-900 shadow-md"
                   : "text-slate-400 hover:text-slate-700"
               }`}
             >
-              <LayoutDashboard className="w-4 h-4" />
+              <LayoutDashboard className={`w-4 h-4 transition-colors duration-100 ${activeTab === "diagram" ? "text-brand-primary" : "text-slate-400"}`} />
               System Design
             </button>
             <button
               onClick={() => setActiveTab("metrics")}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-bold tracking-wider uppercase transition-all duration-200 ${
+              className={`sys-toggle-btn flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-bold tracking-wider uppercase transition-all duration-100 ${
                 activeTab === "metrics"
                   ? "bg-white text-slate-900 shadow-md"
                   : "text-slate-400 hover:text-slate-700"
               }`}
             >
-              <Activity className="w-4 h-4 text-brand-primary" />
+              <Activity className={`w-4 h-4 transition-colors duration-100 ${activeTab === "metrics" ? "text-brand-primary" : "text-slate-400"}`} />
               Metrics
             </button>
           </div>
@@ -302,7 +302,7 @@ export const ArchitectureDiagram = () => {
             >
               <div 
                 ref={setZoomContainer} 
-                className={`relative w-full rounded-2xl border-2 border-slate-900 bg-white select-none aspect-[816/844] touch-pan-y transition-shadow duration-300 ${
+                className={`architecture-diagram-container relative w-full rounded-2xl border-2 border-slate-900 bg-white select-none aspect-[816/844] touch-pan-y transition-shadow duration-300 ${
                   isCurrentlyZoomed 
                     ? "overflow-visible z-[100] shadow-[0_30px_70px_rgba(0,0,0,0.25)]" 
                     : "overflow-hidden z-0 shadow-[0_20px_50px_rgba(0,0,0,0.1)]"
@@ -374,11 +374,11 @@ export const ArchitectureDiagram = () => {
                             <div key={panel.id || idx} className="p-5 rounded-2xl border border-slate-900 bg-slate-900/30 flex flex-col gap-3 md:col-span-2">
                               <div className="flex items-center justify-between">
                                 <h3 className="text-xs font-bold font-mono uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                                  <Layers className="w-4 h-4 text-cyan-400" />
+                                  <Layers className="w-4 h-4 text-brand-primary" />
                                   {title}
                                 </h3>
                                 {unit && (
-                                  <span className="text-[9px] font-mono text-cyan-400 px-1.5 py-0.5 rounded-sm bg-cyan-950/40 border border-cyan-900/40">
+                                  <span className="text-[9px] font-mono text-brand-primary px-1.5 py-0.5 rounded-sm bg-blue-950/40 border border-blue-900/40">
                                     {unit}
                                   </span>
                                 )}

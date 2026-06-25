@@ -54,7 +54,7 @@ const SkillIcon = ({ skill }: { skill: Skill }) => {
 export const Skills = () => {
   const categories = [
     {
-      title: "IaC",
+      title: "Infra as Code",
       skills: [
         { name: "Terraform", slug: "terraform" },
         { name: "Salt", slug: "saltproject" }

@@ -26,7 +26,7 @@ export const Experience = () => {
       company: "RWDI Australia",
       roles: [
         {
-          title: "Software/Electrical Engineer",
+          title: "Systems Engineer",
           period: "2020 - 2023",
           description: "Owned the end-to-end lifecycle of our fleet of environmental monitors; developed, deployed, and maintained reliable cloud systems to ensure continuous operations.",  
           tags: ["Python", "C++", "PHP", "MySQL"]
@@ -93,9 +93,9 @@ export const Experience = () => {
               className="bento-card group flex flex-col md:flex-row gap-8 items-start bg-slate-50/50 border-slate-100 hover:bg-white"
             >
               <div className="flex-none w-full md:w-56 mb-4 md:mb-0">
-                <div className="flex items-center gap-2 text-xs font-mono text-slate-600 bg-white border border-slate-200 px-4 py-1.5 rounded-lg inline-flex items-center uppercase tracking-tight font-bold shadow-sm">
+                <h3 className="text-xl font-black text-slate-900 tracking-tight group-hover:text-brand-primary transition-colors">
                   {exp.company}
-                </div>
+                </h3>
               </div>
 
               <div className="flex-grow relative">
@@ -109,7 +109,7 @@ export const Experience = () => {
                       <div className="absolute -left-[4.5px] top-2 w-2.5 h-2.5 bg-slate-200 border-2 border-white rounded-full group-hover:bg-brand-primary transition-colors" />
                       
                       <div className="flex flex-col mb-4">
-                        <div className="flex items-center gap-3 text-brand-primary mb-1 text-[10px] font-mono font-black uppercase tracking-widest">
+                        <div className="experience-date flex items-center gap-3 text-brand-primary mb-1 text-[10px] font-mono font-black uppercase tracking-widest">
                           <Calendar className="w-3.5 h-3.5" />
                           {role.period}
                         </div>
@@ -124,7 +124,7 @@ export const Experience = () => {
 
                       <div className="flex flex-wrap gap-2">
                         {role.tags.map(tag => (
-                          <span key={tag} className="text-[10px] px-2.5 py-1 rounded-lg bg-white text-slate-400 font-mono border border-slate-100 shadow-xs hover:border-brand-primary/20 hover:text-brand-primary transition-colors uppercase font-bold tracking-wider">
+                          <span key={tag} className="experience-tag text-[10px] px-2.5 py-1 rounded-lg bg-white text-slate-400 font-mono border border-slate-100 shadow-xs hover:border-brand-primary/20 hover:text-brand-primary transition-colors uppercase font-bold tracking-wider">
                             {tag}
                           </span>
                         ))}

@@ -73,7 +73,7 @@
 }
 
 .animate-blueprint-wave-1 {
-  animation: blueprint-slide-layer1 58s linear infinite;
+  animation: blueprint-slide-layer1 110s linear infinite;
 }
 
 .animate-blueprint-wave-2 {
@@ -128,4 +128,294 @@
 .animate-seagull-vertical {
   animation: seagull-vertical 5.5s ease-in-out infinite;
 }
+
+/* ==========================================
+   Dynamic Theme Variables
+   - Centralized to ensure that changing a single variable
+     updates the color in all relevant places of code.
+   - Softened the high-contrast bright white text in night mode
+     to reduce eye strain on dark backgrounds.
+   ========================================== */
+:root {
+  --theme-bg-base: #fdfdfd;
+  --theme-bg-card: #ffffff;
+  --theme-bg-pill: #ffffff;
+  
+  --theme-text-primary: #0f172a; /* Day primary dark text (slate-900) */
+  --theme-text-secondary: #334155; /* Day secondary dark text (slate-700) */
+  --theme-text-muted: #64748b; /* Day muted text (slate-500) */
+  --theme-text-light: #94a3b8; /* Day light text (slate-400) */
+
+  --theme-border-card: #e5e7eb;
+  --theme-border-pill: #e5e7eb;
+  
+  --theme-pill-hover-border: rgba(37, 99, 235, 0.5);
+  --theme-pill-hover-text: #60a5fa;
+}
+
+.theme-night {
+  --theme-bg-base: #030812;
+  --theme-bg-card: #060d1a;
+  --theme-bg-pill: #111e35;
+
+  /* SOFTENED: Made the primary white text less contrasting/softer (now using a smooth, premium slate-300) */
+  --theme-text-primary: #cbd5e1; 
+  --theme-text-secondary: #94a3b8; /* Softened slate-400 */
+  --theme-text-muted: #64748b;
+  --theme-text-light: #475569;
+
+  --theme-border-card: rgba(255, 255, 255, 0.08);
+  --theme-border-pill: rgba(255, 255, 255, 0.15);
+  
+  --theme-pill-hover-border: rgba(37, 99, 235, 0.5);
+  --theme-pill-hover-text: #60a5fa;
+}
+
+/* ==========================================
+   Night Mode Blueprint Theme (Dark Blue & Neon White)
+   ========================================== */
+.theme-night {
+  background-color: var(--theme-bg-base);
+  color: var(--theme-text-secondary);
+}
+
+/* Base Body Override */
+.theme-night, 
+.theme-night body {
+  background-color: var(--theme-bg-base) !important;
+  color: var(--theme-text-secondary) !important;
+}
+
+/* Force backgrounds of sections to dark blueprint navy */
+.theme-night header,
+.theme-night section {
+  background-color: var(--theme-bg-base) !important;
+}
+
+/* Override utility classes for container backgrounds */
+.theme-night .bg-slate-50,
+.theme-night .bg-slate-50\/50,
+.theme-night .bg-white {
+  background-color: var(--theme-bg-base) !important;
+}
+
+/* Bento card dark styling */
+.theme-night .bento-card {
+  background-color: var(--theme-bg-card) !important;
+  border-color: var(--theme-border-card) !important;
+}
+
+.theme-night .bento-card:hover {
+  background-color: #081225 !important;
+  border-color: rgba(37, 99, 235, 0.3) !important;
+  box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.08) !important;
+}
+
+/* Header typography */
+.theme-night h1,
+.theme-night h2,
+.theme-night h3,
+.theme-night h4 {
+  color: var(--theme-text-primary) !important; /* Crisp, readable softened slate-300 */
+}
+
+.theme-night .text-slate-900,
+.theme-night .text-slate-800 {
+  color: var(--theme-text-primary) !important; /* Crisp, readable softened slate-300 */
+}
+
+.theme-night .text-slate-700,
+.theme-night .text-slate-600 {
+  color: var(--theme-text-secondary) !important; /* High contrast body text */
+}
+
+.theme-night .text-slate-500,
+.theme-night .text-slate-400 {
+  color: var(--theme-text-secondary) !important; /* Softer, legible muted slate-400 */
+}
+
+/* Section Header Muted Part - Dual Color Theme */
+.theme-night .section-header-muted {
+  color: var(--theme-text-secondary) !important; /* A bit lighter and softer slate-400 for premium dual-color headers in night mode */
+}
+
+/* Section Header Line in Night Mode */
+.theme-night .section-header-line {
+  background-color: rgba(30, 64, 175, 0.8) !important;
+}
+
+/* Experience Date Styling - Always consistent bright blue, matching day mode */
+.experience-date,
+.theme-night .experience-date {
+  color: #2563eb !important;
+}
+
+
+
+/* Experience Tags/Pills in Night Mode - Exactly matching Tech Stack Pills color & text */
+.theme-night span.experience-tag,
+.theme-night span.experience-tag.text-slate-400 {
+  background-color: var(--theme-bg-pill) !important;
+  color: var(--theme-text-secondary) !important; /* Soft white/gray slate-400 exactly matching tech stack skill text */
+  border-color: var(--theme-border-pill) !important;
+}
+
+.theme-night span.experience-tag:hover,
+.theme-night span.experience-tag.text-slate-400:hover {
+  border-color: var(--theme-pill-hover-border) !important;
+  color: var(--theme-pill-hover-text) !important;
+}
+
+/* Border color adaptations */
+.theme-night .border-slate-100,
+.theme-night .border-slate-200 {
+  border-color: var(--theme-border-card) !important;
+}
+
+.theme-night .bg-slate-100,
+.theme-night .bg-slate-200 {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* Badges & nested pills */
+.theme-night .px-4.py-1\.5.bg-white,
+.theme-night .px-2\.5.py-1.bg-white,
+.theme-night .px-4.py-2.bg-white {
+  background-color: var(--theme-bg-pill) !important;
+  color: var(--theme-text-secondary) !important;
+  border-color: var(--theme-border-pill) !important;
+}
+
+.theme-night .px-2\.5.py-1.bg-white:hover {
+  border-color: var(--theme-pill-hover-border) !important;
+  color: var(--theme-pill-hover-text) !important;
+}
+
+/* Contact LinkedIn Button - Night Mode Hover */
+.theme-night .contact-linkedin-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #60a5fa !important;
+  border-color: rgba(96, 165, 250, 0.4) !important;
+}
+
+.theme-night .contact-linkedin-btn:hover svg {
+  color: #ffffff !important;
+}
+
+/* Glass panel background */
+.theme-night .glass {
+  background-color: rgba(6, 13, 26, 0.75) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+
+
+/* System Design Button Tab Toggle Fast Transition Override */
+.sys-toggle-btn,
+.sys-toggle-btn svg {
+  transition: all 0.12s ease-out !important;
+}
+
+/* Blueprint image invert & screen blend-mode in night mode */
+.theme-night .hero-bg-img {
+  filter: invert(0.92) hue-rotate(195deg) brightness(1.2) contrast(1.15) !important;
+  mix-blend-mode: screen !important;
+  opacity: 0.28 !important;
+}
+
+/* Invert Architecture Diagram SVGs to turn white to a much darker charcoal/black background and soft lines */
+.theme-night img[src*=".svg"]:not([class*="logo"]) {
+  filter: invert(0.94) hue-rotate(185deg) brightness(0.9) contrast(1.0) !important;
+  mix-blend-mode: normal !important;
+  background-color: #ffffff !important; /* White background will invert to a beautiful soft dark gray */
+}
+
+/* Diagram interactive containers */
+.theme-night .border-slate-900 {
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Tab Panel and Chart Overrides */
+.theme-night .bg-slate-100 button[class*="bg-white"] {
+  background-color: #060d1a !important;
+  color: #f8fafc !important;
+}
+
+/* Experience connectors */
+.theme-night .bg-slate-200 {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.theme-night .border-white {
+  border-color: #030812 !important;
+}
+
+.theme-night .border-t.border-slate-100 {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.theme-night footer {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Swimming Lightbulb Fish Animations */
+@keyframes fish-horizontal {
+  0% {
+    transform: translate3d(38vw, 0, 0) scaleX(-1);
+  }
+  49.9% {
+    transform: translate3d(58vw, 0, 0) scaleX(-1);
+  }
+  50% {
+    transform: translate3d(58vw, 0, 0) scaleX(1);
+  }
+  99.9% {
+    transform: translate3d(38vw, 0, 0) scaleX(1);
+  }
+  100% {
+    transform: translate3d(38vw, 0, 0) scaleX(-1);
+  }
+}
+
+@keyframes fish-vertical {
+  0%, 100% {
+    transform: translate3d(0, -8px, 0) rotate(-1.5deg);
+  }
+  50% {
+    transform: translate3d(0, 8px, 0) rotate(1.5deg);
+  }
+}
+
+@keyframes bulb-glow {
+  0%, 100% {
+    opacity: 0.35;
+    filter: drop-shadow(0 0 1px currentColor);
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 8px currentColor) drop-shadow(0 0 16px currentColor);
+  }
+}
+
+.animate-fish-horizontal {
+  animation: fish-horizontal 30s ease-in-out infinite;
+}
+
+.animate-fish-vertical {
+  animation: fish-vertical 10s ease-in-out infinite;
+}
+
+.animate-bulb-glow {
+  animation: bulb-glow 2.5s ease-in-out infinite;
+}
+
+/* Disable transitions and animations completely when theme toggling is in progress. 
+   Placed at the very bottom with HTML root prefix to guarantee maximum override of any other rule. */
+html.theme-toggling,
+html.theme-toggling * {
+  transition: none !important;
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+}
+
 
