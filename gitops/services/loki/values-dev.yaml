@@ -66,13 +66,13 @@ loki:
     allocatedMemory: 32
     allocatedCPU: 50m
     defaultValidity: 24h
-    
+
   resultsCache:
     enabled: true
     writebackSizeLimit: 10MB
     allocatedMemory: 16
     allocatedCPU: 50m
-    defaultValidity: 15m 
+    defaultValidity: 15m
 
   gateway:
     enabled: false
