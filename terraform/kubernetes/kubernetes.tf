@@ -105,7 +105,7 @@ resource "kubernetes_manifest" "haproxy_nlb_target_group_binding" {
     }
     spec = {
       serviceRef = {
-        name = "haproxy-kubernetes-ingress"
+        name = "haproxy-ingress-kubernetes-ingress"
         port = 443
       }
       targetGroupARN = data.aws_lb_target_group.eks_haproxy_backend_https.arn
