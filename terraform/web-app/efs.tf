@@ -6,7 +6,7 @@ data "aws_subnets" "private_subnets" {
 
 data "aws_security_group" "efs" {
   tags = {
-    Name = "efs-sg" # Put your clean, readable name here instead!
+    Name = "efs-sg"
   }
 }
 
@@ -16,7 +16,7 @@ data "aws_kms_key" "key" {
 
 resource "aws_efs_file_system" "eks_efs" {
   creation_token = "${local.env_vars[var.environment].project}-web-app-nfs-storage"
-  encrypted      = true # Enables encryption at rest
+  encrypted      = true
   kms_key_id     = data.aws_kms_key.key.arn
 
   tags = {
@@ -30,4 +30,3 @@ resource "aws_efs_mount_target" "private_subnets" {
   subnet_id       = each.value
   security_groups = [data.aws_security_group.efs.id]
 }
-
