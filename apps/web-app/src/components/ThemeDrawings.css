@@ -1,0 +1,129 @@
+/* Stylized Blueprint Seagull Flight Animations */
+@keyframes seagull-horizontal {
+  0% {
+    transform: translate3d(-15vw, 130px, 0) scale(0.44);
+    opacity: 0;
+  }
+  5% {
+    transform: translate3d(-10vw, 130px, 0) scale(0.446);
+    opacity: 0.45;
+  }
+  50% {
+    transform: translate3d(50vw, 130px, 0) scale(0.52);
+    opacity: 0.45;
+  }
+  95% {
+    transform: translate3d(108vw, 130px, 0) scale(0.446);
+    opacity: 0.45;
+  }
+  100% {
+    transform: translate3d(115vw, 130px, 0) scale(0.44);
+    opacity: 0;
+  }
+}
+
+@keyframes seagull-vertical {
+  0%, 100% {
+    transform: translate3d(0, -25px, 0) rotate(-4deg);
+  }
+  50% {
+    transform: translate3d(0, 25px, 0) rotate(5deg);
+  }
+}
+
+.animate-seagull-horizontal {
+  animation: seagull-horizontal 26s linear infinite;
+}
+
+.animate-seagull-vertical {
+  animation: seagull-vertical 5.5s ease-in-out infinite;
+}
+
+/* Swimming Lightbulb Fish Animations */
+@keyframes fish-horizontal {
+  0% {
+    transform: translate3d(38vw, 0, 0) scaleX(-1);
+  }
+  49.9% {
+    transform: translate3d(58vw, 0, 0) scaleX(-1);
+  }
+  50% {
+    transform: translate3d(58vw, 0, 0) scaleX(1);
+  }
+  99.9% {
+    transform: translate3d(38vw, 0, 0) scaleX(1);
+  }
+  100% {
+    transform: translate3d(38vw, 0, 0) scaleX(-1);
+  }
+}
+
+@keyframes fish-vertical {
+  0%, 100% {
+    transform: translate3d(0, -8px, 0) rotate(-1.5deg);
+  }
+  50% {
+    transform: translate3d(0, 8px, 0) rotate(1.5deg);
+  }
+}
+
+@keyframes bulb-glow {
+  0%, 100% {
+    opacity: 0.35;
+    filter: drop-shadow(0 0 1px currentColor);
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 8px currentColor) drop-shadow(0 0 16px currentColor);
+  }
+}
+
+.animate-fish-horizontal {
+  animation: fish-horizontal 30s ease-in-out infinite;
+}
+
+.animate-fish-vertical {
+  animation: fish-vertical 10s ease-in-out infinite;
+}
+
+.animate-bulb-glow {
+  animation: bulb-glow 2.5s ease-in-out infinite;
+}
+
+/* Precise Theme Water Wave Animations */
+@keyframes theme-slide-layer1 {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-1650px, 0, 0); }
+}
+
+@keyframes theme-slide-layer2-reverse {
+  0% { transform: translate3d(-1350px, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes theme-slide-layer3 {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-1650px, 0, 0); }
+}
+
+@keyframes theme-slide-layer4-reverse {
+  0% { transform: translate3d(-1290px, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+.animate-theme-wave-1 {
+  animation: theme-slide-layer1 110s linear infinite;
+}
+
+.animate-theme-wave-2 {
+  animation: theme-slide-layer2-reverse 42s linear infinite;
+}
+
+.animate-theme-wave-3 {
+  animation: theme-slide-layer3 28s linear infinite;
+}
+
+.animate-theme-wave-4 {
+  animation: theme-slide-layer4-reverse 23s linear infinite;
+}
+
