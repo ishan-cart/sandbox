@@ -1,4 +1,5 @@
 import { motion } from "motion/react";
+import { ThemeLightbulbFish } from "./ThemeDrawings";
 
 interface ContactProps {
   isNight?: boolean;
@@ -38,7 +39,7 @@ export const Contact = ({ isNight }: ContactProps) => {
           >
             <div className="text-center md:text-left">
               <h2 className={`text-4xl md:text-5xl font-black mb-4 leading-[0.9] tracking-tighter ${
-                isNight ? "text-slate-100" : "text-white"
+                isNight ? "text-slate-100" : "text-slate-900"
               }`}>
                 Let's chat!
               </h2>
@@ -54,21 +55,21 @@ export const Contact = ({ isNight }: ContactProps) => {
                 href="https://www.linkedin.com/in/ishansawant" 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className={`contact-linkedin-btn flex items-center gap-5 p-5 md:p-6 rounded-[2rem] border transition-all ${
+                className={`contact-linkedin-btn group flex items-center gap-5 p-5 md:p-6 rounded-[2rem] border transition-all duration-150 ease-in-out ${
                   isNight
                     ? "bg-blue-950/60 border-blue-900/40 text-blue-300 hover:bg-blue-950/80 hover:border-blue-700/80 hover:text-blue-200"
-                    : "bg-white/5 border-white/5 text-white hover:bg-white hover:text-[#0A66C2]"
+                    : "bg-white/5 border border-white/5 text-white hover:bg-white hover:text-[#0A66C2]"
                 }`}
               >
-                <div className={`flex-none w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner transition-all duration-300 border ${
+                <div className={`flex-none w-14 h-14 rounded-2xl flex items-center justify-center shadow-inner transition-all duration-150 ease-in-out border ${
                   isNight
                     ? "bg-blue-950/40 border-blue-900/40 text-white"
-                    : "bg-white/10 border-white/5 text-white"
+                    : "bg-white/10 border border-white/5 text-white group-hover:bg-[#0A66C2] group-hover:border-transparent"
                 }`}>
                   <svg 
                     viewBox="0 0 24 24" 
                     fill="currentColor" 
-                    className="w-11 h-11"
+                    className="w-11 h-11 text-white"
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
@@ -76,7 +77,7 @@ export const Contact = ({ isNight }: ContactProps) => {
                 </div>
                 <div className="text-left">
                   <span className={`text-lg font-bold block leading-tight ${
-                    isNight ? "text-slate-200" : "text-white"
+                    isNight ? "text-slate-200" : ""
                   }`}>Connect on LinkedIn</span>
                   <div className={`text-xs font-mono tracking-wider uppercase mt-1 ${
                     isNight ? "text-slate-500" : "opacity-60"
@@ -144,112 +145,7 @@ export const Contact = ({ isNight }: ContactProps) => {
       </div>
 
       {/* Lightbulb Fish (Anglerfish) swimming slowly - z-20 to ensure it is always visible in front of background/cards */}
-      <div className="absolute inset-x-0 bottom-0 h-32 pointer-events-none select-none overflow-hidden z-20">
-        <div className="absolute bottom-6 left-0 w-20 h-15 animate-fish-horizontal">
-          <div className="animate-fish-vertical inline-block">
-            <svg viewBox="0 0 110 80" className="w-20 h-15 overflow-visible">
-              {/* Lightbulb Glow Ring (behind fish) */}
-              <circle
-                cx="15"
-                cy="15"
-                r="8"
-                fill="none"
-                {...commonGlowStrokeProps}
-              />
-              
-              {/* Stalk/Antenna */}
-              <path
-                d="M 52 24 C 45 5, 25 5, 15 15"
-                fill="none"
-                strokeLinecap="round"
-                {...commonStrokeProps}
-              />
-              
-              {/* Glowing Bulb */}
-              <circle
-                cx="15"
-                cy="15"
-                r="4"
-                fill={bulbFillColor}
-                className="animate-bulb-glow"
-                {...commonStrokeProps}
-              />
-
-              {/* Main Body with mouth open */}
-              <path
-                d="M 85 40 
-                   C 75 22, 60 20, 50 22 
-                   C 40 24, 30 28, 28 35
-                   L 42 42
-                   L 30 48
-                   C 32 55, 42 60, 52 60
-                   C 65 60, 75 52, 85 40 Z"
-                fill="none"
-                strokeLinejoin="round"
-                {...commonStrokeProps}
-              />
-
-              {/* Teeth - Sharp & pointy */}
-              {/* Upper teeth */}
-              <path
-                d="M 29 35 L 32 39 L 34 35 L 37 40 L 40 37 L 42 42"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                {...commonStrokeProps}
-              />
-              {/* Lower teeth */}
-              <path
-                d="M 30 48 L 33 44 L 35 47 L 38 43 L 41 45 L 42 42"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                {...commonStrokeProps}
-              />
-
-              {/* Big circular Eye */}
-              <circle
-                cx="48"
-                cy="32"
-                r="4"
-                fill="none"
-                {...commonStrokeProps}
-              />
-              <circle
-                cx="47"
-                cy="32"
-                r="1.5"
-                fill={strokeColor}
-              />
-
-              {/* Gills / Accent line */}
-              <path
-                d="M 60 30 C 58 35, 58 45, 60 50"
-                fill="none"
-                strokeLinecap="round"
-                opacity="0.6"
-                {...commonStrokeProps}
-              />
-
-              {/* Tail Fin */}
-              <path
-                d="M 85 40 L 98 25 L 95 40 L 98 55 Z"
-                fill="none"
-                strokeLinejoin="round"
-                {...commonStrokeProps}
-              />
-
-              {/* Pectoral Fin */}
-              <path
-                d="M 64 44 C 68 44, 72 48, 70 52 C 68 54, 63 50, 64 44 Z"
-                fill="none"
-                strokeLinejoin="round"
-                {...commonStrokeProps}
-              />
-            </svg>
-          </div>
-        </div>
-      </div>
+      <ThemeLightbulbFish isNight={isNight} />
     </section>
   );
 };

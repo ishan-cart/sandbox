@@ -4,12 +4,13 @@
   --font-sans: "Space Grotesk", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
-  --color-brand-primary: #2563eb; 
-  --color-brand-secondary: #7c3aed;
-  --color-brand-accent: #ea580c;
-  --color-bg-light: #fdfdfd;
-  --color-bg-card: #ffffff;
-  --color-border-light: #e5e7eb;
+  --color-brand-primary: var(--theme-brand-primary); 
+  --color-brand-secondary: var(--theme-brand-secondary);
+  --color-brand-accent: var(--theme-brand-accent);
+  --color-bg-light: var(--theme-bg-base);
+  --color-bg-card: var(--theme-bg-card);
+  --color-bg-pill: var(--theme-bg-pill);
+  --color-border-light: var(--theme-border-card);
 }
 
 @layer base {
@@ -51,83 +52,6 @@
   background: #353535;
 }
 
-/* Precise Blueprint Water Wave Animations */
-@keyframes blueprint-slide-layer1 {
-  0% { transform: translate3d(0, 0, 0); }
-  100% { transform: translate3d(-1650px, 0, 0); }
-}
-
-@keyframes blueprint-slide-layer2-reverse {
-  0% { transform: translate3d(-1350px, 0, 0); }
-  100% { transform: translate3d(0, 0, 0); }
-}
-
-@keyframes blueprint-slide-layer3 {
-  0% { transform: translate3d(0, 0, 0); }
-  100% { transform: translate3d(-1650px, 0, 0); }
-}
-
-@keyframes blueprint-slide-layer4-reverse {
-  0% { transform: translate3d(-1290px, 0, 0); }
-  100% { transform: translate3d(0, 0, 0); }
-}
-
-.animate-blueprint-wave-1 {
-  animation: blueprint-slide-layer1 110s linear infinite;
-}
-
-.animate-blueprint-wave-2 {
-  animation: blueprint-slide-layer2-reverse 42s linear infinite;
-}
-
-.animate-blueprint-wave-3 {
-  animation: blueprint-slide-layer3 28s linear infinite;
-}
-
-.animate-blueprint-wave-4 {
-  animation: blueprint-slide-layer4-reverse 23s linear infinite;
-}
-
-/* Stylized Blueprint Seagull Flight Animations */
-@keyframes seagull-horizontal {
-  0% {
-    transform: translate3d(-15vw, 130px, 0) scale(0.44);
-    opacity: 0;
-  }
-  5% {
-    transform: translate3d(-10vw, 130px, 0) scale(0.446);
-    opacity: 0.45;
-  }
-  50% {
-    transform: translate3d(50vw, 130px, 0) scale(0.52);
-    opacity: 0.45;
-  }
-  95% {
-    transform: translate3d(108vw, 130px, 0) scale(0.446);
-    opacity: 0.45;
-  }
-  100% {
-    transform: translate3d(115vw, 130px, 0) scale(0.44);
-    opacity: 0;
-  }
-}
-
-@keyframes seagull-vertical {
-  0%, 100% {
-    transform: translate3d(0, -25px, 0) rotate(-4deg);
-  }
-  50% {
-    transform: translate3d(0, 25px, 0) rotate(5deg);
-  }
-}
-
-.animate-seagull-horizontal {
-  animation: seagull-horizontal 26s linear infinite;
-}
-
-.animate-seagull-vertical {
-  animation: seagull-vertical 5.5s ease-in-out infinite;
-}
 
 /* ==========================================
    Dynamic Theme Variables
@@ -140,6 +64,7 @@
   --theme-bg-base: #fdfdfd;
   --theme-bg-card: #ffffff;
   --theme-bg-pill: #ffffff;
+  --theme-bg-card-hover: #f8fafc;
   
   --theme-text-primary: #0f172a; /* Day primary dark text (slate-900) */
   --theme-text-secondary: #334155; /* Day secondary dark text (slate-700) */
@@ -149,14 +74,26 @@
   --theme-border-card: #e5e7eb;
   --theme-border-pill: #e5e7eb;
   
+  --theme-color-highlight: #2563eb;
   --theme-pill-hover-border: rgba(37, 99, 235, 0.5);
-  --theme-pill-hover-text: #60a5fa;
+  --theme-pill-hover-text: var(--theme-color-highlight);
+
+  /* Centralized Brand Colors */
+  --theme-brand-primary: #2563eb; 
+  --theme-brand-secondary: #7c3aed;
+  --theme-brand-accent: #ea580c;
+
+  /* Centralized Chart Tooltips */
+  --theme-tooltip-bg: rgba(255, 255, 255, 0.9);
+  --theme-tooltip-border: rgba(229, 231, 235, 0.8);
+  --theme-tooltip-text: #0f172a;
 }
 
 .theme-night {
   --theme-bg-base: #030812;
   --theme-bg-card: #060d1a;
   --theme-bg-pill: #111e35;
+  --theme-bg-card-hover: #081225;
 
   /* SOFTENED: Made the primary white text less contrasting/softer (now using a smooth, premium slate-300) */
   --theme-text-primary: #cbd5e1; 
@@ -167,8 +104,19 @@
   --theme-border-card: rgba(255, 255, 255, 0.08);
   --theme-border-pill: rgba(255, 255, 255, 0.15);
   
+  --theme-color-highlight: #60a5fa;
   --theme-pill-hover-border: rgba(37, 99, 235, 0.5);
-  --theme-pill-hover-text: #60a5fa;
+  --theme-pill-hover-text: var(--theme-color-highlight);
+
+  /* Centralized Brand Colors in Night Mode */
+  --theme-brand-primary: #3b82f6; 
+  --theme-brand-secondary: #a78bfa;
+  --theme-brand-accent: #f97316;
+
+  /* Centralized Chart Tooltips in Night Mode */
+  --theme-tooltip-bg: rgba(6, 13, 26, 0.85);
+  --theme-tooltip-border: rgba(255, 255, 255, 0.12);
+  --theme-tooltip-text: #cbd5e1;
 }
 
 /* ==========================================
@@ -206,9 +154,9 @@
 }
 
 .theme-night .bento-card:hover {
-  background-color: #081225 !important;
-  border-color: rgba(37, 99, 235, 0.3) !important;
-  box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.08) !important;
+  background-color: var(--theme-bg-card-hover) !important;
+  border-color: color-mix(in srgb, var(--theme-brand-primary) 30%, transparent) !important;
+  box-shadow: 0 20px 25px -5px color-mix(in srgb, var(--theme-brand-primary) 8%, transparent) !important;
 }
 
 /* Header typography */
@@ -241,13 +189,13 @@
 
 /* Section Header Line in Night Mode */
 .theme-night .section-header-line {
-  background-color: rgba(30, 64, 175, 0.8) !important;
+  background-color: var(--theme-brand-primary) !important;
 }
 
 /* Experience Date Styling - Always consistent bright blue, matching day mode */
 .experience-date,
 .theme-night .experience-date {
-  color: #2563eb !important;
+  color: var(--theme-brand-primary) !important;
 }
 
 
@@ -294,8 +242,8 @@
 /* Contact LinkedIn Button - Night Mode Hover */
 .theme-night .contact-linkedin-btn:hover {
   background-color: rgba(255, 255, 255, 0.1) !important;
-  color: #60a5fa !important;
-  border-color: rgba(96, 165, 250, 0.4) !important;
+  color: var(--theme-color-highlight) !important;
+  border-color: color-mix(in srgb, var(--theme-color-highlight) 40%, transparent) !important;
 }
 
 .theme-night .contact-linkedin-btn:hover svg {
@@ -304,8 +252,8 @@
 
 /* Glass panel background */
 .theme-night .glass {
-  background-color: rgba(6, 13, 26, 0.75) !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
+  background-color: color-mix(in srgb, var(--theme-bg-card) 75%, transparent) !important;
+  border-color: var(--theme-border-card) !important;
 }
 
 
@@ -332,12 +280,12 @@
 
 /* Diagram interactive containers */
 .theme-night .border-slate-900 {
-  border-color: rgba(255, 255, 255, 0.15) !important;
+  border-color: var(--theme-border-pill) !important;
 }
 
 /* Tab Panel and Chart Overrides */
 .theme-night .bg-slate-100 button[class*="bg-white"] {
-  background-color: #060d1a !important;
+  background-color: var(--theme-bg-card) !important;
   color: #f8fafc !important;
 }
 
@@ -347,7 +295,7 @@
 }
 
 .theme-night .border-white {
-  border-color: #030812 !important;
+  border-color: var(--theme-bg-base) !important;
 }
 
 .theme-night .border-t.border-slate-100 {
@@ -358,64 +306,13 @@
   border-color: rgba(255, 255, 255, 0.05) !important;
 }
 
-/* Swimming Lightbulb Fish Animations */
-@keyframes fish-horizontal {
-  0% {
-    transform: translate3d(38vw, 0, 0) scaleX(-1);
-  }
-  49.9% {
-    transform: translate3d(58vw, 0, 0) scaleX(-1);
-  }
-  50% {
-    transform: translate3d(58vw, 0, 0) scaleX(1);
-  }
-  99.9% {
-    transform: translate3d(38vw, 0, 0) scaleX(1);
-  }
-  100% {
-    transform: translate3d(38vw, 0, 0) scaleX(-1);
-  }
-}
 
-@keyframes fish-vertical {
-  0%, 100% {
-    transform: translate3d(0, -8px, 0) rotate(-1.5deg);
-  }
-  50% {
-    transform: translate3d(0, 8px, 0) rotate(1.5deg);
-  }
-}
 
-@keyframes bulb-glow {
-  0%, 100% {
-    opacity: 0.35;
-    filter: drop-shadow(0 0 1px currentColor);
-  }
-  50% {
-    opacity: 1;
-    filter: drop-shadow(0 0 8px currentColor) drop-shadow(0 0 16px currentColor);
-  }
-}
-
-.animate-fish-horizontal {
-  animation: fish-horizontal 30s ease-in-out infinite;
-}
-
-.animate-fish-vertical {
-  animation: fish-vertical 10s ease-in-out infinite;
-}
-
-.animate-bulb-glow {
-  animation: bulb-glow 2.5s ease-in-out infinite;
-}
-
-/* Disable transitions and animations completely when theme toggling is in progress. 
-   Placed at the very bottom with HTML root prefix to guarantee maximum override of any other rule. */
+/* Disable transitions completely when theme toggling is in progress. 
+   We keep ongoing keyframe animations running so elements like the seagull and fish do not reset or flash. */
 html.theme-toggling,
 html.theme-toggling * {
   transition: none !important;
-  animation-duration: 0s !important;
-  animation-delay: 0s !important;
 }
 
 
