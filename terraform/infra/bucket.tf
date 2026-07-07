@@ -37,7 +37,7 @@ resource "aws_s3_bucket_logging" "terraform_state" {
 }
 
 resource "aws_s3_bucket" "access_logs" {
-  # checkov:skip=CKV_AWS_21
+  # checkov:skip=CKV_AWS_21,CKV_AWS_145
   bucket = "${local.env_vars[var.environment].project}-${local.env_vars[var.environment].env_short}-access-logs"
 }
 
@@ -46,8 +46,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "access_logs" {
   bucket = aws_s3_bucket.access_logs.id
   rule {
     apply_server_side_encryption_by_default {
-      kms_master_key_id = aws_kms_key.key.arn
-      sse_algorithm     = "aws:kms"
+      sse_algorithm = "AES256"
     }
     bucket_key_enabled = true
   }
@@ -76,6 +75,15 @@ resource "aws_s3_bucket_policy" "access_logs" {
         "Action" : "s3:PutObject",
         "Resource" : "arn:aws:s3:::${aws_s3_bucket.access_logs.bucket}/AWSLogs/${local.env_vars[var.environment].project_id}/*",
       },
+      {
+        "Sid" : "ALBRegionalLogDeliveryWrite",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : "arn:aws:iam::783225319266:root" # Sydney
+        },
+        "Action" : "s3:PutObject",
+        "Resource" : "arn:aws:s3:::${aws_s3_bucket.access_logs.bucket}/AWSLogs/${local.env_vars[var.environment].project_id}/*",
+      }
     ]
   })
 }
