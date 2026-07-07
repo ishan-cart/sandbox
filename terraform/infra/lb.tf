@@ -4,7 +4,7 @@ resource "aws_lb" "front_end" {
   internal                   = false
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.fe_lb.id]
-  subnets                    = [aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
+  subnets                    = [for subnet in aws_subnet.public_subnets : subnet.id]
   drop_invalid_header_fields = true
   enable_deletion_protection = true
 

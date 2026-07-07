@@ -13,43 +13,59 @@ data "aws_ami" "al2023_arm64" {
 
 # Fix: Create the Profile Wrapper to attach the Role to the Instance
 resource "aws_iam_instance_profile" "nat_profile" {
-  name = "diy-nat-instance-profile"
-  role = aws_iam_role.nat_route_role.name
+  name_prefix = "diy-nat-instance-profile"
+  role        = aws_iam_role.nat_route_role.name
 }
 
-resource "aws_instance" "diy_nat_gw" {
-  # checkov:skip=CKV_AWS_88,CKV_AWS_126 : Pull logs with another tool
-  ami                         = data.aws_ami.al2023_arm64.id
-  instance_type               = "t4g.nano"
-  vpc_security_group_ids      = [aws_security_group.diy_nat_sg.id]
-  subnet_id                   = aws_subnet.public_subnet_1.id # hardcode one of the public subnets
-  iam_instance_profile        = aws_iam_instance_profile.nat_profile.name
-  associate_public_ip_address = true
-  source_dest_check           = false
-  ebs_optimized               = true
+locals {
+  route_tables_string = join(" ", [for rt in aws_route_table.private_tables : rt.id])
+}
+
+resource "aws_launch_template" "diy_nat" {
+  # checkov:skip=CKV_AWS_88
+  name_prefix = "diy-nat-gw-template"
+  description = "Launch template for highly available DIY NAT Gateway"
+
+  image_id      = data.aws_ami.al2023_arm64.id
+  instance_type = "t4g.nano"
+
+  placement {
+    group_name = aws_placement_group.diy_nat.name
+  }
+
+  iam_instance_profile {
+    arn = aws_iam_instance_profile.nat_profile.arn
+  }
+
+  network_interfaces {
+    associate_public_ip_address = true
+    security_groups             = [aws_security_group.diy_nat_sg.id]
+    interface_type              = "interface"
+  }
 
   instance_market_options {
     market_type = "spot"
     spot_options {
-      spot_instance_type             = "persistent"
-      instance_interruption_behavior = "stop"
+      spot_instance_type             = "one-time"
+      instance_interruption_behavior = "terminate"
     }
   }
 
-  root_block_device {
-    encrypted = true
+  block_device_mappings {
+    device_name = "/dev/xvda" # Default root drive for Amazon Linux
+    ebs {
+      encrypted = true
+    }
   }
 
+  # IMDSv2 configuration
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
   }
 
-  tags = {
-    Name = "diy-nat-gw"
-  }
-
-  user_data = <<-EOF
+  # User data needs to be base64 encoded for launch templates
+  user_data = base64encode(<<-EOF
     MIME-Version: 1.0
     Content-Type: multipart/mixed; boundary="==BOUNDARY=="
 
@@ -72,7 +88,7 @@ resource "aws_instance" "diy_nat_gw" {
 
     aws ec2 modify-instance-attribute --region $REGION --instance-id $INSTANCE_ID --no-source-dest-check
 
-    ROUTE_TABLES="${aws_route_table.private_1.id} ${aws_route_table.private_2.id}"
+    ROUTE_TABLES="${local.route_tables_string}"
 
     for RTB_ID in $ROUTE_TABLES; do
       aws ec2 replace-route --region $REGION --route-table-id $RTB_ID --destination-cidr-block 0.0.0.0/0 --instance-id $INSTANCE_ID
@@ -97,6 +113,20 @@ resource "aws_instance" "diy_nat_gw" {
     service iptables save
     --==BOUNDARY==--
   EOF
+  )
+
+  # Tags applied directly to the template resource itself
+  tags = {
+    Name = "diy-nat-gw-template"
+  }
+
+  # Standard template tag specs to tag actual EC2 instances at launch
+  tag_specifications {
+    resource_type = "instance"
+    tags = {
+      Name = "diy-nat-gw"
+    }
+  }
 }
 
 resource "aws_iam_role" "nat_route_role" {
@@ -167,4 +197,43 @@ resource "aws_vpc_security_group_egress_rule" "nat_all_outbound" {
   security_group_id = aws_security_group.diy_nat_sg.id
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "-1"
+}
+
+resource "aws_placement_group" "diy_nat" {
+  name     = "diy-nat-pg"
+  strategy = "spread"
+}
+
+
+resource "aws_autoscaling_group" "diy_nat" {
+  name_prefix         = "diy-nat-asg"
+  max_size            = 1
+  min_size            = 1
+  health_check_type   = "EC2"
+  desired_capacity    = 1
+  force_delete        = false
+  vpc_zone_identifier = [for subnet in aws_subnet.public_subnets : subnet.id]
+
+  launch_template {
+    id      = aws_launch_template.diy_nat.id
+    version = "$Latest"
+  }
+
+  instance_maintenance_policy {
+    min_healthy_percentage = 90
+    max_healthy_percentage = 120
+  }
+
+  initial_lifecycle_hook {
+    name                 = "launch-hook"
+    default_result       = "CONTINUE"
+    heartbeat_timeout    = 300
+    lifecycle_transition = "autoscaling:EC2_INSTANCE_LAUNCHING"
+  }
+
+  tag {
+    key                 = "environment"
+    value               = var.environment
+    propagate_at_launch = true
+  }
 }

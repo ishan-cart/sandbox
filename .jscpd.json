@@ -8,6 +8,7 @@
     "apps/web-app/src/components/SectionHeader.tsx",
     "apps/web-app/src/components/Contact.tsx",
     "gitops/",
-    ".github/workflows/"
+    ".github/workflows/",
+    "terraform/*/globals.tf"
   ]
 }
